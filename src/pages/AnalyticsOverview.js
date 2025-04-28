@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { fetchOverview, fetchTopQueries, fetchTopPages, fetchBacklinks } from "../services/analyticsService";
 
 export default function AnalyticsOverview() {
   const navigate = useNavigate();
