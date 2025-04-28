@@ -10,7 +10,7 @@ export default function SiteSelector() {
     const tokenData = JSON.parse(localStorage.getItem("tokenData"));
     console.log("📤 إرسال tokenData إلى السيرفر:", tokenData);
 
-    fetch("http://localhost:8000/google-auth/sites", {
+    fetch("https://breevo-backend.onrender.com/google-auth/sites", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token_data: tokenData }),
@@ -31,50 +31,35 @@ export default function SiteSelector() {
   }, []);
 
   const handleSelect = (siteUrl, permissionLevel) => {
+    const tokenData = JSON.parse(localStorage.getItem("tokenData"));
+
+    // ✅ حفظ التوكن وربط الحساب
+    localStorage.setItem("token", tokenData.access_token);
+    localStorage.setItem("google_linked", "true");
     localStorage.setItem("selectedSite", siteUrl);
     localStorage.setItem("permissionLevel", permissionLevel);
+
     navigate("/analytics");
   };
 
   return (
     <div className="relative min-h-screen bg-[#0f111a] text-white font-arabic py-16 px-4 overflow-hidden">
-      {/* خلفية SVG خفيفة في الأسفل */}
-      <div className="absolute inset-x-0 bottom-0 h-72 bg-no-repeat bg-bottom opacity-5"
-        style={{ backgroundImage: "url('https://www.svgrepo.com/show/382106/global-earth.svg')", backgroundSize: "300px", backgroundPosition: "center" }}>
-      </div>
+      <div className="text-center max-w-xl mx-auto">
+        <h1 className="text-3xl font-bold mb-4">🔗 اختر الموقع الذي تريد تحليله</h1>
+        {error && <p className="text-red-400 mb-4">{error}</p>}
 
-      {/* محتوى مركزي */}
-      <div className="max-w-7xl mx-auto relative z-10">
-        <h1 className="text-2xl font-bold mb-10 flex items-center justify-center gap-2">
-          <span role="img" aria-label="globe">🌍</span> اختر موقعك من Google Search Console
-        </h1>
-
-        {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sites.map((site, idx) => (
-            <div
-              key={idx}
-              className="bg-gray-800 p-5 rounded-2xl shadow-xl hover:shadow-2xl transition border border-gray-700"
+        <ul className="space-y-4 mt-8">
+          {sites.map((site, index) => (
+            <li
+              key={index}
+              onClick={() => handleSelect(site.siteUrl, site.permissionLevel)}
+              className="bg-white text-black p-4 rounded shadow hover:bg-gray-100 cursor-pointer transition-all"
             >
-              <p className="text-md font-semibold text-white truncate mb-1">
-                {site.siteUrl}
-              </p>
-              <p className="text-xs text-gray-400 mb-4">
-                صلاحية: {site.permissionLevel}
-              </p>
-              <button
-                onClick={() => handleSelect(site.siteUrl, site.permissionLevel)}
-                className="bg-[#83dcc9] text-black font-bold w-full py-2 rounded-xl hover:bg-[#6ac6b3] transition"
-              >
-                اختر هذا الموقع
-              </button>
-            </div>
+              <div className="font-semibold">{site.siteUrl}</div>
+              <div className="text-sm text-gray-600">صلاحية: {site.permissionLevel}</div>
+            </li>
           ))}
-        </div>
-
-        {/* توقيع خفيف في الأسفل */}
-        <p className="text-center text-xs text-gray-600 mt-16">🚀 منصتك الذكية للبيانات تبدأ من هنا</p>
+        </ul>
       </div>
     </div>
   );

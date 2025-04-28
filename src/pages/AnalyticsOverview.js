@@ -15,7 +15,8 @@ export default function AnalyticsOverview() {
 
   useEffect(() => {
     if (!token) {
-      navigate("/");
+      alert("يرجى تسجيل الدخول أولاً.");
+      navigate("/login");
       return;
     }
 
@@ -77,11 +78,32 @@ export default function AnalyticsOverview() {
 
                 <div className="bg-white p-4 rounded shadow col-span-full">
                   <h2 className="font-semibold mb-3">أعلى الكلمات المفتاحية:</h2>
-                  <ul className="list-disc list-inside space-y-1">
-                    {queries.length > 0 ? queries.map((q, i) => (
-                      <li key={i}>{q.query} ({q.clicks} نقرات)</li>
-                    )) : <li>جاري تحميل الكلمات...</li>}
-                  </ul>
+                  {queries.length > 0 ? (
+                    <table className="w-full text-right border">
+                      <thead className="bg-gray-100 text-sm font-bold">
+                        <tr>
+                          <th className="p-2">#</th>
+                          <th className="p-2">الكلمة</th>
+                          <th className="p-2">النقرات</th>
+                          <th className="p-2">الظهور</th>
+                          <th className="p-2">CTR</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {queries.map((q, i) => (
+                          <tr key={i} className="border-t text-sm">
+                            <td className="p-2">{i + 1}</td>
+                            <td className="p-2">{q.keys[0]}</td>
+                            <td className="p-2">{q.clicks}</td>
+                            <td className="p-2">{q.impressions}</td>
+                            <td className="p-2">{(q.ctr * 100).toFixed(2)}%</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <p>جاري تحميل الكلمات...</p>
+                  )}
                 </div>
 
                 <div className="bg-white p-4 rounded shadow col-span-full">
