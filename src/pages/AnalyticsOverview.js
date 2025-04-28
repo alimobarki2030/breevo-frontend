@@ -34,7 +34,7 @@ export default function AnalyticsOverview() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen flex bg-gray-50">
+      <div className="min-h-screen flex bg-[#0f111a] text-white">
         <main className="flex-1 p-6 space-y-6">
           <div className="max-w-6xl mx-auto">
             <div className="flex justify-between items-center mb-6">
