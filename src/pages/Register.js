@@ -129,7 +129,7 @@ export default function RegisterLanding() {
               {/* زرّ تسجيل عبر Google */}
               <button
                 type="button"
-                onClick={() => window.location.assign("http://localhost:8000/google-auth/login")}
+                onClick={() => window.location.assign("https://breevo-backend.onrender.com/google-auth/login")}
                 className="w-full mt-3 py-3 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 transition duration-300"
               >
                 سجّل عبر Google
