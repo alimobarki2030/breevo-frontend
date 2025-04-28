@@ -14,6 +14,17 @@ export default function AnalyticsOverview() {
   const token = localStorage.getItem("token");
 
   useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlToken = urlParams.get("token");
+  
+    if (urlToken) {
+      localStorage.setItem("token", urlToken);
+      window.history.replaceState({}, document.title, "/analytics");
+    }
+  }, []);
+  
+
+  useEffect(() => {
     if (!token) {
       alert("يرجى تسجيل الدخول أولاً.");
       navigate("/login");
