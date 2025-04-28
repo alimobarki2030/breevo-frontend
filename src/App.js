@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import AnalyticsOverview from "./pages/AnalyticsOverview";
 import ProductsList from "./pages/ProductsList";
 import ProductSEO from "./pages/ProductSEO";
-import Register from "./pages/Register";
+import RegisterLanding from "./pages/Register";
 import Login from "./pages/Login";
 import Account from "./pages/Account";
 import Videos from "./pages/Videos";       // ✅ أضف هذا
@@ -23,7 +23,7 @@ function App() {
     <div dir="rtl" className="font-sans">
   <Routes>
   <Route path="/" element={<LandingPage />} />
-  <Route path="/register" element={<Register />} />
+  <Route path="/register" element={<RegisterLanding />} />
   <Route path="/login" element={<Login />} />
   <Route path="/account" element={<Account />} />
   <Route path="/videos" element={<Videos />} />
