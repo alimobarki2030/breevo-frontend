@@ -1,71 +1,58 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Register() {
+export default function ManualLogin() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ full_name: "", email: "", password: "" });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
-      const res = await fetch("https://breevo-backend.onrender.com/auth/register", {
+      const res = await fetch("https://breevo-backend.onrender.com/auth/manual-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
-
       if (!res.ok) {
-        setError(data.detail || "فشل في التسجيل");
+        const errorData = await res.json();
+        setError(errorData.detail || "فشل تسجيل الدخول");
         return;
       }
 
+      const data = await res.json();
       localStorage.setItem("token", data.token);
       navigate("/analytics");
     } catch (err) {
       console.error(err);
-      setError("حدث خطأ أثناء التسجيل.");
+      setError("حدث خطأ أثناء تسجيل الدخول.");
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-full max-w-sm">
-        <h2 className="text-xl font-bold mb-4">تسجيل حساب جديد</h2>
+      <form onSubmit={handleLogin} className="bg-white p-6 rounded shadow-md w-full max-w-sm">
+        <h2 className="text-xl font-bold mb-4">تسجيل الدخول</h2>
 
         <input
-          type="text"
-          name="full_name"
-          placeholder="الاسم الكامل"
-          value={form.full_name}
-          onChange={handleChange}
-          className="w-full mb-3 p-2 border rounded"
-          required
-        />
-        <input
           type="email"
-          name="email"
           placeholder="البريد الإلكتروني"
-          value={form.email}
-          onChange={handleChange}
           className="w-full mb-3 p-2 border rounded"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
         />
+
         <input
           type="password"
-          name="password"
           placeholder="كلمة المرور"
-          value={form.password}
-          onChange={handleChange}
           className="w-full mb-3 p-2 border rounded"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           required
         />
 
@@ -75,7 +62,7 @@ export default function Register() {
           type="submit"
           className="bg-blue-600 text-white w-full py-2 rounded hover:bg-blue-700"
         >
-          إنشاء حساب
+          دخول
         </button>
       </form>
     </div>
