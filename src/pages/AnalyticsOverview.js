@@ -1,127 +1,101 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import { fetchOverview, fetchTopQueries, fetchTopPages, fetchBacklinks } from "../services/analyticsService";
 
 export default function AnalyticsOverview() {
-  const [overviewData, setOverviewData] = useState(null);
-  const [topQueries, setTopQueries] = useState([]);
-  const [topPages, setTopPages] = useState([]);
-  const [backlinks, setBacklinks] = useState([]);
-  const [utmCampaigns, setUtmCampaigns] = useState([]);
+  const navigate = useNavigate();
+  const [overview, setOverview] = useState(null);
+  const [queries, setQueries] = useState([]);
+  const [pages, setPages] = useState([]);
+  const [backlinks, setBacklinks] = useState(null);
+  const [days, setDays] = useState(30);
+  const [isLinkedToGoogle, setIsLinkedToGoogle] = useState(false);
+
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const token = localStorage.getItem("access_token");
+    if (!token) {
+      navigate("/");
+      return;
+    }
 
-    const fetchData = async () => {
-      try {
-        const [overviewRes, queriesRes, pagesRes, backlinksRes, ga4Res] = await Promise.all([
-          fetch("http://localhost:8000/analytics/overview", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}` }
-          }),
-          fetch("http://localhost:8000/analytics/top-queries", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}` }
-          }),
-          fetch("http://localhost:8000/analytics/top-pages", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}` }
-          }),
-          fetch("http://localhost:8000/analytics/backlinks", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}` }
-          }),
-          fetch("http://localhost:8000/analytics/ga4/utm-summary", {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}` }
-          })
-        ]);
+    const linked = localStorage.getItem("google_linked") === "true";
+    setIsLinkedToGoogle(linked);
 
-        const [overviewData, queriesData, pagesData, backlinksData, ga4Data] = await Promise.all([
-          overviewRes.json(),
-          queriesRes.json(),
-          pagesRes.json(),
-          backlinksRes.json(),
-          ga4Res.json()
-        ]);
-
-        setOverviewData(overviewData);
-        setTopQueries(queriesData.top_queries || []);
-        setTopPages(pagesData.top_pages || []);
-        setBacklinks(backlinksData.backlinks || []);
-        setUtmCampaigns(ga4Data.utm_campaigns || []);
-      } catch (error) {
-        console.error("فشل في جلب البيانات:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+    if (linked) {
+      fetchOverview(token, days).then(setOverview).catch(console.error);
+      fetchTopQueries(token, days).then(setQueries).catch(console.error);
+      fetchTopPages(token, days).then(setPages).catch(console.error);
+      fetchBacklinks(token).then(setBacklinks).catch(console.error);
+    }
+  }, [token, days]);
 
   return (
-    <div className="p-6 space-y-6 text-white bg-[#0f111a] min-h-screen">
-      <h1 className="text-2xl font-bold">📊 تحليلات Google لموقعك</h1>
+    <>
+      <Navbar />
+      <div className="bg-gray-100 min-h-screen py-10 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold">📊 تحليلات متجرك</h1>
+            <div className="space-x-2">
+              <button
+                onClick={() => setDays(7)}
+                className={`px-3 py-1 rounded ${days === 7 ? 'bg-black text-white' : 'bg-white border'}`}
+              >7 أيام</button>
+              <button
+                onClick={() => setDays(30)}
+                className={`px-3 py-1 rounded ${days === 30 ? 'bg-black text-white' : 'bg-white border'}`}
+              >30 يوم</button>
+            </div>
+          </div>
 
-      {/* نظرة عامة */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-gray-800 rounded-xl p-6 shadow">
-          <h2 className="text-lg font-semibold mb-2">النقرات</h2>
-          <p className="text-3xl">{overviewData?.clicks ?? "—"}</p>
+          {!isLinkedToGoogle ? (
+            <div className="bg-yellow-100 border border-yellow-300 p-6 rounded-lg shadow mb-10">
+              <p className="mb-3 text-lg">🚫 لم تقم بربط حسابك مع Google بعد.</p>
+              <button
+                onClick={() => window.location.href = "https://breevo-backend.onrender.com/google-auth/login"}
+                className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
+              >
+                ربط Google الآن
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="bg-white p-4 rounded shadow">
+                <h2 className="font-semibold mb-2">النقرات:</h2>
+                <p>{overview?.clicks ?? "جاري التحميل..."}</p>
+              </div>
+              <div className="bg-white p-4 rounded shadow">
+                <h2 className="font-semibold mb-2">الظهور:</h2>
+                <p>{overview?.impressions ?? "جاري التحميل..."}</p>
+              </div>
+              <div className="bg-white p-4 rounded shadow">
+                <h2 className="font-semibold mb-2">عدد الروابط الخلفية (باك لينك):</h2>
+                <p>{backlinks ?? "جاري التحميل..."}</p>
+              </div>
+
+              <div className="bg-white p-4 rounded shadow col-span-full">
+                <h2 className="font-semibold mb-3">أعلى الكلمات المفتاحية:</h2>
+                <ul className="list-disc list-inside space-y-1">
+                  {queries.length > 0 ? queries.map((q, i) => (
+                    <li key={i}>{q.query} ({q.clicks} نقرات)</li>
+                  )) : <li>جاري تحميل الكلمات...</li>}
+                </ul>
+              </div>
+
+              <div className="bg-white p-4 rounded shadow col-span-full">
+                <h2 className="font-semibold mb-3">أهم الصفحات:</h2>
+                <ul className="list-disc list-inside space-y-1">
+                  {pages.length > 0 ? pages.map((p, i) => (
+                    <li key={i}>{p.page} ({p.clicks} نقرات)</li>
+                  )) : <li>جاري تحميل الصفحات...</li>}
+                </ul>
+              </div>
+            </div>
+          )}
         </div>
-        <div className="bg-gray-800 rounded-xl p-6 shadow">
-          <h2 className="text-lg font-semibold mb-2">الظهور</h2>
-          <p className="text-3xl">{overviewData?.impressions ?? "—"}</p>
-        </div>
       </div>
-
-      {/* الكلمات المفتاحية */}
-      <div className="bg-gray-800 rounded-xl p-6 shadow">
-        <h2 className="text-xl font-semibold mb-4">🔥 أفضل الكلمات المفتاحية</h2>
-        <ul className="space-y-2 text-sm text-gray-300">
-          {topQueries.map((q, idx) => (
-            <li key={idx} className="border-b border-gray-700 pb-1">
-              <strong>{q.keys.join(" ")}</strong> – نقرات: {q.clicks} – ظهور: {q.impressions}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* الصفحات الأعلى ظهورًا */}
-      <div className="bg-gray-800 rounded-xl p-6 shadow">
-        <h2 className="text-xl font-semibold mb-4">🌐 الصفحات الأعلى ظهورًا</h2>
-        <ul className="space-y-2 text-sm text-gray-300">
-          {topPages.map((page, idx) => (
-            <li key={idx} className="border-b border-gray-700 pb-1">
-              <span>{page.page}</span> – نقرات: {page.clicks} – ظهور: {page.impressions}
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* الباك لينكات */}
-      <div className="bg-gray-800 rounded-xl p-6 shadow">
-        <h2 className="text-xl font-semibold mb-4">🔗 روابط الباك لينك</h2>
-        <ul className="space-y-1 text-sm text-gray-300">
-          {backlinks.map((link, idx) => (
-            <li key={idx}>{link}</li>
-          ))}
-        </ul>
-      </div>
-
-      {/* حملات UTM من GA4 */}
-      <div className="bg-gray-800 rounded-xl p-6 shadow">
-        <h2 className="text-xl font-semibold mb-4">📈 حملات UTM من Google Analytics</h2>
-        {utmCampaigns.length === 0 ? (
-          <p className="text-gray-400 text-sm">لا توجد بيانات حملات حتى الآن.</p>
-        ) : (
-          <ul className="text-sm text-gray-300 space-y-1">
-            {utmCampaigns.map((item, idx) => (
-              <li key={idx} className="flex justify-between border-b border-gray-700 pb-1">
-                <span>🎯 {item.campaign || "—"} ({item.source})</span>
-                <span className="text-[#83dcc9]">الجلسات: {item.sessions}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </div>
+    </>
   );
 }
