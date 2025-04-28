@@ -83,7 +83,7 @@ export default function Login() {
             {/* زرّ تسجيل الدخول عبر Google */}
             <button
               type="button"
-              onClick={() => window.location.href = "http://localhost:8000/google-auth/login"}
+              onClick={() => window.location.href = "https://breevo-backend.onrender.com/google-auth/login"}
               className="w-full mt-3 py-3 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 transition duration-300"
             >
               تسجيل الدخول عبر Google
