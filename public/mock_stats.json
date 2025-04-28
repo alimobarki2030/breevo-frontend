@@ -1,0 +1,26 @@
+[
+  {
+    "date": "2025-04-09",
+    "impressions": 320,
+    "clicks": 40,
+    "ctr": 5
+  },
+  {
+    "date": "2025-04-10",
+    "impressions": 410,
+    "clicks": 55,
+    "ctr": 6
+  },
+  {
+    "date": "2025-04-11",
+    "impressions": 470,
+    "clicks": 65,
+    "ctr": 7
+  },
+  {
+    "date": "2025-04-12",
+    "impressions": 530,
+    "clicks": 70,
+    "ctr": 8
+  }
+]

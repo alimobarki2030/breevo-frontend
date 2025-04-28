@@ -1,0 +1,49 @@
+/* تنسيقات محرر Tiptap */
+
+.ProseMirror {
+  direction: rtl;
+  text-align: right;
+  outline: none;
+}
+
+.tiptap-editor {
+  background-color: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  min-height: 300px;
+  line-height: 1.8;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: #333;
+}
+
+.tiptap-editor ul {
+  list-style-type: disc;
+  padding-right: 1.5rem;
+  padding-left: 0;
+}
+
+.tiptap-editor h2 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.tiptap-editor h3 {
+  font-size: 1.125rem;
+  font-weight: bold;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.tiptap-editor p {
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+/* زر داخلي عام */
+.btn {
+  @apply text-sm font-bold px-2 py-1 rounded border bg-white hover:bg-gray-100 transition;
+}

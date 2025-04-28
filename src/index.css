@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  font-family: 'Noto Kufi Arabic', sans-serif !important;
+}
+
+body {
+  direction: rtl;
+}
