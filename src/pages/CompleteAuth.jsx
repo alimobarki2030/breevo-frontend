@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function CompleteAuth() {
   const navigate = useNavigate();
+  console.log("✅ صفحة CompleteAuth تعمل");
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
