@@ -1,3 +1,4 @@
+// ✅ CompleteAuth.jsx
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -5,26 +6,27 @@ export default function CompleteAuth() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const raw = params.get("token_data");
-      const decoded = decodeURIComponent(raw);
-      const tokenData = JSON.parse(decoded);
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenData = urlParams.get("token_data");
 
-      localStorage.setItem("tokenData", JSON.stringify(tokenData));
-
-      // ✅ الانتقال إلى صفحة اختيار الموقع أو مباشرة إلى التحليلات
-      navigate("/dashboard");
-    } catch (error) {
-      console.error("❌ فشل في تحليل بيانات OAuth:", error);
+    if (!tokenData) {
+      console.error("❌ لا يوجد token_data في الرابط");
+      return;
     }
-  }, []);
+
+    try {
+      const decoded = JSON.parse(decodeURIComponent(tokenData));
+      localStorage.setItem("user_token", JSON.stringify(decoded));
+      console.log("✅ تم حفظ بيانات المستخدم في localStorage:", decoded);
+      navigate("/site-selector");
+    } catch (error) {
+      console.error("❌ فشل في فك تشفير token_data:", error);
+    }
+  }, [navigate]);
 
   return (
-    <div className="text-white h-screen flex items-center justify-center font-arabic text-lg">
-      ⏳ جاري تجهيز حسابك من Google...
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
+      <p className="text-lg">🔄 جاري معالجة تسجيل الدخول...</p>
     </div>
   );
 }
-
-
