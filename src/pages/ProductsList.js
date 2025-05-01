@@ -1,10 +1,10 @@
-
 import React, { useEffect, useState, Fragment } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import SmartProductsGrid from "../components/SmartProductsGrid";
 import ProductToolbar from "../components/ProductToolbar";
 import { Dialog, Transition } from "@headlessui/react";
+import { BASE_URL } from '../api/analyticsAPI'; // ✅ أضفنا هذا السطر
 
 export default function ProductsList() {
   const [products, setProducts] = useState([]);
@@ -25,7 +25,7 @@ export default function ProductsList() {
   };
 
   useEffect(() => {
-    fetch("http://localhost:8000/products")
+    fetch(`${BASE_URL}/products`)  // ✅ عدّلنا الرابط
       .then((res) => res.json())
       .then((data) => {
         setProducts(data);
