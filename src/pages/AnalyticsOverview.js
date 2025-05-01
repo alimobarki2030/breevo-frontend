@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+export const BASE_URL = "https://breevo-backend.onrender.com";
 
 export default function AnalyticsOverview() {
   const navigate = useNavigate();
