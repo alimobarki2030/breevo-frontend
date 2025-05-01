@@ -26,7 +26,7 @@ export default function RegisterLanding() {
     setLoading(true);
     toast.success("تم إنشاء الحساب بنجاح 🎉");
     setTimeout(() => {
-      navigate("/dashboard");
+      navigate("/analytics");
       setLoading(false);
     }, 1800);
   };
