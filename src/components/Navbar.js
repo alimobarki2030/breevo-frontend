@@ -29,7 +29,7 @@ const clientName = storedName ? `مرحبًا، ${storedName}` : "مرحبًا،
 
         <ul className="hidden md:flex gap-6 text-sm font-medium">
           <li>
-            <Link to="/dashboard" className="hover:text-[#83dcc9] transition">لوحة التحكم</Link>
+          <Link to="/analytics" className="hover:text-[#83dcc9] transition">التحليلات</Link>
           </li>
           <li>
             <Link to="/products" className="hover:text-[#83dcc9] transition">منتجاتي</Link>

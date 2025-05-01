@@ -16,9 +16,10 @@ export default function Account() {
         <img src="/logo2.png" alt="Logo" className="h-12 mb-6" />
 
         <Link
-          to="/dashboard"
-          className="mb-6 text-sm text-[#83dcc9] hover:underline self-start"
-        >
+  to="/analytics"
+  className="mb-6 text-sm text-[#83dcc9] hover:underline self-start"
+>
+
           ← العودة إلى لوحة التحكم
         </Link>
 

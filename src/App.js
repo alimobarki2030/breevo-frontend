@@ -4,7 +4,6 @@ import AnalyticsOverview from "./pages/AnalyticsOverview";
 import ProductsList from "./pages/ProductsList";
 import ProductSEO from "./pages/ProductSEO";
 import RegisterLanding from "./pages/Register";
-import Login from "./pages/Login";
 import Account from "./pages/Account";
 import Videos from "./pages/Videos";       // ✅ أضف هذا
 import Settings from "./pages/Settings";   // ✅ وأضف هذا
@@ -24,7 +23,6 @@ function App() {
   <Routes>
   <Route path="/" element={<LandingPage />} />
   <Route path="/register" element={<RegisterLanding />} />
-  <Route path="/login" element={<Login />} />
   <Route path="/account" element={<Account />} />
   <Route path="/videos" element={<Videos />} />
   <Route path="/settings" element={<Settings />} />

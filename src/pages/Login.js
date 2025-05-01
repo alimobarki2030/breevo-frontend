@@ -19,7 +19,7 @@ export default function Login() {
     setLoading(true);
     toast.success("🎉 تم تسجيل الدخول بنجاح");
     setTimeout(() => {
-      navigate("/dashboard");
+      navigate("/analytics");
       setLoading(false);
     }, 1800);
   };
