@@ -1,4 +1,5 @@
-const BASE_URL = "https://breevo-backend.onrender.com";
+export const BASE_URL = "https://breevo-backend.onrender.com";
+
 
 // 🔍 نظرة عامة: النقرات + الظهور
 export async function fetchOverview(token, days = 30) {
