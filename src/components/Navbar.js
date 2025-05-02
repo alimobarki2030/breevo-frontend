@@ -6,8 +6,8 @@ export default function Navbar() {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const storedName = localStorage.getItem("clientName");
-const clientName = storedName ? `مرحبًا، ${storedName}` : "مرحبًا، ضيف";
-
+  const clientName = storedName ? `مرحبًا، ${storedName}` : "مرحبًا، ضيف";
+  const selectedSite = localStorage.getItem("selected_site");
 
   const handleOutsideClick = (e) => {
     if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -24,12 +24,17 @@ const clientName = storedName ? `مرحبًا، ${storedName}` : "مرحبًا،
     <nav className="bg-gray-950 text-white py-4 px-6 shadow-sm border-b border-gray-800">
       <div className="max-w-screen-xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-3">
-        <img src="/logo2.png" alt="Logo" className="h-9" />
+          <img src="/logo2.png" alt="Logo" className="h-9" />
+          {selectedSite && (
+            <span className="ml-4 text-sm bg-green-600 px-3 py-1 rounded-full">
+              {selectedSite}
+            </span>
+          )}
         </div>
 
         <ul className="hidden md:flex gap-6 text-sm font-medium">
           <li>
-          <Link to="/analytics" className="hover:text-[#83dcc9] transition">التحليلات</Link>
+            <Link to="/analytics" className="hover:text-[#83dcc9] transition">التحليلات</Link>
           </li>
           <li>
             <Link to="/products" className="hover:text-[#83dcc9] transition">منتجاتي</Link>
@@ -51,6 +56,7 @@ const clientName = storedName ? `مرحبًا، ${storedName}` : "مرحبًا،
             <div className="absolute right-0 mt-2 w-48 bg-white text-gray-900 rounded-md shadow-lg py-2 z-50">
               <div className="px-4 py-2 border-b">
                 <p className="text-sm font-semibold">{clientName}</p>
+                {selectedSite && <p className="text-xs text-gray-600">{selectedSite}</p>}
               </div>
               <Link
                 to="/account"

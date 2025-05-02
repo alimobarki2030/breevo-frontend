@@ -1,3 +1,5 @@
+// src/pages/ManualLogin.js
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -25,8 +27,10 @@ export default function ManualLogin() {
       }
 
       const data = await res.json();
-      localStorage.setItem("token", data.token);
-      navigate("/analytics");
+      localStorage.setItem("token", data.token); // ✅ تخزين التوكن
+      localStorage.setItem("clientName", email); // ✅ حفظ اسم العميل
+
+      navigate("/site-selector"); // ✅ توجيه لاختيار الموقع
     } catch (err) {
       console.error(err);
       setError("حدث خطأ أثناء تسجيل الدخول.");
@@ -36,7 +40,7 @@ export default function ManualLogin() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <form onSubmit={handleLogin} className="bg-white p-6 rounded shadow-md w-full max-w-sm">
-        <h2 className="text-xl font-bold mb-4">تسجيل الدخول</h2>
+        <h2 className="text-xl font-bold mb-4">تسجيل الدخول اليدوي</h2>
 
         <input
           type="email"

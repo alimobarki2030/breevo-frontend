@@ -1,7 +1,9 @@
+// src/pages/AnalyticsOverview.js
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-export const BASE_URL = "https://breevo-backend.onrender.com";
+import { fetchWithAuth } from "../api/analyticsAPI";
 
 export default function AnalyticsOverview() {
   const navigate = useNavigate();
@@ -11,19 +13,20 @@ export default function AnalyticsOverview() {
   const [backlinks, setBacklinks] = useState(null);
   const [days, setDays] = useState(30);
   const [isLinkedToGoogle, setIsLinkedToGoogle] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const token = localStorage.getItem("token");
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const urlToken = urlParams.get("token");
-  
+
     if (urlToken) {
       localStorage.setItem("token", urlToken);
       window.history.replaceState({}, document.title, "/analytics");
     }
   }, []);
-  
 
   useEffect(() => {
     if (!token) {
@@ -35,13 +38,33 @@ export default function AnalyticsOverview() {
     const linked = localStorage.getItem("google_linked") === "true";
     setIsLinkedToGoogle(linked);
 
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const overviewData = await fetchWithAuth("/analytics/overview");
+        const queriesData = await fetchWithAuth("/analytics/top-queries");
+        const pagesData = await fetchWithAuth("/analytics/top-pages");
+        const backlinksData = await fetchWithAuth("/analytics/backlinks");
+
+        setOverview(overviewData);
+        setQueries(queriesData);
+        setPages(pagesData);
+        setBacklinks(backlinksData.count || 0);
+      } catch (err) {
+        console.error("Error fetching analytics:", err);
+        setError("حدث خطأ أثناء تحميل البيانات.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (linked) {
-      fetchOverview(token, days).then(setOverview).catch(console.error);
-      fetchTopQueries(token, days).then(setQueries).catch(console.error);
-      fetchTopPages(token, days).then(setPages).catch(console.error);
-      fetchBacklinks(token).then(setBacklinks).catch(console.error);
+      loadData();
     }
-  }, [token, days]);
+  }, [token, days, navigate]);
+
+  if (loading) return <div className="p-6">⏳ جاري تحميل البيانات...</div>;
+  if (error) return <div className="p-6 text-red-500">{error}</div>;
 
   return (
     <>
@@ -77,15 +100,15 @@ export default function AnalyticsOverview() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="bg-white p-4 rounded shadow">
                   <h2 className="font-semibold mb-2">النقرات:</h2>
-                  <p>{overview?.clicks ?? "جاري التحميل..."}</p>
+                  <p>{overview?.clicks ?? "لا توجد بيانات"}</p>
                 </div>
                 <div className="bg-white p-4 rounded shadow">
                   <h2 className="font-semibold mb-2">الظهور:</h2>
-                  <p>{overview?.impressions ?? "جاري التحميل..."}</p>
+                  <p>{overview?.impressions ?? "لا توجد بيانات"}</p>
                 </div>
                 <div className="bg-white p-4 rounded shadow">
                   <h2 className="font-semibold mb-2">عدد الروابط الخلفية (باك لينك):</h2>
-                  <p>{backlinks ?? "جاري التحميل..."}</p>
+                  <p>{backlinks ?? "لا توجد بيانات"}</p>
                 </div>
 
                 <div className="bg-white p-4 rounded shadow col-span-full">

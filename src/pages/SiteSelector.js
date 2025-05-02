@@ -2,55 +2,82 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function SiteSelector() {
-  const navigate = useNavigate();
   const [sites, setSites] = useState([]);
-  const [selectedSite, setSelectedSite] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const tokenData = JSON.parse(localStorage.getItem("user_token"));
-    if (!tokenData) {
-      console.error("❌ لم يتم العثور على بيانات المستخدم");
-      navigate("/complete-auth");
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/manual-login");
       return;
     }
 
-    console.log("✅ بيانات التوكن:", tokenData);
+    async function fetchSites() {
+      try {
+        const res = await fetch("https://breevo-backend.onrender.com/sites", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
 
-    // هنا تستدعي API لجلب المواقع بناءً على التوكن
-    // مؤقتًا حطينا بيانات وهمية
-    setSites([
-      { id: 1, url: "https://example1.com" },
-      { id: 2, url: "https://example2.com" }
-    ]);
+        if (!res.ok) {
+          throw new Error("فشل في جلب المواقع");
+        }
+
+        const data = await res.json();
+        setSites(data);
+      } catch (err) {
+        console.error(err);
+        setError("حدث خطأ أثناء تحميل المواقع.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchSites();
   }, [navigate]);
 
-  const handleSelect = () => {
-    if (!selectedSite) return;
-    localStorage.setItem("selected_site", selectedSite);
+  const handleSelectSite = (site) => {
+    localStorage.setItem("selected_site", site.name);
     navigate("/analytics");
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <p className="text-lg">🔄 جاري تحميل المواقع...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-red-100">
+        <p className="text-lg text-red-600">{error}</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
-      <h1 className="text-2xl mb-4">اختر الموقع الذي ترغب بتحليله:</h1>
-      <select
-        className="w-full p-3 text-black rounded-lg mb-4"
-        value={selectedSite}
-        onChange={(e) => setSelectedSite(e.target.value)}
-      >
-        <option value="">-- اختر موقعك --</option>
-        {sites.map((site) => (
-          <option key={site.id} value={site.url}>
-            {site.url}
-          </option>
-        ))}
-      </select>
-      <button
-        onClick={handleSelect}
-        className="bg-green-600 hover:bg-green-700 p-3 rounded-lg w-full"
-      >
-        التالي
-      </button>
+    <div className="min-h-screen bg-gray-100 p-6">
+      <div className="max-w-xl mx-auto bg-white rounded shadow p-6">
+        <h2 className="text-xl font-bold mb-4">اختر الموقع للعمل عليه</h2>
+        <ul className="space-y-2">
+          {sites.map((site) => (
+            <li key={site.id}>
+              <button
+                onClick={() => handleSelectSite(site)}
+                className="w-full text-right px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                {site.name}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
