@@ -1,39 +1,40 @@
-// src/pages/CompleteAuth.jsx
-
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import jwt_decode from "jwt-decode";
 
-export default function CompleteAuth() {
+const CompleteAuth = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const tokenData = urlParams.get("token");
+    const searchParams = new URLSearchParams(window.location.search);
+    const tokenData = searchParams.get("token");
 
-    if (!tokenData) {
-      console.error("❌ لا يوجد token_data في الرابط");
-      navigate("/error-auth");
-      return;
-    }
+    if (tokenData) {
+      try {
+        // تحقق أن التوكن يحمل البنية الصحيحة (3 أجزاء مفصولة بنقاط)
+        if (tokenData.split(".").length !== 3) {
+          throw new Error("الـ token غير صالح");
+        }
 
-    try {
-      const decoded = JSON.parse(decodeURIComponent(tokenData));
-      localStorage.setItem("token", decoded.access_token);
-      localStorage.setItem("clientName", decoded.email);
-      localStorage.setItem("google_linked", "true");
+        const decoded = jwt_decode(tokenData);
+        localStorage.setItem("token", tokenData);
+        localStorage.setItem("clientName", decoded.email);
+        localStorage.setItem("google_linked", "true");
 
-      console.log("✅ تم تسجيل الدخول عبر Google:", decoded);
-      navigate("/site-selector");
+        console.log("✅ تم تسجيل الدخول عبر Google:", decoded);
+        navigate("/site-selector");
 
-    } catch (error) {
-      console.error("❌ خطأ في فك تشفير التوكن:", error);
+      } catch (error) {
+        console.error("❌ خطأ في فك تشفير التوكن:", error);
+        navigate("/error-auth");
+      }
+    } else {
+      console.error("❌ لم يتم العثور على توكن في رابط العودة");
       navigate("/error-auth");
     }
   }, [navigate]);
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
-      <p className="text-lg">🔄 جاري معالجة تسجيل الدخول...</p>
-    </div>
-  );
-}
+  return <div>جاري إكمال تسجيل الدخول...</div>;
+};
+
+export default CompleteAuth;
