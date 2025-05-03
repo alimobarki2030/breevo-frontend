@@ -20,6 +20,7 @@ const CompleteAuth = () => {
         localStorage.setItem("token", tokenData);
         localStorage.setItem("clientName", decoded.email);
         localStorage.setItem("google_linked", "true");
+        
 
         console.log("✅ تم تسجيل الدخول عبر Google:", decoded);
         navigate("/site-selector");
