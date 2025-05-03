@@ -17,21 +17,17 @@ export default function AnalyticsOverview() {
   const [error, setError] = useState(null);
 
   const token = localStorage.getItem("token");
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlToken = urlParams.get("token");
-
-    if (urlToken) {
-      localStorage.setItem("token", urlToken);
-      window.history.replaceState({}, document.title, "/analytics");
-    }
-  }, []);
+  const selectedSite = localStorage.getItem("selected_site");
 
   useEffect(() => {
     if (!token) {
       alert("يرجى تسجيل الدخول أولاً.");
       navigate("/login");
+      return;
+    }
+    if (!selectedSite) {
+      alert("يرجى اختيار الموقع أولاً.");
+      navigate("/site-selector");
       return;
     }
 
@@ -41,10 +37,10 @@ export default function AnalyticsOverview() {
     const loadData = async () => {
       try {
         setLoading(true);
-        const overviewData = await fetchWithAuth("/analytics/overview");
-        const queriesData = await fetchWithAuth("/analytics/top-queries");
-        const pagesData = await fetchWithAuth("/analytics/top-pages");
-        const backlinksData = await fetchWithAuth("/analytics/backlinks");
+        const overviewData = await fetchWithAuth(`/analytics/overview?site=${encodeURIComponent(selectedSite)}`);
+        const queriesData = await fetchWithAuth(`/analytics/top-queries?site=${encodeURIComponent(selectedSite)}`);
+        const pagesData = await fetchWithAuth(`/analytics/top-pages?site=${encodeURIComponent(selectedSite)}`);
+        const backlinksData = await fetchWithAuth(`/analytics/backlinks?site=${encodeURIComponent(selectedSite)}`);
 
         setOverview(overviewData);
         setQueries(queriesData);
@@ -61,7 +57,7 @@ export default function AnalyticsOverview() {
     if (linked) {
       loadData();
     }
-  }, [token, days, navigate]);
+  }, [token, days, navigate, selectedSite]);
 
   if (loading) return <div className="p-6">⏳ جاري تحميل البيانات...</div>;
   if (error) return <div className="p-6 text-red-500">{error}</div>;
@@ -73,28 +69,17 @@ export default function AnalyticsOverview() {
         <main className="flex-1 p-6 space-y-6">
           <div className="max-w-6xl mx-auto">
             <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold">📊 تحليلات متجرك</h1>
+              <h1 className="text-2xl font-bold">📊 تحليلات {selectedSite}</h1>
               <div className="space-x-2">
-                <button
-                  onClick={() => setDays(7)}
-                  className={`px-3 py-1 rounded ${days === 7 ? 'bg-black text-white' : 'bg-white border'}`}
-                >7 أيام</button>
-                <button
-                  onClick={() => setDays(30)}
-                  className={`px-3 py-1 rounded ${days === 30 ? 'bg-black text-white' : 'bg-white border'}`}
-                >30 يوم</button>
+                <button onClick={() => setDays(7)} className={`px-3 py-1 rounded ${days === 7 ? 'bg-black text-white' : 'bg-white border'}`}>7 أيام</button>
+                <button onClick={() => setDays(30)} className={`px-3 py-1 rounded ${days === 30 ? 'bg-black text-white' : 'bg-white border'}`}>30 يوم</button>
               </div>
             </div>
 
             {!isLinkedToGoogle ? (
               <div className="bg-yellow-100 border border-yellow-300 p-6 rounded-lg shadow mb-10">
                 <p className="mb-3 text-lg">🚫 لم تقم بربط حسابك مع Google بعد.</p>
-                <button
-                  onClick={() => window.location.href = "https://breevo-backend.onrender.com/google-auth/login"}
-                  className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
-                >
-                  ربط Google الآن
-                </button>
+                <button onClick={() => window.location.href = "https://breevo-backend.onrender.com/google-auth/login"} className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700">ربط Google الآن</button>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -110,7 +95,6 @@ export default function AnalyticsOverview() {
                   <h2 className="font-semibold mb-2">عدد الروابط الخلفية (باك لينك):</h2>
                   <p>{backlinks ?? "لا توجد بيانات"}</p>
                 </div>
-
                 <div className="bg-white p-4 rounded shadow col-span-full">
                   <h2 className="font-semibold mb-3">أعلى الكلمات المفتاحية:</h2>
                   {queries.length > 0 ? (
@@ -140,7 +124,6 @@ export default function AnalyticsOverview() {
                     <p>جاري تحميل الكلمات...</p>
                   )}
                 </div>
-
                 <div className="bg-white p-4 rounded shadow col-span-full">
                   <h2 className="font-semibold mb-3">أهم الصفحات:</h2>
                   <ul className="list-disc list-inside space-y-1">

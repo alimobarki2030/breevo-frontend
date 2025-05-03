@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import jwt_decode from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 const CompleteAuth = () => {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const CompleteAuth = () => {
           throw new Error("الـ token غير صالح");
         }
 
-        const decoded = jwt_decode(tokenData);
+        const decoded = jwtDecode(tokenData);
         localStorage.setItem("token", tokenData);
         localStorage.setItem("clientName", decoded.email);
         localStorage.setItem("google_linked", "true");
