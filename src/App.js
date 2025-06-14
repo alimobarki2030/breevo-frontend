@@ -11,7 +11,6 @@ import Videos from "./pages/Videos";
 import Settings from "./pages/Settings";
 import LandingPage from "./pages/LandingPage";
 import SiteSelector from "./pages/SiteSelector";
-import CompleteAuth from "./pages/CompleteAuth";
 import AnalyticsUTM from "./pages/AnalyticsUTM";
 import ManualLogin from "./pages/ManualLogin";
 import { AuthProvider } from "./AuthContext";
@@ -35,12 +34,7 @@ function App() {
           <Route path="/analytics" element={<AnalyticsOverview />} />
           <Route path="/analytics-utm" element={<AnalyticsUTM />} />
           <Route path="/site-selector" element={<SiteSelector />} />
-          <Route path="/complete-auth" element={<CompleteAuth />} />
           <Route path="/manual-login" element={<ManualLogin />} />
-          <Route
-            path="/error-auth"
-            element={<div>فشل تسجيل الدخول بحساب Google. يرجى المحاولة لاحقًا.</div>}
-          />
         </Routes>
       </div>
     </AuthProvider>
