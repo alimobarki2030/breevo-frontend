@@ -1,3 +1,4 @@
+
 // src/pages/AnalyticsOverview.js
 
 import React, { useEffect, useState } from "react";
@@ -12,7 +13,6 @@ export default function AnalyticsOverview() {
   const [pages, setPages] = useState([]);
   const [backlinks, setBacklinks] = useState(null);
   const [days, setDays] = useState(30);
-  const [isLinkedToGoogle, setIsLinkedToGoogle] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -30,9 +30,6 @@ export default function AnalyticsOverview() {
       navigate("/site-selector");
       return;
     }
-
-    const linked = localStorage.getItem("google_linked") === "true";
-    setIsLinkedToGoogle(linked);
 
     const loadData = async () => {
       try {
@@ -54,9 +51,7 @@ export default function AnalyticsOverview() {
       }
     };
 
-    if (linked) {
-      loadData();
-    }
+    loadData();
   }, [token, days, navigate, selectedSite]);
 
   if (loading) return <div className="p-6">⏳ جاري تحميل البيانات...</div>;
@@ -76,64 +71,57 @@ export default function AnalyticsOverview() {
               </div>
             </div>
 
-            {!isLinkedToGoogle ? (
-              <div className="bg-yellow-100 border border-yellow-300 p-6 rounded-lg shadow mb-10">
-                <p className="mb-3 text-lg">🚫 لم تقم بربط حسابك مع Google بعد.</p>
-                <button onClick={() => window.location.href = "https://breevo-backend.onrender.com/google-auth/login"} className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700">ربط Google الآن</button>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="bg-white p-4 rounded shadow">
+                <h2 className="font-semibold mb-2">النقرات:</h2>
+                <p>{overview?.clicks ?? "لا توجد بيانات"}</p>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="bg-white p-4 rounded shadow">
-                  <h2 className="font-semibold mb-2">النقرات:</h2>
-                  <p>{overview?.clicks ?? "لا توجد بيانات"}</p>
-                </div>
-                <div className="bg-white p-4 rounded shadow">
-                  <h2 className="font-semibold mb-2">الظهور:</h2>
-                  <p>{overview?.impressions ?? "لا توجد بيانات"}</p>
-                </div>
-                <div className="bg-white p-4 rounded shadow">
-                  <h2 className="font-semibold mb-2">عدد الروابط الخلفية (باك لينك):</h2>
-                  <p>{backlinks ?? "لا توجد بيانات"}</p>
-                </div>
-                <div className="bg-white p-4 rounded shadow col-span-full">
-                  <h2 className="font-semibold mb-3">أعلى الكلمات المفتاحية:</h2>
-                  {queries.length > 0 ? (
-                    <table className="w-full text-right border">
-                      <thead className="bg-gray-100 text-sm font-bold">
-                        <tr>
-                          <th className="p-2">#</th>
-                          <th className="p-2">الكلمة</th>
-                          <th className="p-2">النقرات</th>
-                          <th className="p-2">الظهور</th>
-                          <th className="p-2">CTR</th>
+              <div className="bg-white p-4 rounded shadow">
+                <h2 className="font-semibold mb-2">الظهور:</h2>
+                <p>{overview?.impressions ?? "لا توجد بيانات"}</p>
+              </div>
+              <div className="bg-white p-4 rounded shadow">
+                <h2 className="font-semibold mb-2">عدد الروابط الخلفية (باك لينك):</h2>
+                <p>{backlinks ?? "لا توجد بيانات"}</p>
+              </div>
+              <div className="bg-white p-4 rounded shadow col-span-full">
+                <h2 className="font-semibold mb-3">أعلى الكلمات المفتاحية:</h2>
+                {queries.length > 0 ? (
+                  <table className="w-full text-right border">
+                    <thead className="bg-gray-100 text-sm font-bold">
+                      <tr>
+                        <th className="p-2">#</th>
+                        <th className="p-2">الكلمة</th>
+                        <th className="p-2">النقرات</th>
+                        <th className="p-2">الظهور</th>
+                        <th className="p-2">CTR</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {queries.map((q, i) => (
+                        <tr key={i} className="border-t text-sm">
+                          <td className="p-2">{i + 1}</td>
+                          <td className="p-2">{q.keys[0]}</td>
+                          <td className="p-2">{q.clicks}</td>
+                          <td className="p-2">{q.impressions}</td>
+                          <td className="p-2">{(q.ctr * 100).toFixed(2)}%</td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {queries.map((q, i) => (
-                          <tr key={i} className="border-t text-sm">
-                            <td className="p-2">{i + 1}</td>
-                            <td className="p-2">{q.keys[0]}</td>
-                            <td className="p-2">{q.clicks}</td>
-                            <td className="p-2">{q.impressions}</td>
-                            <td className="p-2">{(q.ctr * 100).toFixed(2)}%</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  ) : (
-                    <p>جاري تحميل الكلمات...</p>
-                  )}
-                </div>
-                <div className="bg-white p-4 rounded shadow col-span-full">
-                  <h2 className="font-semibold mb-3">أهم الصفحات:</h2>
-                  <ul className="list-disc list-inside space-y-1">
-                    {pages.length > 0 ? pages.map((p, i) => (
-                      <li key={i}>{p.page} ({p.clicks} نقرات)</li>
-                    )) : <li>جاري تحميل الصفحات...</li>}
-                  </ul>
-                </div>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <p>جاري تحميل الكلمات...</p>
+                )}
               </div>
-            )}
+              <div className="bg-white p-4 rounded shadow col-span-full">
+                <h2 className="font-semibold mb-3">أهم الصفحات:</h2>
+                <ul className="list-disc list-inside space-y-1">
+                  {pages.length > 0 ? pages.map((p, i) => (
+                    <li key={i}>{p.page} ({p.clicks} نقرات)</li>
+                  )) : <li>جاري تحميل الصفحات...</li>}
+                </ul>
+              </div>
+            </div>
           </div>
         </main>
       </div>
