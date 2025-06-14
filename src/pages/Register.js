@@ -2,96 +2,83 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-export default function RegisterLanding() {
+export default function Register() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({
-    fullName: "",
+  const [formData, setFormData] = useState({
+    name: "",
     email: "",
     password: "",
   });
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (loading) return;
-    setLoading(true);
 
     try {
-      const res = await fetch("https://breevo-backend.onrender.com/auth/register", {
+      const res = await fetch("https://breevo-backend.onrender.com/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          full_name: form.fullName,
-          email: form.email,
-          password: form.password,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
 
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.detail || "حدث خطأ أثناء التسجيل");
-
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("clientName", form.fullName);
-      navigate("/analytics");
-      toast.success("🎉 تم إنشاء الحساب بنجاح");
-
-    } catch (err) {
-      toast.error(err.message);
-    } finally {
-      setLoading(false);
+      if (res.ok) {
+        localStorage.setItem("token", data.access_token);
+        toast.success("تم التسجيل بنجاح!");
+        navigate("/site-selector");
+      } else {
+        toast.error(data.detail || "فشل في التسجيل");
+      }
+    } catch (error) {
+      toast.error("حدث خطأ أثناء الاتصال بالخادم");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded shadow-md w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-[#0f111a] text-white">
+      <div className="bg-[#1c1e29] p-8 rounded-lg shadow-lg w-full max-w-md">
         <h1 className="text-2xl font-bold mb-6 text-center">إنشاء حساب جديد</h1>
-
-        <label className="block mb-2">الاسم الكامل</label>
-        <input
-          type="text"
-          name="fullName"
-          value={form.fullName}
-          onChange={handleChange}
-          required
-          className="w-full mb-4 p-2 border rounded"
-        />
-
-        <label className="block mb-2">البريد الإلكتروني</label>
-        <input
-          type="email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          required
-          className="w-full mb-4 p-2 border rounded"
-        />
-
-        <label className="block mb-2">كلمة المرور</label>
-        <input
-          type="password"
-          name="password"
-          value={form.password}
-          onChange={handleChange}
-          required
-          className="w-full mb-6 p-2 border rounded"
-        />
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
-        >
-          {loading ? "⏳ جاري إنشاء الحساب..." : "إنشاء حساب"}
-        </button>
-      </form>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            name="name"
+            placeholder="الاسم الكامل"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            className="w-full p-3 rounded bg-[#2a2d3c] border border-gray-700 text-white"
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="البريد الإلكتروني"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            className="w-full p-3 rounded bg-[#2a2d3c] border border-gray-700 text-white"
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="كلمة المرور"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            className="w-full p-3 rounded bg-[#2a2d3c] border border-gray-700 text-white"
+          />
+          <button
+            type="submit"
+            className="w-full bg-[#4f46e5] hover:bg-[#4338ca] text-white font-semibold py-3 rounded transition"
+          >
+            تسجيل
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
