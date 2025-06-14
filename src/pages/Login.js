@@ -26,12 +26,9 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col justify-between font-arabic">
-      {/* المحتوى */}
       <div className="flex flex-col items-center justify-center px-4 py-12 flex-grow">
-        {/* ✅ الشعار أعلى الصفحة */}
         <img src="/logo2.png" alt="Logo" className="h-14 object-contain mb-8" />
 
-        {/* ✅ الكارد الرئيسي */}
         <div className="max-w-md w-full bg-white text-gray-800 rounded-3xl p-10 md:p-12 border border-gray-100 shadow-[0_20px_60px_rgba(131,220,201,0.25)]">
           <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">تسجيل الدخول</h2>
 
@@ -79,20 +76,8 @@ export default function Login() {
             >
               {loading ? "🎉 جاري التحويل..." : "تسجيل الدخول"}
             </button>
-
-            {/* زرّ تسجيل الدخول عبر Google */}
-            <button
-              type="button"
-              onClick={() => window.location.href = "https://breevo-backend.onrender.com/google-auth/login"}
-              className="w-full mt-3 py-3 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 transition duration-300"
-            >
-              تسجيل الدخول عبر Google
-            </button>
           </form>
 
-          
-
-          {/* رابط التسجيل */}
           <div className="text-center mt-6 text-sm text-gray-600">
             لا تملك حساب؟{" "}
             <Link to="/register" className="text-blue-600 hover:underline font-medium">
@@ -102,7 +87,6 @@ export default function Login() {
         </div>
       </div>
 
-      {/* ✅ الفوتر */}
       <Footer />
     </div>
   );
