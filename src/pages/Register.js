@@ -41,10 +41,7 @@ export default function RegisterLanding() {
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.detail || "فشل التسجيل");
-      }
+      if (!res.ok) throw new Error(data.detail || "فشل التسجيل");
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("clientName", form.fullName);
@@ -79,19 +76,19 @@ export default function RegisterLanding() {
           <div className="bg-white text-gray-800 rounded-3xl p-10 md:p-12 w-full border border-gray-100 shadow-[0_20px_60px_rgba(131,220,201,0.25)]">
             <h2 className="text-xl font-bold mb-6 text-center text-green-700">سجّل الآن وابدأ مجاناً</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <input name="fullName" type="text" required placeholder="الاسم الكامل" onChange={handleChange} className="input" />
-              <input name="email" type="email" required placeholder="البريد الإلكتروني" onChange={handleChange} className="input" />
-              <input name="password" type="password" required placeholder="كلمة المرور" onChange={handleChange} className="input" />
+              <input name="fullName" type="text" required placeholder="الاسم الكامل" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
+              <input name="email" type="email" required placeholder="البريد الإلكتروني" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
+              <input name="password" type="password" required placeholder="كلمة المرور" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
               <div className="relative">
                 <div className="absolute top-1/2 right-4 transform -translate-y-1/2 text-sm text-gray-500 flex items-center gap-1">
                   <span>🇸🇦</span>
                   <span>+966</span>
                 </div>
-                <input name="phone" type="tel" required placeholder="512345678" onChange={handleChange} className="input pr-24" />
+                <input name="phone" type="tel" required placeholder="512345678" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 pr-24 pl-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
               </div>
-              <input name="storeUrl" type="url" required placeholder="رابط متجرك https://" onChange={handleChange} className="input" />
-              <input name="heardFrom" type="text" placeholder="كيف عرفت عنّا؟ (تويتر، قوقل، صديق...)" onChange={handleChange} className="input" />
-              <select name="plan" value={form.plan} onChange={handleChange} className="input">
+              <input name="storeUrl" type="url" required placeholder="رابط متجرك https://" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
+              <input name="heardFrom" type="text" placeholder="كيف عرفت عنّا؟ (تويتر، قوقل، صديق...)" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
+              <select name="plan" value={form.plan} onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600">
                 <option value="free">الخطة المجانية</option>
                 <option value="pro">الخطة المدفوعة - Pro</option>
                 <option value="enterprise">الخطة المتقدمة - Enterprise</option>
@@ -112,5 +109,3 @@ export default function RegisterLanding() {
     </div>
   );
 }
-
-// ملاحظة: كلاس input اختصار للتنظيف. ضيف هذا بالـ tailwind configs أو بدله لو تحب بتكرار الـ classNames
