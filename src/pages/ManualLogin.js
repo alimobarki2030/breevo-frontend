@@ -29,7 +29,7 @@ export default function ManualLogin() {
       localStorage.setItem("clientName", email); // ✅ حفظ اسم العميل
       localStorage.setItem("selected_site", "example.com"); // ✅ موقع افتراضي للتجاوز
 
-      navigate("/analytics"); // ✅ التوجيه مباشرة إلى التحليلات
+      navigate("/products"); // ✅ التوجيه مباشرة إلى التحليلات
     } catch (err) {
       console.error(err);
       setError("حدث خطأ أثناء تسجيل الدخول.");

@@ -48,7 +48,7 @@ export default function RegisterLanding() {
       localStorage.setItem("selected_site", form.storeUrl); // ✅ استخدام رابط المتجر كموقع افتراضي
 
       toast.success("تم إنشاء الحساب بنجاح 🎉");
-      navigate("/analytics");
+      navigate("/products");
     } catch (err) {
       toast.error(err.message || "حدث خطأ أثناء التسجيل");
     } finally {

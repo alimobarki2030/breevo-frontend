@@ -10,8 +10,6 @@ import Account from "./pages/Account";
 import Videos from "./pages/Videos";
 import Settings from "./pages/Settings";
 import LandingPage from "./pages/LandingPage";
-import SiteSelector from "./pages/SiteSelector";
-import AnalyticsUTM from "./pages/AnalyticsUTM";
 import ManualLogin from "./pages/ManualLogin";
 import { AuthProvider } from "./AuthContext";
 
@@ -32,8 +30,6 @@ function App() {
           <Route path="/products" element={<ProductsList />} />
           <Route path="/product-seo" element={<ProductSEO />} />
           <Route path="/analytics" element={<AnalyticsOverview />} />
-          <Route path="/analytics-utm" element={<AnalyticsUTM />} />
-          <Route path="/site-selector" element={<SiteSelector />} />
           <Route path="/manual-login" element={<ManualLogin />} />
         </Routes>
       </div>
