@@ -1,6 +1,3 @@
-
-// src/pages/AnalyticsOverview.js
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
@@ -18,17 +15,18 @@ export default function AnalyticsOverview() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const selectedSite = localStorage.getItem("selected_site");
+    let selectedSite = localStorage.getItem("selected_site");
 
     if (!token) {
       alert("يرجى تسجيل الدخول أولاً.");
       navigate("/login");
       return;
     }
+
+    // 👇 تجاوز الحاجة لاختيار الموقع يدويًا
     if (!selectedSite) {
-      alert("يرجى اختيار الموقع أولاً.");
-      navigate("/site-selector");
-      return;
+      selectedSite = "example.com";
+      localStorage.setItem("selected_site", selectedSite);
     }
 
     const loadData = async () => {

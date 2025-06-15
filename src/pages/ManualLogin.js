@@ -1,5 +1,3 @@
-// src/pages/ManualLogin.js
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -29,8 +27,9 @@ export default function ManualLogin() {
       const data = await res.json();
       localStorage.setItem("token", data.token); // ✅ تخزين التوكن
       localStorage.setItem("clientName", email); // ✅ حفظ اسم العميل
+      localStorage.setItem("selected_site", "example.com"); // ✅ موقع افتراضي للتجاوز
 
-      navigate("/site-selector"); // ✅ توجيه لاختيار الموقع
+      navigate("/analytics"); // ✅ التوجيه مباشرة إلى التحليلات
     } catch (err) {
       console.error(err);
       setError("حدث خطأ أثناء تسجيل الدخول.");

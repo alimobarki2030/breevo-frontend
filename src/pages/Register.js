@@ -45,6 +45,8 @@ export default function RegisterLanding() {
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("clientName", form.fullName);
+      localStorage.setItem("selected_site", form.storeUrl); // ✅ استخدام رابط المتجر كموقع افتراضي
+
       toast.success("تم إنشاء الحساب بنجاح 🎉");
       navigate("/analytics");
     } catch (err) {
