@@ -26,18 +26,18 @@ export default function RegisterLanding() {
 
     setLoading(true);
     try {
+      const formData = new FormData();
+      formData.append("full_name", form.fullName);
+      formData.append("email", form.email);
+      formData.append("password", form.password);
+      formData.append("phone", form.phone);
+      formData.append("store_url", form.storeUrl);
+      formData.append("heard_from", form.heardFrom || "");
+      formData.append("plan", form.plan);
+
       const res = await fetch("https://breevo-backend.onrender.com/auth/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          full_name: form.fullName,
-          email: form.email,
-          password: form.password,
-          phone: form.phone,
-          store_url: form.storeUrl,
-          heard_from: form.heardFrom,
-          plan: form.plan,
-        }),
+        body: formData,
       });
 
       const data = await res.json();
