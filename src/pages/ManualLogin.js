@@ -1,18 +1,17 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 export default function ManualLogin() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
 
     try {
-      const res = await fetch("https://breevo-backend.onrender.com/auth/manual-login", {
+      const res = await fetch("http://localhost:10000/auth/manual-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -20,19 +19,19 @@ export default function ManualLogin() {
 
       if (!res.ok) {
         const errorData = await res.json();
-        setError(errorData.detail || "فشل تسجيل الدخول");
+        toast.error(errorData.detail || "فشل تسجيل الدخول");
         return;
       }
 
       const data = await res.json();
-      localStorage.setItem("token", data.token); // ✅ تخزين التوكن
-      localStorage.setItem("clientName", email); // ✅ حفظ اسم العميل
-      localStorage.setItem("selected_site", "example.com"); // ✅ موقع افتراضي للتجاوز
+      localStorage.setItem("token", data.access_token); // ✅ التصحيح هنا
+      localStorage.setItem("clientName", email);
+      localStorage.setItem("selected_site", "example.com");
 
-      navigate("/products"); // ✅ التوجيه مباشرة إلى التحليلات
+      navigate("/products");
     } catch (err) {
       console.error(err);
-      setError("حدث خطأ أثناء تسجيل الدخول.");
+      toast.error("حدث خطأ أثناء تسجيل الدخول.");
     }
   };
 
@@ -58,8 +57,6 @@ export default function ManualLogin() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-
-        {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
 
         <button
           type="submit"

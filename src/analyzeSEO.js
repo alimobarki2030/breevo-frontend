@@ -1,3 +1,4 @@
+
 export default function analyzeSEO(product) {
   const {
     name = "",
@@ -34,7 +35,7 @@ export default function analyzeSEO(product) {
 
   checks.push({
     text: "الوصف يحتوي على أكثر من 100 كلمة.",
-    status: isValidDescription && description.split(" ").length > 100 ? "pass" : "fail",
+status: isValidDescription && description.split(" ").length > 100 ? "pass" : "fail",
   });
 
   checks.push({
@@ -70,24 +71,6 @@ export default function analyzeSEO(product) {
   checks.push({
     text: "الصورة تحتوي على ALT فيه الكلمة المفتاحية.",
     status: isValidKeyword && isValidAlt && imageAlt.toLowerCase().includes(keywordLower) ? "pass" : "fail",
-  });
-
-  // مؤشرات إضافية تعزز تجربة العميل
-  const ctaKeywords = ["اطلب", "اشترِ", "تسوق", "احصل", "جرّب", "لا تفوت", "سارع", "اختر", "استمتع"];
-  const hasCTA = ctaKeywords.some((kw) => descLower.includes(kw));
-  checks.push({
-    text: "الوصف يحتوي على دعوة واضحة لاتخاذ إجراء (CTA).",
-    status: hasCTA ? "pass" : "fail",
-  });
-
-  checks.push({
-    text: "نغمة الكتابة متوافقة مع الجمهور المستهدف.",
-    status: product.tone && product.audience_gender && product.tone.toLowerCase().includes("ناعمة") === (product.audience_gender === "أنثى") ? "pass" : "fail",
-  });
-
-  checks.push({
-    text: "العنوان يحتوي على رقم أو وحدة قياس.",
-    status: /\d+/.test(name) ? "pass" : "fail",
   });
 
   return {

@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import AnalyticsOverview from "./pages/AnalyticsOverview";
 import ProductsList from "./pages/ProductsList";
 import ProductSEO from "./pages/ProductSEO";
 import RegisterLanding from "./pages/Register";
@@ -29,7 +28,6 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/products" element={<ProductsList />} />
           <Route path="/product-seo" element={<ProductSEO />} />
-          <Route path="/analytics" element={<AnalyticsOverview />} />
           <Route path="/manual-login" element={<ManualLogin />} />
         </Routes>
       </div>

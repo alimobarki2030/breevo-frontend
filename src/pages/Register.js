@@ -26,7 +26,7 @@ export default function RegisterLanding() {
 
     setLoading(true);
     try {
-      const res = await fetch("https://breevo-backend.onrender.com/auth/register", {
+      const res = await fetch("http://localhost:10000/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -41,14 +41,17 @@ export default function RegisterLanding() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || "فشل التسجيل");
+      if (!res.ok) {
+        toast.error(data.detail || "فشل التسجيل");
+        return;
+      }
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("clientName", form.fullName);
       toast.success("تم إنشاء الحساب بنجاح 🎉");
-      navigate("/analytics");
+      navigate("/products");
     } catch (err) {
-      toast.error(err.message || "حدث خطأ أثناء التسجيل");
+      toast.error("حدث خطأ أثناء الاتصال بالسيرفر");
     } finally {
       setLoading(false);
     }

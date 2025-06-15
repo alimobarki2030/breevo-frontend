@@ -32,17 +32,7 @@ export default function Navbar() {
           )}
         </div>
 
-        <ul className="hidden md:flex gap-6 text-sm font-medium">
-          <li>
-            <Link to="/analytics" className="hover:text-[#83dcc9] transition">التحليلات</Link>
-          </li>
-          <li>
-            <Link to="/products" className="hover:text-[#83dcc9] transition">منتجاتي</Link>
-          </li>
-          <li>
-            <Link to="/videos" className="hover:text-[#83dcc9] transition">شروحات الفيديو</Link>
-          </li>
-        </ul>
+       
 
         <div className="relative" ref={dropdownRef}>
           <button
