@@ -1,113 +1,179 @@
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { toast } from "react-hot-toast";
-import Footer from "../components/Footer";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function RegisterLanding() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-    phone: "",
-    storeUrl: "",
-    heardFrom: "",
-    plan: "free",
-  });
-  const [loading, setLoading] = useState(false);
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const [full_name, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [store_url, setStoreUrl] = useState('');
+  const [heard_from, setHeardFrom] = useState('');
+  const [plan, setPlan] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (loading) return;
-
-    setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append("full_name", form.fullName);
-      formData.append("email", form.email);
-      formData.append("password", form.password);
-      formData.append("phone", form.phone);
-      formData.append("store_url", form.storeUrl);
-      formData.append("heard_from", form.heardFrom || "");
-      formData.append("plan", form.plan);
-
-      const res = await fetch("https://breevo-backend.onrender.com/auth/register", {
-        method: "POST",
-        body: formData,
+      const response = await fetch('https://breevo-backend.onrender.com/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          full_name,
+          email,
+          password,
+          phone,
+          store_url,
+          heard_from,
+          plan,
+        }),
       });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || "فشل التسجيل");
+      const data = await response.json();
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("clientName", form.fullName);
-      localStorage.setItem("selected_site", form.storeUrl); // ✅ استخدام رابط المتجر كموقع افتراضي
+      if (!response.ok) {
+        throw new Error(data.detail || 'حدث خطأ أثناء التسجيل');
+      }
 
-      toast.success("تم إنشاء الحساب بنجاح 🎉");
-      navigate("/products");
+      localStorage.setItem('access_token', data.access_token);
+      setSuccess(true);
+      setTimeout(() => {
+        navigate('/products');
+      }, 1000);
     } catch (err) {
-      toast.error(err.message || "حدث خطأ أثناء التسجيل");
-    } finally {
-      setLoading(false);
+      setError(err.message);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col justify-between font-arabic">
-      <div className="flex-grow flex items-center justify-center px-4 py-12">
-        <div className="max-w-7xl w-full grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-          <div className="space-y-6 px-4">
-            <img src="/logo2.png" alt="Logo" className="max-h-20 object-contain" />
-            <h1 className="text-4xl font-bold leading-tight text-white">
-              أطلق نمو متجرك باستخدام تحليل السيو الذكي.
-            </h1>
-            <p className="text-gray-300 text-lg">
-              أدخل عالم السيو باحتراف. نسخة مجانية، بدون بطاقة ائتمانية.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <img src="/salla.png" alt="Salla" className="h-6 object-contain" />
-              <img src="/shopify.png" alt="Shopify" className="h-6 object-contain" />
-              <img src="/zid.png" alt="Zid" className="h-6 object-contain" />
-            </div>
-          </div>
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          إنشاء حساب جديد
+        </h2>
+      </div>
 
-          <div className="bg-white text-gray-800 rounded-3xl p-10 md:p-12 w-full border border-gray-100 shadow-[0_20px_60px_rgba(131,220,201,0.25)]">
-            <h2 className="text-xl font-bold mb-6 text-center text-green-700">سجّل الآن وابدأ مجاناً</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input name="fullName" type="text" required placeholder="الاسم الكامل" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
-              <input name="email" type="email" required placeholder="البريد الإلكتروني" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
-              <input name="password" type="password" required placeholder="كلمة المرور" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
-              <div className="relative">
-                <div className="absolute top-1/2 right-4 transform -translate-y-1/2 text-sm text-gray-500 flex items-center gap-1">
-                  <span>🇸🇦</span>
-                  <span>+966</span>
-                </div>
-                <input name="phone" type="tel" required placeholder="512345678" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 pr-24 pl-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
-              </div>
-              <input name="storeUrl" type="url" required placeholder="رابط متجرك https://" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
-              <input name="heardFrom" type="text" placeholder="كيف عرفت عنّا؟ (تويتر، قوقل، صديق...)" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
-              <select name="plan" value={form.plan} onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600">
-                <option value="free">الخطة المجانية</option>
-                <option value="pro">الخطة المدفوعة - Pro</option>
-                <option value="enterprise">الخطة المتقدمة - Enterprise</option>
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
+          <form className="mb-0 space-y-6" onSubmit={handleSubmit}>
+            <div>
+              <label htmlFor="full_name" className="block text-sm font-medium text-gray-700">
+                الاسم الكامل
+              </label>
+              <input
+                id="full_name"
+                type="text"
+                required
+                value={full_name}
+                onChange={(e) => setFullName(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                البريد الإلكتروني
+              </label>
+              <input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                كلمة المرور
+              </label>
+              <input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                رقم الجوال
+              </label>
+              <input
+                id="phone"
+                type="text"
+                required
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="store_url" className="block text-sm font-medium text-gray-700">
+                رابط المتجر
+              </label>
+              <input
+                id="store_url"
+                type="text"
+                required
+                value={store_url}
+                onChange={(e) => setStoreUrl(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="heard_from" className="block text-sm font-medium text-gray-700">
+                من وين سمعت عنّا؟
+              </label>
+              <input
+                id="heard_from"
+                type="text"
+                required
+                value={heard_from}
+                onChange={(e) => setHeardFrom(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="plan" className="block text-sm font-medium text-gray-700">
+                نوع الباقة
+              </label>
+              <select
+                id="plan"
+                required
+                value={plan}
+                onChange={(e) => setPlan(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              >
+                <option value="">اختر الباقة</option>
+                <option value="free">مجانية</option>
+                <option value="pro">احترافية</option>
               </select>
-
-              <button type="submit" disabled={loading} className={`w-full py-3 rounded-xl font-bold text-white transition duration-300 ${loading ? "bg-green-600 animate-pulse cursor-default" : "bg-green-600 hover:bg-green-700"}`}>
-                {loading ? "🎉 جاري التسجيل..." : "🚀 ابدأ الآن مجاناً"}
-              </button>
-            </form>
-
-            <div className="text-center mt-6 text-sm text-gray-600">
-              لديك حساب بالفعل؟ <Link to="/manual-login" className="text-blue-600 hover:underline font-medium">تسجيل الدخول</Link>
             </div>
-          </div>
+
+            <div>
+              <button
+                type="submit"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+              >
+                إنشاء الحساب
+              </button>
+            </div>
+
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {success && <p className="text-green-500 text-sm">✅ تم التسجيل بنجاح، يتم التوجيه الآن...</p>}
+          </form>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }
