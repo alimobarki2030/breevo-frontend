@@ -86,6 +86,7 @@ export default function ProductSEO() {
     } catch (e) {
       console.error("❌ فشل تحليل المنتج:", e);
       alert("فشل تحليل المنتج");
+      console.error("📛 تفاصيل الخطأ:", e?.response || e?.message || e);
     }
     setGenerating(false);
   };
