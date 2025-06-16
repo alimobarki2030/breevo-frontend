@@ -15,13 +15,13 @@ export default function Account() {
       <div className="max-w-screen-md mx-auto flex flex-col items-center">
         <img src="/logo2.png" alt="Logo" className="h-12 mb-6" />
 
-        <Link
-  to="/analytics"
+      <Link
+  to="/products"
   className="mb-6 text-sm text-[#83dcc9] hover:underline self-start"
 >
+  ← العودة إلى منتجاتي
+</Link>
 
-          ← العودة إلى لوحة التحكم
-        </Link>
 
         <div className="bg-gray-900 rounded-xl shadow-lg p-8 space-y-6 w-full">
           <h2 className="text-3xl font-bold border-b border-gray-700 pb-4">حسابي</h2>
@@ -47,6 +47,16 @@ export default function Account() {
               <button className="bg-[#83dcc9] text-gray-900 px-4 py-2 rounded-xl font-bold hover:bg-[#6cc9b9] transition">
                 ترقية الخطة
               </button>
+              <button
+  onClick={() => {
+    localStorage.clear();
+    window.location.href = "/";
+  }}
+  className="mt-6 w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-xl font-bold transition"
+>
+  تسجيل الخروج
+</button>
+
             </div>
           </div>
         </div>
