@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import Footer from "../components/Footer";
 
-export default function RegisterLanding() {
+export default function Register() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     fullName: "",
@@ -26,7 +26,7 @@ export default function RegisterLanding() {
 
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:10000/auth/register", {
+      const res = await fetch("https://breevo-backend.onrender.com/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

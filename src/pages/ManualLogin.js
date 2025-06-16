@@ -11,7 +11,7 @@ export default function ManualLogin() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:10000/auth/manual-login", {
+      const res = await fetch("https://breevo-backend.onrender.com/auth/manual-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
