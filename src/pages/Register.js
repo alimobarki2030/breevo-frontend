@@ -48,6 +48,7 @@ export default function Register() {
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("clientName", form.fullName);
+      localStorage.setItem("user", JSON.stringify({ name: form.fullName }));
       toast.success("تم إنشاء الحساب بنجاح 🎉");
       navigate("/products");
     } catch (err) {

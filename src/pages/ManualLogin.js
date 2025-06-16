@@ -28,6 +28,7 @@ export default function ManualLogin() {
       const data = await res.json();
       localStorage.setItem("token", data.access_token);
       localStorage.setItem("clientName", email);
+      localStorage.setItem("user", JSON.stringify({ name: form.fullName }))
       toast.success("تم تسجيل الدخول بنجاح");
       navigate("/products");
     } catch (err) {
