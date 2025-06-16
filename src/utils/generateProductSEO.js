@@ -14,10 +14,10 @@ export const generateProductSEO = async (prompt) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("❌ خطأ من OpenAI:", errorData);
-      throw new Error("فشل الاتصال بـ OpenAI");
-    }
+  const errorData = await response.json();
+  console.error("❌ خطأ من OpenAI:", errorData); // ✅ نطبع التفاصيل
+  throw new Error(errorData?.error?.message || "فشل الاتصال بـ OpenAI");
+}
 
     const data = await response.json();
     return data.choices[0].message.content;
