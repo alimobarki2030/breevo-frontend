@@ -42,9 +42,17 @@ export default function Register() {
 
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.detail || "فشل التسجيل");
-        return;
-      }
+  const errData = await res.json();
+  console.error("🔥 الخطأ من الباكند:", errData);
+
+  if (errData.detail?.includes("مستخدم مسبقًا")) {
+    toast.error("🚫 هذا البريد مسجّل مسبقًا. جرّب تسجيل الدخول.");
+  } else {
+    toast.error(errData.detail || "حدث خطأ أثناء إنشاء الحساب");
+  }
+  return;
+}
+
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("clientName", form.fullName);
