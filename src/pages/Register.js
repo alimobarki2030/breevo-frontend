@@ -26,6 +26,7 @@ export default function Register() {
 
     setLoading(true);
     try {
+      console.log("📦 البيانات المرسلة:", form);
       const res = await fetch("https://breevo-backend.onrender.com/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
