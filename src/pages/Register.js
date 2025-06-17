@@ -99,12 +99,9 @@ export default function Register() {
               </select>
 
               
-{!form.email && localStorage.getItem("user") && (
+{localStorage.getItem("user") && (
   <div className="text-red-600 text-sm text-center bg-red-50 border border-red-200 py-2 px-4 rounded-lg mb-2">
-    يبدو أنك تملك حساباً بالفعل! يمكنك{" "}
-    <Link to="/manual-login" className="text-blue-600 underline">
-      تسجيل الدخول من هنا
-    </Link>.
+    يبدو أنك تملك حساباً بالفعل! يمكنك <Link to="/manual-login" className="text-blue-600 underline">تسجيل الدخول من هنا</Link>.
   </div>
 )}
 
