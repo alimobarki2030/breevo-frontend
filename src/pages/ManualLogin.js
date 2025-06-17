@@ -41,8 +41,14 @@ export default function ManualLogin() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <form onSubmit={handleLogin} className="bg-white p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-xl font-semibold mb-6 text-center">تسجيل الدخول</h2>
+      <form
+        onSubmit={handleLogin}
+        className="bg-white border border-gray-200 rounded-xl shadow-lg p-8 max-w-md w-full space-y-4"
+      >
+        <div className="flex flex-col items-center justify-center mb-4">
+          <img src="/logo.png" alt="Logo" className="h-12 mb-2" />
+          <h2 className="text-xl font-semibold text-gray-700">أهلاً بك من جديد 👋</h2>
+        </div>
 
         <input
           type="email"
@@ -68,6 +74,13 @@ export default function ManualLogin() {
         >
           {loading ? "جاري الدخول..." : "دخول"}
         </button>
+
+        <div className="text-center text-sm text-gray-600 mt-4">
+          ليس لديك حساب؟{" "}
+          <a href="/register" className="text-blue-600 underline">
+            أنشئ حسابك الآن
+          </a>
+        </div>
       </form>
     </div>
   );

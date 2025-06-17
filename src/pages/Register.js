@@ -98,7 +98,14 @@ export default function Register() {
                 <option value="enterprise">الخطة المتقدمة - Enterprise</option>
               </select>
 
-              <button type="submit" disabled={loading} className={`w-full py-3 rounded-xl font-bold text-white transition duration-300 ${loading ? "bg-green-600 animate-pulse cursor-default" : "bg-green-600 hover:bg-green-700"}`}>
+              
+{localStorage.getItem("user") && (
+  <div className="text-red-600 text-sm text-center bg-red-50 border border-red-200 py-2 px-4 rounded-lg mb-2">
+    يبدو أنك تملك حساباً بالفعل! يمكنك <Link to="/manual-login" className="text-blue-600 underline">تسجيل الدخول من هنا</Link>.
+  </div>
+)}
+
+<button type="submit" disabled={loading} className={`w-full py-3 rounded-xl font-bold text-white transition duration-300 ${loading ? "bg-green-600 animate-pulse cursor-default" : "bg-green-600 hover:bg-green-700"}`}>
                 {loading ? "🎉 جاري التسجيل..." : "🚀 ابدأ الآن مجاناً"}
               </button>
             </form>

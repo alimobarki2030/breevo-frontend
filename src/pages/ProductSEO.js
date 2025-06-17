@@ -212,7 +212,7 @@ export default function ProductSEO() {
       }));
     } catch (e) {
       console.error("❌ فشل التوليد:", e);
-      alert("فشل التوليد الذكي");
+      toast.error("⚠️ حدث خطأ أثناء توليد البيانات. الرجاء المحاولة مرة أخرى.");
     }
     setGenerating(false);
   };
@@ -286,7 +286,7 @@ export default function ProductSEO() {
       }));
     } catch (e) {
       console.error("❌ فشل توليد الحقل:", e);
-      alert("فشل توليد الحقل");
+      toast.error("⚠️ تعذّر توليد هذا الحقل تلقائيًا. حاول مرة أخرى لاحقا.");
     }
     setFieldLoading("");
   };
