@@ -46,7 +46,7 @@ export default function ManualLogin() {
         className="bg-white border border-gray-200 rounded-xl shadow-lg p-8 max-w-md w-full space-y-4"
       >
         <div className="flex flex-col items-center justify-center mb-4">
-          <img src="/logo.png" alt="Logo" className="h-12 mb-2" />
+          <img src="/logo2.png" alt="Logo" className="max-h-20 object-contain" />
           <h2 className="text-xl font-semibold text-gray-700">أهلاً بك من جديد 👋</h2>
         </div>
 
