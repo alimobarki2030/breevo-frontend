@@ -15,7 +15,12 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === "phone" && value && value[0] === "0") {
+      toast.error("رقم الجوال يجب أن يبدأ بـ 5");
+      return;
+    }
+    setForm({ ...form, [name]: value });
   };
 
   const handleSubmit = async (e) => {
@@ -100,8 +105,9 @@ export default function Register() {
           name="phone"
           value={form.phone}
           onChange={handleChange}
-          placeholder="رقم الجوال"
+          placeholder="مثال: 555736427"
           className="w-full p-2 border rounded"
+          required
         />
         <input
           type="url"
