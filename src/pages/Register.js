@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
@@ -11,20 +12,28 @@ export default function Register() {
     password: "",
     phone: "",
     storeUrl: "",
-    heardFrom: "",
     plan: "free",
   });
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === "phone") {
+      if (value && !/^5\d{8}$/.test(value)) {
+        toast.error("رقم الجوال يجب أن يكون 9 أرقام ويبدأ بـ 5");
+        return;
+      }
+    }
+
+    setForm({ ...form, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
-
     setLoading(true);
+
     try {
       console.log("📦 البيانات المرسلة:", form);
       const res = await fetch("https://breevo-backend.onrender.com/auth/register", {
@@ -36,24 +45,22 @@ export default function Register() {
           password: form.password,
           phone: form.phone,
           store_url: form.storeUrl,
-          heard_from: form.heardFrom,
           plan: form.plan,
         }),
       });
 
       const data = await res.json();
+
       if (!res.ok) {
-  const errData = await res.json();
-  console.error("🔥 الخطأ من الباكند:", errData);
+        console.error("🔥 الخطأ من الباكند:", data);
 
-  if (errData.detail?.includes("مستخدم مسبقًا")) {
-    toast.error("🚫 هذا البريد مسجّل مسبقًا. جرّب تسجيل الدخول.");
-  } else {
-    toast.error(errData.detail || "حدث خطأ أثناء إنشاء الحساب");
-  }
-  return;
-}
-
+        if (data.detail?.includes("مستخدم مسبقًا")) {
+          toast.error("🚫 هذا البريد مسجّل مسبقًا. جرّب تسجيل الدخول.");
+        } else {
+          toast.error(data.detail || "حدث خطأ أثناء إنشاء الحساب");
+        }
+        return;
+      }
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("clientName", form.fullName);
@@ -97,24 +104,22 @@ export default function Register() {
                   <span>🇸🇦</span>
                   <span>+966</span>
                 </div>
-                <input name="phone" type="tel" required placeholder="512345678" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 pr-24 pl-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
+                <input name="phone" type="tel" required placeholder="مثال: 512345678" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 pr-24 pl-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
               </div>
               <input name="storeUrl" type="url" required placeholder="رابط متجرك https://" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
-              <input name="heardFrom" type="text" placeholder="كيف عرفت عنّا؟ (تويتر، قوقل، صديق...)" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
               <select name="plan" value={form.plan} onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600">
                 <option value="free">الخطة المجانية</option>
                 <option value="pro">الخطة المدفوعة - Pro</option>
                 <option value="enterprise">الخطة المتقدمة - Enterprise</option>
               </select>
 
-              
-{localStorage.getItem("user") && (
-  <div className="text-red-600 text-sm text-center bg-red-50 border border-red-200 py-2 px-4 rounded-lg mb-2">
-    يبدو أنك تملك حساباً بالفعل! يمكنك <Link to="/manual-login" className="text-blue-600 underline">تسجيل الدخول من هنا</Link>.
-  </div>
-)}
+              {localStorage.getItem("user") && (
+                <div className="text-red-600 text-sm text-center bg-red-50 border border-red-200 py-2 px-4 rounded-lg mb-2">
+                  يبدو أنك تملك حساباً بالفعل! يمكنك <Link to="/manual-login" className="text-blue-600 underline">تسجيل الدخول من هنا</Link>.
+                </div>
+              )}
 
-<button type="submit" disabled={loading} className={`w-full py-3 rounded-xl font-bold text-white transition duration-300 ${loading ? "bg-green-600 animate-pulse cursor-default" : "bg-green-600 hover:bg-green-700"}`}>
+              <button type="submit" disabled={loading} className={`w-full py-3 rounded-xl font-bold text-white transition duration-300 ${loading ? "bg-green-600 animate-pulse cursor-default" : "bg-green-600 hover:bg-green-700"}`}>
                 {loading ? "🎉 جاري التسجيل..." : "🚀 ابدأ الآن مجاناً"}
               </button>
             </form>
