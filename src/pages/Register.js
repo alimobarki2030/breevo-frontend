@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
+import { useNavigate, Link } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import Footer from "../components/Footer";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -10,24 +11,20 @@ export default function Register() {
     password: "",
     phone: "",
     storeUrl: "",
+    heardFrom: "",
     plan: "free",
   });
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "phone" && value && value[0] === "0") {
-      toast.error("رقم الجوال يجب أن يبدأ بـ 5");
-      return;
-    }
-    setForm({ ...form, [name]: value });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (loading) return;
-    setLoading(true);
 
+    setLoading(true);
     try {
       console.log("📦 البيانات المرسلة:", form);
       const res = await fetch("https://breevo-backend.onrender.com/auth/register", {
@@ -39,100 +36,96 @@ export default function Register() {
           password: form.password,
           phone: form.phone,
           store_url: form.storeUrl,
+          heard_from: form.heardFrom,
           plan: form.plan,
         }),
       });
 
-      if (!res.ok) {
-        const errData = await res.json();
-        toast.error(errData.detail || "فشل التسجيل");
-        return;
-      }
-
       const data = await res.json();
-      toast.success("تم إنشاء الحساب بنجاح");
-      localStorage.setItem("token", data.access_token);
-      localStorage.setItem("user", JSON.stringify({ name: data.client_name }));
+      if (!res.ok) {
+  const errData = await res.json();
+  console.error("🔥 الخطأ من الباكند:", errData);
+
+  if (errData.detail?.includes("مستخدم مسبقًا")) {
+    toast.error("🚫 هذا البريد مسجّل مسبقًا. جرّب تسجيل الدخول.");
+  } else {
+    toast.error(errData.detail || "حدث خطأ أثناء إنشاء الحساب");
+  }
+  return;
+}
+
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("clientName", form.fullName);
+      localStorage.setItem("user", JSON.stringify({ name: form.fullName }));
+      toast.success("تم إنشاء الحساب بنجاح 🎉");
       navigate("/products");
     } catch (err) {
       toast.error("حدث خطأ أثناء الاتصال بالسيرفر");
-      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white border border-gray-200 rounded-xl shadow-lg p-8 max-w-md w-full space-y-4"
-      >
-        <div className="flex flex-col items-center justify-center mb-4">
-          <img src="/logo.png" alt="Logo" className="h-12 mb-2" />
-          <h2 className="text-xl font-semibold text-gray-700">أنشئ حسابك 👋</h2>
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col justify-between font-arabic">
+      <div className="flex-grow flex items-center justify-center px-4 py-12">
+        <div className="max-w-7xl w-full grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+          <div className="space-y-6 px-4">
+            <img src="/logo2.png" alt="Logo" className="max-h-20 object-contain" />
+            <h1 className="text-4xl font-bold leading-tight text-white">
+              أطلق نمو متجرك باستخدام تحليل السيو الذكي.
+            </h1>
+            <p className="text-gray-300 text-lg">
+              أدخل عالم السيو باحتراف. نسخة مجانية، بدون بطاقة ائتمانية.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <img src="/salla.png" alt="Salla" className="h-6 object-contain" />
+              <img src="/shopify.png" alt="Shopify" className="h-6 object-contain" />
+              <img src="/zid.png" alt="Zid" className="h-6 object-contain" />
+            </div>
+          </div>
+
+          <div className="bg-white text-gray-800 rounded-3xl p-10 md:p-12 w-full border border-gray-100 shadow-[0_20px_60px_rgba(131,220,201,0.25)]">
+            <h2 className="text-xl font-bold mb-6 text-center text-green-700">سجّل الآن وابدأ مجاناً</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <input name="fullName" type="text" required placeholder="الاسم الكامل" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
+              <input name="email" type="email" required placeholder="البريد الإلكتروني" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
+              <input name="password" type="password" required placeholder="كلمة المرور" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
+              <div className="relative">
+                <div className="absolute top-1/2 right-4 transform -translate-y-1/2 text-sm text-gray-500 flex items-center gap-1">
+                  <span>🇸🇦</span>
+                  <span>+966</span>
+                </div>
+                <input name="phone" type="tel" required placeholder="512345678" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 pr-24 pl-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
+              </div>
+              <input name="storeUrl" type="url" required placeholder="رابط متجرك https://" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
+              <input name="heardFrom" type="text" placeholder="كيف عرفت عنّا؟ (تويتر، قوقل، صديق...)" onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" />
+              <select name="plan" value={form.plan} onChange={handleChange} className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600">
+                <option value="free">الخطة المجانية</option>
+                <option value="pro">الخطة المدفوعة - Pro</option>
+                <option value="enterprise">الخطة المتقدمة - Enterprise</option>
+              </select>
+
+              
+{localStorage.getItem("user") && (
+  <div className="text-red-600 text-sm text-center bg-red-50 border border-red-200 py-2 px-4 rounded-lg mb-2">
+    يبدو أنك تملك حساباً بالفعل! يمكنك <Link to="/manual-login" className="text-blue-600 underline">تسجيل الدخول من هنا</Link>.
+  </div>
+)}
+
+<button type="submit" disabled={loading} className={`w-full py-3 rounded-xl font-bold text-white transition duration-300 ${loading ? "bg-green-600 animate-pulse cursor-default" : "bg-green-600 hover:bg-green-700"}`}>
+                {loading ? "🎉 جاري التسجيل..." : "🚀 ابدأ الآن مجاناً"}
+              </button>
+            </form>
+
+            <div className="text-center mt-6 text-sm text-gray-600">
+              لديك حساب بالفعل؟ <Link to="/manual-login" className="text-blue-600 hover:underline font-medium">تسجيل الدخول</Link>
+            </div>
+          </div>
         </div>
-
-        <input
-          type="text"
-          name="fullName"
-          value={form.fullName}
-          onChange={handleChange}
-          placeholder="الاسم الكامل"
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          type="email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          placeholder="البريد الإلكتروني"
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          type="password"
-          name="password"
-          value={form.password}
-          onChange={handleChange}
-          placeholder="كلمة المرور"
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          type="text"
-          name="phone"
-          value={form.phone}
-          onChange={handleChange}
-          placeholder="مثال: 555736427"
-          className="w-full p-2 border rounded"
-          required
-        />
-        <input
-          type="url"
-          name="storeUrl"
-          value={form.storeUrl}
-          onChange={handleChange}
-          placeholder="رابط المتجر (اختياري)"
-          className="w-full p-2 border rounded"
-        />
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-[#162b41] text-white py-2 rounded hover:bg-[#1e3b5f] transition"
-        >
-          {loading ? "جاري التسجيل..." : "إنشاء حساب"}
-        </button>
-
-        <div className="text-center text-sm text-gray-600 mt-4">
-          لديك حساب؟ {" "}
-          <a href="/login" className="text-blue-600 underline">
-            سجّل دخولك
-          </a>
-        </div>
-      </form>
+      </div>
+      <Footer />
     </div>
   );
 }
