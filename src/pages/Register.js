@@ -18,14 +18,24 @@ export default function Register() {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === "phone") {
-      if (value && !/^5\d{8}$/.test(value)) {
-        toast.error("رقم الجوال يجب أن يكون 9 أرقام ويبدأ بـ 5");
+    // تحديث الحالة أولاً
+    setForm({ ...form, [name]: value });
+
+    // التحقق من صحة رقم الهاتف (فقط إذا تم إدخال رقم)
+    if (name === "phone" && value) {
+      // التحقق من أن الرقم يحتوي على أرقام فقط
+      if (!/^\d*$/.test(value)) {
+        toast.error("يجب أن يحتوي رقم الجوال على أرقام فقط");
         return;
       }
+      
+      // التحقق من الطول والبداية (فقط عند اكتمال الرقم)
+      if (value.length === 9 && !value.startsWith('5')) {
+        toast.error("رقم الجوال يجب أن يبدأ بـ 5");
+      } else if (value.length > 9) {
+        toast.error("رقم الجوال يجب أن يكون 9 أرقام فقط");
+      }
     }
-
-    setForm({ ...form, [name]: value });
   };
 
   const handleSubmit = async (e) => {
