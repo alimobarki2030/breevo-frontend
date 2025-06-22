@@ -1,80 +1,159 @@
+// Enhanced Product Categorization with Better AI Logic
+const enhancedProductCategorization = (product) => {
+  
+  // Multi-step categorization process
+  const categorizeProduct = async (product) => {
+    
+    // Step 1: Extract all available information
+    const productName = product.name?.trim() || '';
+    
+    // Step 2: Enhanced categorization prompt with multiple data sources
+    const categorizationPrompt = `أنت خبير تصنيف منتجات محترف متخصص في السوق السعودي.
 
-export default function analyzeSEO(product) {
-  const {
-    name = "",
-    description = "",
-    keyword = "",
-    meta_title = "",
-    meta_description = "",
-    imageAlt = "",
-  } = product;
+مهمتك: تحليل المعلومات التالية وتحديد الفئة الصحيحة للمنتج.
 
-  const checks = [];
-  const keywordLower = keyword.trim().toLowerCase();
-  const descLower = description.toLowerCase();
-  const titleLower = name.toLowerCase();
+معلومات المنتج:
+العنوان: "${productName}"
 
-  const isValidKeyword = keywordLower.length > 1;
-  const isValidDescription = description.trim().length > 0;
-  const isValidTitle = name.trim().length > 0;
-  const isValidMetaTitle = meta_title.trim().length > 0;
-  const isValidMetaDesc = meta_description.trim().length > 0;
-  const isValidAlt = imageAlt.trim().length > 0;
+قواعد التصنيف (مهمة جداً):
 
-  const firstWords = description.split(" ").slice(0, 25).join(" ").toLowerCase();
+1. منتجات التجميل والعناية:
+   - كلمات مفتاحية: كريم، مرطب، شامبو، صابون، عطر، مكياج، سيروم، تونر، غسول، بلسم، ماسك
+   - أمثلة: "كريم مرطب للوجه"، "شامبو للشعر"، "عطر رجالي"
+   - الفئة: "تجميل وعناية"
 
-  checks.push({
-    text: "أضف الكلمة المفتاحية في بداية المحتوى.",
-    status: isValidKeyword && isValidDescription && firstWords.includes(keywordLower) ? "pass" : "fail",
-  });
+2. الإلكترونيات والتقنية:
+   - كلمات مفتاحية: هاتف، جهاز، كمبيوتر، تلفزيون، سماعات، شاحن، كابل، موبايل، آيفون، سامسونج
+   - أمثلة: "هاتف آيفون 15"، "سماعات بلوتوث"، "شاحن لاسلكي"
+   - الفئة: "إلكترونيات وتقنية"
 
-  checks.push({
-    text: "استخدم الكلمة المفتاحية داخل المحتوى.",
-    status: isValidKeyword && isValidDescription && descLower.includes(keywordLower) ? "pass" : "fail",
-  });
+3. الملابس والأزياء:
+   - كلمات مفتاحية: قميص، بنطال، فستان، حذاء، جاكيت، تيشيرت، بلوزة، صندل، حقيبة
+   - أمثلة: "قميص قطني"، "حذاء رياضي"، "فستان سهرة"
+   - الفئة: "ملابس وأزياء"
 
-  checks.push({
-    text: "الوصف يحتوي على أكثر من 100 كلمة.",
-status: isValidDescription && description.split(" ").length > 100 ? "pass" : "fail",
-  });
+4. الطعام والمشروبات:
+   - كلمات مفتاحية: طعام، شراب، قهوة، شاي، عصير، حلويات، خبز، أرز، معكرونة
+   - أمثلة: "قهوة عربية"، "عصير برتقال"، "شوكولاتة"
+   - الفئة: "أغذية ومشروبات"
 
-  checks.push({
-    text: "العنوان يحتوي على الكلمة المفتاحية.",
-    status: isValidKeyword && isValidTitle && titleLower.includes(keywordLower) ? "pass" : "fail",
-  });
+5. المنزل والديكور:
+   - كلمات مفتاحية: أثاث، طاولة، كرسي، سجادة، وسادة، مصباح، ستارة، مرآة
+   - أمثلة: "طاولة خشبية"، "سجادة فارسية"، "مصباح LED"
+   - الفئة: "منزل وديكور"
 
-  checks.push({
-    text: "وصف الميتا يحتوي على الكلمة المفتاحية.",
-    status: isValidKeyword && isValidMetaDesc && meta_description.toLowerCase().includes(keywordLower) ? "pass" : "fail",
-  });
+6. الصحة والطب:
+   - كلمات مفتاحية: دواء، فيتامين، مكمل، طبي، علاج، صحة، أدوية، حبوب
+   - أمثلة: "فيتامين د"، "مكمل البروتين"، "جهاز قياس ضغط"
+   - الفئة: "صحة وطب"
 
-  checks.push({
-    text: "عنوان السيو يحتوي على الكلمة المفتاحية.",
-    status: isValidKeyword && isValidMetaTitle && meta_title.toLowerCase().includes(keywordLower) ? "pass" : "fail",
-  });
+7. الرياضة واللياقة:
+   - كلمات مفتاحية: رياضة، تمرين، جيم، لياقة، أوزان، دراجة، كرة، معدات رياضية
+   - أمثلة: "دراجة هوائية"، "أوزان حديد"، "كرة قدم"
+   - الفئة: "رياضة ولياقة"
 
-  checks.push({
-    text: "العنوان لا يتجاوز 60 حرفًا.",
-    status: isValidTitle && name.length <= 60 ? "pass" : "fail",
-  });
+8. السيارات والمركبات:
+   - كلمات مفتاحية: سيارة، مركبة، إطار، محرك، قطع غيار، زيت، فلتر
+   - أمثلة: "إطارات سيارة"، "زيت المحرك"، "مرآة جانبية"
+   - الفئة: "سيارات ومركبات"
 
-  checks.push({
-    text: "وصف الميتا لا يتجاوز 150 حرفًا.",
-    status: isValidMetaDesc && meta_description.length <= 150 ? "pass" : "fail",
-  });
+خطوات التحليل:
+1. اقرأ العنوان والوصف بعناية
+2. ابحث عن الكلمات المفتاحية في النص
+3. طابق مع الفئات المحددة أعلاه
+4. اختر الفئة الأكثر دقة
 
-  checks.push({
-    text: "عنوان السيو لا يتجاوز 60 حرفًا.",
-    status: isValidMetaTitle && meta_title.length <= 60 ? "pass" : "fail",
-  });
+مثال توضيحي:
+المنتج: "كريم مرطب للوجه للبشرة الحساسة من Eucerin"
+التحليل: يحتوي على "كريم مرطب" و "للوجه" = منتج تجميل
+الفئة: "تجميل وعناية"
 
-  checks.push({
-    text: "الصورة تحتوي على ALT فيه الكلمة المفتاحية.",
-    status: isValidKeyword && isValidAlt && imageAlt.toLowerCase().includes(keywordLower) ? "pass" : "fail",
-  });
+الآن حلل المنتج المعطى واختر الفئة الصحيحة.
+
+أعد فقط اسم الفئة بدون شرح:`;
+
+    return categorizationPrompt;
+  };
+
+  // Step 3: Target audience analysis with better context
+  const analyzeTargetAudience = async (product, category) => {
+    const audiencePrompt = `بناءً على المنتج والفئة التالية، حدد الجمهور المستهدف:
+
+المنتج: "${product.name}"
+الفئة: "${category}"
+
+قواعد تحديد الجمهور:
+
+للتجميل والعناية:
+- منتجات الوجه والعناية بالبشرة → "النساء والرجال"
+- مكياج وأحمر شفاه → "النساء"
+- كريمات حلاقة ومنتجات اللحية → "الرجال"
+- منتجات الأطفال → "الأمهات والآباء"
+- منتجات مكافحة الشيخوخة → "البالغين 30+"
+
+للإلكترونيات:
+- ألعاب وقيمنق → "الشباب والمراهقين"
+- أجهزة مكتبية → "المهنيين والموظفين"
+- هواتف ذكية → "الجميع"
+- أجهزة منزلية ذكية → "العائلات"
+
+للملابس:
+- ملابس رجالية → "الرجال"
+- ملابس نسائية → "النساء"
+- ملابس أطفال → "الأمهات والآباء"
+- ملابس رياضية → "الرياضيين والشباب"
+
+للطعام:
+- أطعمة أطفال → "الأمهات والآباء"
+- مكملات رياضية → "الرياضيين"
+- أطعمة صحية → "المهتمين بالصحة"
+- حلويات → "العائلات والأطفال"
+
+حدد الجمهور الأنسب للمنتج المذكور.
+
+أعد فقط وصف الجمهور المستهدف:`;
+
+    return audiencePrompt;
+  };
+
+  // Step 4: Tone selection based on category and audience
+  const selectTone = (category, audience) => {
+    const toneMap = {
+      "تجميل وعناية": "ناعمة",
+      "إلكترونيات وتقنية": "محايدة", 
+      "ملابس وأزياء": "دافئة",
+      "أغذية ومشروبات": "دافئة",
+      "منزل وديكور": "دافئة",
+      "صحة وطب": "رسمية",
+      "رياضة ولياقة": "حماسية",
+      "سيارات ومركبات": "عملية"
+    };
+    
+    return toneMap[category] || "محايدة";
+  };
+
+  // Step 5: Story arc selection
+  const selectStoryArc = (category) => {
+    const storyMap = {
+      "تجميل وعناية": "قبل-بعد",
+      "إلكترونيات وتقنية": "مشكلة-حل",
+      "ملابس وأزياء": "رحلة-التحول", 
+      "أغذية ومشروبات": "التجربة",
+      "منزل وديكور": "رحلة-التحول",
+      "صحة وطب": "مشكلة-حل",
+      "رياضة ولياقة": "قبل-بعد",
+      "سيارات ومركبات": "مشكلة-حل"
+    };
+    
+    return storyMap[category] || "مشكلة-حل";
+  };
 
   return {
-    score: checks.filter((c) => c.status === "pass").length,
-    checks,
+    categorizeProduct,
+    analyzeTargetAudience,
+    selectTone,
+    selectStoryArc
   };
-}
+};
+
+export default enhancedProductCategorization;

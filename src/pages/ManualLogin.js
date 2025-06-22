@@ -1,306 +1,609 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import toast from "react-hot-toast";
-import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { Eye, EyeOff } from "lucide-react";
+import Footer from "../components/Footer";
+
+// إعداد Google Client ID
+const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com";
+
+// تعريف الخطط
+const PLAN_INFO = {
+  free: { name: "المجانية", price: "مجانًا", icon: "🆓" },
+  pro: { name: "الاحترافية", price: "49 ريال/شهر", icon: "💎" },
+  enterprise: { name: "الأعمال", price: "129 ريال/شهر", icon: "👑" }
+};
 
 export default function ManualLogin() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: ""
-  });
-  const [loading, setLoading] = useState(false);
+  const location = useLocation();
+  const [isLogin, setIsLogin] = useState(true); // التبديل بين الدخول والتسجيل
+  const [selectedPlan, setSelectedPlan] = useState(null); // الخطة المختارة
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  
+  // بيانات تسجيل الدخول
+  const [loginForm, setLoginForm] = useState({
+    email: "",
+    password: "",
+    rememberMe: false
+  });
 
-  // تحميل البيانات المحفوظة عند تحميل الصفحة
+  // بيانات التسجيل
+  const [registerForm, setRegisterForm] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    phone: "",
+    storeUrl: "",
+    plan: selectedPlan || "free" // استخدام الخطة المختارة أو المجانية افتراضياً
+  });
+
+  // تحميل Google Identity Services
   useEffect(() => {
+    // قراءة معامل الخطة من URL
+    const urlParams = new URLSearchParams(location.search);
+    const planParam = urlParams.get('plan');
+    
+    if (planParam && PLAN_INFO[planParam]) {
+      setSelectedPlan(planParam);
+      // إذا كانت خطة مدفوعة، اعرض نموذج التسجيل
+      if (planParam !== 'free') {
+        setIsLogin(false);
+      }
+      console.log(`تم اختيار الخطة: ${PLAN_INFO[planParam].name}`);
+    }
+
+    // تحميل البيانات المحفوظة للدخول
     const savedEmail = localStorage.getItem("rememberedEmail");
     if (savedEmail) {
-      setFormData(prev => ({ ...prev, email: savedEmail }));
-      setRememberMe(true);
+      setLoginForm(prev => ({ ...prev, email: savedEmail, rememberMe: true }));
     }
-  }, []);
 
-  // التحقق من صحة البيانات
-  const validateForm = () => {
-    const newErrors = {};
-    
-    if (!formData.email) {
-      newErrors.email = "البريد الإلكتروني مطلوب";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "البريد الإلكتروني غير صحيح";
-    }
-    
-    if (!formData.password) {
-      newErrors.password = "كلمة المرور مطلوبة";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "كلمة المرور يجب أن تكون 6 أحرف على الأقل";
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    // تحميل Google Script
+    const loadGoogleScript = () => {
+      if (document.getElementById('google-identity-script')) {
+        initializeGoogle();
+        return;
+      }
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
-    // إزالة رسالة الخطأ عند بدء الكتابة
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: "" }));
-    }
-  };
+      const script = document.createElement('script');
+      script.id = 'google-identity-script';
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = initializeGoogle;
+      document.head.appendChild(script);
+    };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-    
-    setLoading(true);
+    const initializeGoogle = () => {
+      if (window.google && GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== "YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com") {
+        try {
+          window.google.accounts.id.initialize({
+            client_id: GOOGLE_CLIENT_ID,
+            callback: handleGoogleResponse,
+            auto_select: false,
+            cancel_on_tap_outside: true
+          });
+        } catch (error) {
+          console.error('خطأ في تهيئة Google Sign-In:', error);
+        }
+      }
+    };
 
+    loadGoogleScript();
+  }, [location.search]); // إعادة التشغيل عند تغيير URL
+
+  // تحديث خطة التسجيل عند تغيير الخطة المختارة
+  useEffect(() => {
+    if (selectedPlan) {
+      setRegisterForm(prev => ({ ...prev, plan: selectedPlan }));
+    }
+  }, [selectedPlan]);
+
+  // معالجة Google Login
+  const handleGoogleResponse = async (response) => {
+    setGoogleLoading(true);
+    
     try {
-      console.log("محاولة تسجيل الدخول للمستخدم:", formData.email);
+      const payload = JSON.parse(atob(response.credential.split('.')[1]));
       
-      const res = await fetch("https://breevo-backend.onrender.com/auth/login", {
+      const res = await fetch("https://breevo-backend.onrender.com/auth/google-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ id_token: response.credential }),
       });
-
-      console.log("حالة الاستجابة:", res.status);
 
       if (!res.ok) {
         const errData = await res.json();
-        console.error("خطأ في تسجيل الدخول:", errData);
-        
-        if (res.status === 400) {
-          toast.error("البريد الإلكتروني أو كلمة المرور غير صحيحة");
-        } else {
-          toast.error(errData.detail || "فشل تسجيل الدخول");
-        }
+        toast.error(errData.detail || "فشل تسجيل الدخول بـ Google");
         return;
       }
 
       const data = await res.json();
-      console.log("بيانات الاستجابة:", data);
-
-      // التحقق من وجود البيانات المطلوبة
-      if (!data.access_token && !data.token) {
-        console.error("لا يوجد رمز وصول في الاستجابة");
-        toast.error("خطأ في البيانات المستلمة من الخادم");
-        return;
-      }
-
-      // حفظ البيانات في localStorage
       const token = data.access_token || data.token;
-      const clientName = data.client_name || formData.email;
+      const clientName = data.client_name || payload.name;
 
       localStorage.setItem("token", token);
       localStorage.setItem("clientName", clientName);
       localStorage.setItem("user", JSON.stringify({ 
         name: clientName,
-        email: formData.email 
+        email: data.email || payload.email,
+        provider: 'google'
       }));
 
-      // حفظ البريد الإلكتروني إذا كان المستخدم قد اختار "تذكرني"
-      if (rememberMe) {
-        localStorage.setItem("rememberedEmail", formData.email);
+      toast.success(`مرحباً ${clientName}، تم تسجيل الدخول بنجاح`);
+      
+      // التحقق من الخطة المختارة للتوجيه المناسب
+      if (selectedPlan && selectedPlan !== 'free') {
+        setTimeout(() => {
+          navigate(`/checkout?plan=${selectedPlan}`);
+        }, 1000);
+      } else {
+        setTimeout(() => {
+          navigate("/products");
+        }, 500);
+      }
+
+    } catch (err) {
+      toast.error("حدث خطأ أثناء تسجيل الدخول بـ Google");
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = () => {
+    if (!window.google) {
+      toast.error("خدمة Google غير متاحة حالياً");
+      return;
+    }
+
+    if (GOOGLE_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com") {
+      toast.error("يرجى إعداد Google Client ID أولاً");
+      return;
+    }
+
+    try {
+      window.google.accounts.id.prompt();
+    } catch (error) {
+      toast.error("حدث خطأ في خدمة Google");
+    }
+  };
+
+  // معالجة تغيير النماذج
+  const handleLoginChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setLoginForm(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  const handleRegisterChange = (e) => {
+    const { name, value } = e.target;
+    setRegisterForm(prev => ({ ...prev, [name]: value }));
+
+    // التحقق من رقم الهاتف
+    if (name === "phone" && value) {
+      if (!/^\d*$/.test(value)) {
+        toast.error("يجب أن يحتوي رقم الجوال على أرقام فقط");
+        return;
+      }
+      
+      if (value.length === 9 && !value.startsWith('5')) {
+        toast.error("رقم الجوال يجب أن يبدأ بـ 5");
+      } else if (value.length > 9) {
+        toast.error("رقم الجوال يجب أن يكون 9 أرقام فقط");
+      }
+    }
+  };
+
+  // تسجيل الدخول
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    if (loading) return;
+    setLoading(true);
+
+    try {
+      const res = await fetch("https://breevo-backend.onrender.com/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: loginForm.email,
+          password: loginForm.password
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        toast.error("البريد الإلكتروني أو كلمة المرور غير صحيحة");
+        return;
+      }
+
+      const data = await res.json();
+      const token = data.access_token || data.token;
+      const clientName = data.client_name || loginForm.email;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("clientName", clientName);
+      localStorage.setItem("user", JSON.stringify({ 
+        name: clientName,
+        email: loginForm.email,
+        provider: 'manual'
+      }));
+
+      if (loginForm.rememberMe) {
+        localStorage.setItem("rememberedEmail", loginForm.email);
       } else {
         localStorage.removeItem("rememberedEmail");
       }
 
-      console.log("تم حفظ البيانات بنجاح");
       toast.success(`مرحباً ${clientName}، تم تسجيل الدخول بنجاح`);
-      
-      // تأخير قصير للتأكد من حفظ البيانات
-      setTimeout(() => {
-        console.log("الانتقال إلى صفحة المنتجات");
-        navigate("/products");
-      }, 500);
+      navigate("/products");
 
     } catch (err) {
-      console.error("خطأ في الاتصال:", err);
       toast.error("حدث خطأ أثناء الاتصال بالخادم");
     } finally {
       setLoading(false);
     }
   };
 
+  // التسجيل
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    if (loading) return;
+    setLoading(true);
+
+    try {
+      const res = await fetch("https://breevo-backend.onrender.com/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          full_name: registerForm.fullName,
+          email: registerForm.email,
+          password: registerForm.password,
+          phone: registerForm.phone,
+          store_url: registerForm.storeUrl,
+          plan: registerForm.plan,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (data.detail && (data.detail.includes("already exists") || data.detail.includes("مستخدم مسبقًا"))) {
+          toast.error("🚫 هذا البريد الإلكتروني مسجّل مسبقًا. يرجى تسجيل الدخول أو استخدام بريد آخر.");
+        } else {
+          toast.error(data.detail || "حدث خطأ أثناء إنشاء الحساب");
+        }
+        return;
+      }
+
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("clientName", registerForm.fullName);
+        localStorage.setItem("user", JSON.stringify({ name: registerForm.fullName }));
+        
+        // رسالة نجاح مخصصة حسب الخطة
+        if (selectedPlan && selectedPlan !== 'free') {
+          toast.success(`🎉 تم إنشاء الحساب بنجاح! سيتم توجيهك لإتمام الدفع للخطة ${PLAN_INFO[selectedPlan].name}`);
+          // توجيه إلى صفحة الدفع للخطط المدفوعة
+          setTimeout(() => {
+            navigate(`/checkout?plan=${selectedPlan}`);
+          }, 1500);
+        } else {
+          toast.success("تم إنشاء الحساب بنجاح 🎉");
+          navigate("/products");
+        }
+      }
+      
+    } catch (err) {
+      toast.error("حدث خطأ أثناء الاتصال بالسيرفر");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleForgotPassword = () => {
-    if (!formData.email) {
+    if (!loginForm.email) {
       toast.error("يرجى إدخال البريد الإلكتروني أولاً");
       return;
     }
-    
-    // يمكنك تنفيذ هذه الوظيفة لاحقاً
     toast.success("تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <img src="/logo2.png" alt="Logo" className="max-h-20 object-contain mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">أهلاً بك من جديد</h1>
-          <p className="text-gray-600">سجل دخولك للوصول إلى حسابك</p>
-        </div>
-
-        {/* Login Form */}
-        <form onSubmit={handleLogin} className="bg-white rounded-2xl shadow-xl p-8 space-y-6">
-          {/* Email Field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              البريد الإلكتروني
-            </label>
-            <div className="relative">
-              <Mail className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="email"
-                name="email"
-                placeholder="أدخل بريدك الإلكتروني"
-                value={formData.email}
-                onChange={handleInputChange}
-                className={`w-full pr-12 pl-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
-                  errors.email 
-                    ? 'border-red-500 focus:ring-red-500' 
-                    : 'border-gray-300 focus:ring-blue-500'
-                }`}
-                required
-              />
-            </div>
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+    <div className="min-h-screen bg-gray-950 text-white flex flex-col justify-between font-arabic">
+      <div className="flex-grow flex items-center justify-center px-4 py-12">
+        <div className="max-w-7xl w-full grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+          
+          {/* الجانب الأيسر - المعلومات */}
+          <div className="space-y-6 px-4">
+            <img src="/logo2.png" alt="Logo" className="max-h-20 object-contain" />
+            <h1 className="text-4xl font-bold leading-tight text-white">
+              {isLogin ? 
+                "مرحباً بك مرة أخرى!" : 
+                selectedPlan ? `اختيار ممتاز! الخطة ${PLAN_INFO[selectedPlan].name}` : "أطلق نمو متجرك باستخدام تحليل السيو الذكي."
+              }
+            </h1>
+            <p className="text-gray-300 text-lg">
+              {isLogin ? 
+                "سجل دخولك للوصول إلى لوحة التحكم وتحليلات السيو المتقدمة." :
+                selectedPlan ? `ستحصل على جميع مميزات الخطة ${PLAN_INFO[selectedPlan].name} فور إتمام التسجيل` : "أدخل عالم السيو باحتراف. نسخة مجانية، بدون بطاقة ائتمانية."
+              }
+            </p>
+            
+            {/* عرض معلومات الخطة المختارة */}
+            {selectedPlan && (
+              <div className="bg-gray-800/50 rounded-xl p-4 border border-[#83dcc9]/30">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-2xl">{PLAN_INFO[selectedPlan].icon}</span>
+                  <div>
+                    <h3 className="font-bold text-[#83dcc9]">الخطة {PLAN_INFO[selectedPlan].name}</h3>
+                    <p className="text-sm text-gray-300">{PLAN_INFO[selectedPlan].price}</p>
+                  </div>
+                </div>
+                {selectedPlan === 'free' && (
+                  <ul className="text-sm text-gray-300 space-y-1">
+                    <li>✅ 3 منتجات شهرياً</li>
+                    <li>✅ معاينة Google</li>
+                    <li>✅ مؤشرات سيو أساسية</li>
+                  </ul>
+                )}
+                {selectedPlan === 'pro' && (
+                  <ul className="text-sm text-gray-300 space-y-1">
+                    <li>✅ 30 منتج شهرياً</li>
+                    <li>✅ مؤشرات سيو متقدمة</li>
+                    <li>✅ توليد تلقائي بالذكاء الاصطناعي</li>
+                    <li>✅ دعم فني مخصص</li>
+                  </ul>
+                )}
+                {selectedPlan === 'enterprise' && (
+                  <ul className="text-sm text-gray-300 space-y-1">
+                    <li>✅ منتجات غير محدودة</li>
+                    <li>✅ تحليل شامل متقدم</li>
+                    <li>✅ دعم خاص ومتابعة مخصصة</li>
+                    <li>✅ تقارير مفصلة</li>
+                  </ul>
+                )}
+              </div>
             )}
+            
+            <div className="flex flex-wrap gap-4">
+              <img src="/salla.png" alt="Salla" className="h-6 object-contain" />
+              <img src="/shopify.png" alt="Shopify" className="h-6 object-contain" />
+              <img src="/zid.png" alt="Zid" className="h-6 object-contain" />
+            </div>
           </div>
 
-          {/* Password Field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              كلمة المرور
-            </label>
-            <div className="relative">
-              <Lock className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="أدخل كلمة المرور"
-                value={formData.password}
-                onChange={handleInputChange}
-                className={`w-full pr-12 pl-12 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
-                  errors.password 
-                    ? 'border-red-500 focus:ring-red-500' 
-                    : 'border-gray-300 focus:ring-blue-500'
-                }`}
-                required
-              />
+          {/* الجانب الأيمن - النموذج */}
+          <div className="bg-white text-gray-800 rounded-3xl p-10 md:p-12 w-full border border-gray-100 shadow-[0_20px_60px_rgba(131,220,201,0.25)]">
+            
+            {/* أزرار التبديل */}
+            <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
               <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                onClick={() => setIsLogin(true)}
+                className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
+                  isLogin 
+                    ? 'bg-green-600 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
               >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                تسجيل الدخول
+              </button>
+              <button
+                onClick={() => setIsLogin(false)}
+                className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
+                  !isLogin 
+                    ? 'bg-green-600 text-white shadow-md' 
+                    : 'text-gray-600 hover:text-gray-800'
+                }`}
+              >
+                إنشاء حساب
               </button>
             </div>
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-            )}
-          </div>
 
-          {/* Remember Me & Forgot Password */}
-          <div className="flex items-center justify-between">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <span className="mr-2 text-sm text-gray-600">تذكرني</span>
-            </label>
+            <h2 className="text-xl font-bold mb-6 text-center text-green-700">
+              {isLogin ? "أهلاً بك من جديد" : selectedPlan ? `التسجيل في الخطة ${PLAN_INFO[selectedPlan].name}` : "سجّل الآن وابدأ مجاناً"}
+            </h2>
+
+            {/* زر Google */}
             <button
               type="button"
-              onClick={handleForgotPassword}
-              className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+              onClick={handleGoogleLogin}
+              disabled={googleLoading}
+              className="w-full flex items-center justify-center px-4 py-3 mb-4 border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:border-green-300 transition-all duration-200 disabled:opacity-50"
             >
-              نسيت كلمة المرور؟
+              {googleLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600 ml-3"></div>
+                  <span>جاري تسجيل الدخول...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5 ml-3" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                  </svg>
+                  <span>{isLogin ? "تسجيل الدخول" : "التسجيل"} بـ Google</span>
+                </>
+              )}
             </button>
-          </div>
 
-          {/* Login Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#162b41] text-white py-3 rounded-lg hover:bg-[#1e3b5f] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-          >
-            {loading ? (
-              <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                <span className="mr-2">جاري الدخول...</span>
-              </>
+            {/* خط الفصل */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">أو</span>
+              </div>
+            </div>
+
+            {/* نماذج الدخول/التسجيل */}
+            {isLogin ? (
+              /* نموذج تسجيل الدخول */
+              <form onSubmit={handleLogin} className="space-y-4">
+                <input 
+                  name="email" 
+                  type="email" 
+                  required 
+                  placeholder="البريد الإلكتروني" 
+                  value={loginForm.email}
+                  onChange={handleLoginChange} 
+                  className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" 
+                />
+                
+                <div className="relative">
+                  <input 
+                    name="password" 
+                    type={showPassword ? "text" : "password"} 
+                    required 
+                    placeholder="كلمة المرور" 
+                    value={loginForm.password}
+                    onChange={handleLoginChange} 
+                    className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 pr-4 pl-12 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" 
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="rememberMe"
+                      checked={loginForm.rememberMe}
+                      onChange={handleLoginChange}
+                      className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                    />
+                    <span className="mr-2 text-sm text-gray-600">تذكرني</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                  >
+                    نسيت كلمة المرور؟
+                  </button>
+                </div>
+
+                <button 
+                  type="submit" 
+                  disabled={loading} 
+                  className={`w-full py-3 rounded-xl font-bold text-white transition duration-300 ${
+                    loading ? "bg-green-600 animate-pulse cursor-default" : "bg-green-600 hover:bg-green-700"
+                  }`}
+                >
+                  {loading ? "جاري تسجيل الدخول..." : "🔐 تسجيل الدخول"}
+                </button>
+              </form>
             ) : (
-              <>
-                <ArrowRight className="w-5 h-5 ml-2" />
-                <span>دخول</span>
-              </>
+              /* نموذج التسجيل */
+              <form onSubmit={handleRegister} className="space-y-4">
+                <input 
+                  name="fullName" 
+                  type="text" 
+                  required 
+                  placeholder="الاسم الكامل" 
+                  value={registerForm.fullName}
+                  onChange={handleRegisterChange} 
+                  className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" 
+                />
+                <input 
+                  name="email" 
+                  type="email" 
+                  required 
+                  placeholder="البريد الإلكتروني" 
+                  value={registerForm.email}
+                  onChange={handleRegisterChange} 
+                  className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" 
+                />
+                <div className="relative">
+                  <input 
+                    name="password" 
+                    type={showPassword ? "text" : "password"} 
+                    required 
+                    placeholder="كلمة المرور" 
+                    value={registerForm.password}
+                    onChange={handleRegisterChange} 
+                    className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 pr-4 pl-12 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" 
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+                <div className="relative">
+                  <div className="absolute top-1/2 right-4 transform -translate-y-1/2 text-sm text-gray-500 flex items-center gap-1">
+                    <span>🇸🇦</span>
+                    <span>+966</span>
+                  </div>
+                  <input 
+                    name="phone" 
+                    type="tel" 
+                    required 
+                    placeholder="مثال: 512345678" 
+                    value={registerForm.phone}
+                    onChange={handleRegisterChange} 
+                    className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 pr-24 pl-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" 
+                  />
+                </div>
+                <input 
+                  name="storeUrl" 
+                  type="url" 
+                  required 
+                  placeholder="رابط متجرك https://" 
+                  value={registerForm.storeUrl}
+                  onChange={handleRegisterChange} 
+                  className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" 
+                />
+                <select 
+                  name="plan" 
+                  value={registerForm.plan} 
+                  onChange={handleRegisterChange} 
+                  className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600"
+                  disabled={selectedPlan} // تعطيل التغيير إذا تم اختيار خطة من الرابط
+                >
+                  <option value="free">الخطة المجانية</option>
+                  <option value="pro">الخطة المدفوعة - Pro</option>
+                  <option value="enterprise">الخطة المتقدمة - Enterprise</option>
+                </select>
+                
+                {selectedPlan && (
+                  <p className="text-xs text-green-600 mt-1">
+                    ✅ تم اختيار الخطة {PLAN_INFO[selectedPlan].name} مسبقاً
+                  </p>
+                )}
+
+                <button 
+                  type="submit" 
+                  disabled={loading} 
+                  className={`w-full py-3 rounded-xl font-bold text-white transition duration-300 ${
+                    loading ? "bg-green-600 animate-pulse cursor-default" : "bg-green-600 hover:bg-green-700"
+                  }`}
+                >
+                  {loading ? "🎉 جاري التسجيل..." : 
+                   selectedPlan && selectedPlan !== 'free' ? `💳 التسجيل في ${PLAN_INFO[selectedPlan].name}` : 
+                   "🚀 ابدأ الآن مجاناً"}
+                </button>
+              </form>
             )}
-          </button>
-
-          {/* Divider */}
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">أو</span>
-            </div>
           </div>
-
-          {/* Social Login Buttons */}
-          <div className="space-y-3">
-            <button
-              type="button"
-              className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              onClick={() => toast.info("ميزة تسجيل الدخول بجوجل قريباً")}
-            >
-              <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5 ml-2" />
-              <span>تسجيل الدخول بجوجل</span>
-            </button>
-          </div>
-
-          {/* Register Link */}
-          <div className="text-center pt-4 border-t border-gray-200">
-            <p className="text-sm text-gray-600">
-              ليس لديك حساب؟{" "}
-              <Link 
-                to="/register" 
-                className="text-blue-600 hover:text-blue-800 font-medium hover:underline"
-              >
-                أنشئ حسابك الآن
-              </Link>
-            </p>
-          </div>
-        </form>
-
-        {/* Footer Links */}
-        <div className="text-center mt-8 space-x-4">
-          <Link to="/privacy" className="text-sm text-gray-500 hover:text-gray-700">
-            سياسة الخصوصية
-          </Link>
-          <span className="text-gray-300">|</span>
-          <Link to="/terms" className="text-sm text-gray-500 hover:text-gray-700">
-            الشروط والأحكام
-          </Link>
-          <span className="text-gray-300">|</span>
-          <Link to="/support" className="text-sm text-gray-500 hover:text-gray-700">
-            الدعم الفني
-          </Link>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

@@ -1,28 +1,27 @@
+// src/utils/generateProductSEO.js
+
 export const generateProductSEO = async (prompt) => {
+  const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+  const token = localStorage.getItem("token");
+
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch(`${API_URL}/generate`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`,
+        ...(token && { Authorization: `Bearer ${token}` })
       },
-      body: JSON.stringify({
-        model: "gpt-4-turbo",
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.7,
-      }),
+      body: JSON.stringify({ prompt })
     });
 
     if (!response.ok) {
-  const errorData = await response.json();
-  console.error("❌ خطأ من OpenAI:", errorData); // ✅ نطبع التفاصيل
-  throw new Error(errorData?.error?.message || "فشل الاتصال بـ OpenAI");
-}
+      throw new Error("فشل في الاتصال بسيرفر الذكاء الاصطناعي");
+    }
 
     const data = await response.json();
-    return data.choices[0].message.content;
+    return data.text?.trim() || ""; // يرجع النص الناتج من الذكاء
   } catch (error) {
-    console.error("❌ فشل التوليد:", error);
-    throw new Error("فشل التوليد من GPT-4");
+    console.error("❌ Error in generateProductSEO:", error);
+    throw error;
   }
 };
