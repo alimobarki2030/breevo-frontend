@@ -291,6 +291,107 @@ export const getEnvironmentConfig = () => {
   return configs[env] || configs.development;
 };
 
+// ✅ Main API Call Function
+export const apiCall = async (endpoint, options = {}) => {
+  const {
+    method = 'GET',
+    body = null,
+    headers = {},
+    timeout = API_CONFIG.timeout.default,
+    ...restOptions
+  } = options;
+
+  // Get auth token from localStorage if available
+  const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+  
+  // Prepare headers
+  const defaultHeaders = token ? getAuthHeaders(token) : getBasicHeaders();
+  const requestHeaders = { ...defaultHeaders, ...headers };
+
+  // Prepare request config
+  const requestConfig = {
+    method,
+    headers: requestHeaders,
+    ...restOptions,
+  };
+
+  // Add body if present (and not GET request)
+  if (body && method !== 'GET') {
+    if (body instanceof FormData) {
+      // Remove Content-Type for FormData - let browser set it
+      delete requestConfig.headers['Content-Type'];
+      requestConfig.body = body;
+    } else if (typeof body === 'object') {
+      requestConfig.body = JSON.stringify(body);
+    } else {
+      requestConfig.body = body;
+    }
+  }
+
+  try {
+    // Create abort controller for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    requestConfig.signal = controller.signal;
+
+    // Make the request
+    const response = await fetch(endpoint, requestConfig);
+    clearTimeout(timeoutId);
+
+    // Handle response
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ 
+        message: `HTTP Error ${response.status}` 
+      }));
+      throw new Error(errorData.message || `Request failed with status ${response.status}`);
+    }
+
+    // Return JSON if possible, otherwise return text
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      return await response.json();
+    } else {
+      return await response.text();
+    }
+
+  } catch (error) {
+    // Handle different types of errors
+    if (error.name === 'AbortError') {
+      throw new Error('Request timeout');
+    } else if (error.message.includes('Failed to fetch')) {
+      throw new Error('Network error - please check your connection');
+    } else {
+      throw error;
+    }
+  }
+};
+
+// ✅ Convenience functions for common HTTP methods
+export const apiGet = (endpoint, options = {}) => 
+  apiCall(endpoint, { ...options, method: 'GET' });
+
+export const apiPost = (endpoint, body, options = {}) => 
+  apiCall(endpoint, { ...options, method: 'POST', body });
+
+export const apiPut = (endpoint, body, options = {}) => 
+  apiCall(endpoint, { ...options, method: 'PUT', body });
+
+export const apiPatch = (endpoint, body, options = {}) => 
+  apiCall(endpoint, { ...options, method: 'PATCH', body });
+
+export const apiDelete = (endpoint, options = {}) => 
+  apiCall(endpoint, { ...options, method: 'DELETE' });
+
+// ✅ File upload helper
+export const apiUpload = (endpoint, file, additionalData = {}, options = {}) => {
+  const formData = buildFormData({ file, ...additionalData });
+  return apiCall(endpoint, { 
+    ...options, 
+    method: 'POST', 
+    body: formData 
+  });
+};
+
 // ✅ Default export
 export default API_ENDPOINTS;
 
