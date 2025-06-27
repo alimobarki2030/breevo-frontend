@@ -217,23 +217,34 @@ const SmartAnalysisCard = ({ product, onUpdate, isAnalyzing, userPlan, canAnalyz
   };
 
   const performAnalysis = async () => {
-    const { categorizeProduct, analyzeTargetAudience, selectTone, selectStoryArc } = analyzeSEO(product);
-    
-    const keyword = (await generateProductSEO(`استخرج كلمة مفتاحية لهذا المنتج: "${product.name}"`)).trim();
-    const categoryPrompt = await categorizeProduct(product);
-    const category = (await generateProductSEO(categoryPrompt)).trim();
-    const audiencePrompt = await analyzeTargetAudience(product, category);
-    const targetAudience = (await generateProductSEO(audiencePrompt)).trim();
-    const tone = selectTone(category, targetAudience);
-    const bestStoryArc = selectStoryArc(category);
+    try {
+      const { categorizeProduct, analyzeTargetAudience, selectTone, selectStoryArc } = analyzeSEO(product);
+      
+      const keyword = (await generateProductSEO(`استخرج كلمة مفتاحية لهذا المنتج: "${product.name}"`)).trim();
+      const categoryPrompt = await categorizeProduct(product);
+      const category = (await generateProductSEO(categoryPrompt)).trim();
+      const audiencePrompt = await analyzeTargetAudience(product, category);
+      const targetAudience = (await generateProductSEO(audiencePrompt)).trim();
+      const tone = selectTone(category, targetAudience);
+      const bestStoryArc = selectStoryArc(category);
 
-    return {
-      keyword: truncateText(keyword, FIELD_LIMITS.keyword_limit),
-      category: category || "",
-      target_audience: targetAudience || "",
-      tone: tone || "",
-      best_story_arc: bestStoryArc || "",
-    };
+      return {
+        keyword: truncateText(keyword, FIELD_LIMITS.keyword_limit),
+        category: category || "",
+        target_audience: targetAudience || "",
+        tone: tone || "",
+        best_story_arc: bestStoryArc || "",
+      };
+    } catch (error) {
+      console.error("Analysis error:", error);
+      return {
+        keyword: "",
+        category: "",
+        target_audience: "",
+        tone: "",
+        best_story_arc: "",
+      };
+    }
   };
 
   const hasAnalysis = product.category && product.target_audience && product.tone && product.best_story_arc;
@@ -552,9 +563,7 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
   );
 };
 
-// Main Component continues with the rest of the logic...
-// [The rest of the component remains the same, but with the new SmartAnalysisCard integrated]
-
+// Main Component
 export default function ProductSEO() {
   const { id } = useParams();
   const location = useLocation();
@@ -637,6 +646,103 @@ export default function ProductSEO() {
     setShowUpgradeModal(true);
   };
 
+  // Load product data
+  useEffect(() => {
+    loadProduct();
+  }, [id, passedProduct]);
+
+  // Analyze SEO when product changes
+  useEffect(() => {
+    if (Object.keys(product).length > 0) {
+      try {
+        const result = analyzeSEO(product);
+        setScore(result);
+      } catch (error) {
+        console.error("SEO analysis error:", error);
+        setScore({});
+      }
+    }
+  }, [
+    product.name,
+    product.description,
+    product.keyword,
+    product.meta_title,
+    product.meta_description,
+    product.url_path,
+    product.imageAlt,
+  ]);
+
+  // Track unsaved changes
+  useEffect(() => {
+    if (Object.keys(originalProduct).length > 0) {
+      const hasChanges = JSON.stringify(product) !== JSON.stringify(originalProduct);
+      setHasUnsavedChanges(hasChanges);
+    }
+  }, [product, originalProduct]);
+
+  // Warn before leaving with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
+
+  const loadProduct = useCallback(async () => {
+    setLoading(true);
+    setErrors({});
+
+    try {
+      let productData = null;
+
+      if (passedProduct) {
+        productData = passedProduct;
+      } else if (id) {
+        // Try API first
+        const token = localStorage.getItem("token");
+        if (token) {
+          try {
+            const response = await fetch(`${API_BASE_URL}/product/${id}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            });
+            if (response.ok) {
+              productData = await response.json();
+            }
+          } catch (apiError) {
+            console.log("API not available, loading from localStorage");
+          }
+        }
+
+        // Fallback to localStorage
+        if (!productData) {
+          const saved = JSON.parse(localStorage.getItem("saved_products") || "[]");
+          productData = saved.find(p => p.id == id);
+        }
+      }
+
+      if (productData) {
+        setProduct(productData);
+        setOriginalProduct(JSON.parse(JSON.stringify(productData)));
+      } else {
+        throw new Error("المنتج غير موجود");
+      }
+    } catch (error) {
+      console.error("Error loading product:", error);
+      setErrors({ load: error.message || "فشل في تحميل بيانات المنتج" });
+      toast.error("فشل في تحميل بيانات المنتج");
+    } finally {
+      setLoading(false);
+    }
+  }, [id, passedProduct]);
+
   // Updated handleProductChange to work with the new analysis card
   const handleProductChange = useCallback((field, value) => {
     if (typeof field === 'object') {
@@ -669,8 +775,260 @@ export default function ProductSEO() {
     setProductAnalysis(analysisData);
   }, [handleProductChange]);
 
-  // Rest of the component logic remains the same...
-  // [Include all the existing useEffect hooks, functions, and render logic]
+  const validateProduct = useCallback(() => {
+    const newErrors = {};
+    
+    if (!product.name?.trim()) {
+      newErrors.name = "اسم المنتج مطلوب";
+    } else if (product.name.length > FIELD_LIMITS.name_limit) {
+      newErrors.name = `اسم المنتج يجب ألا يتجاوز ${FIELD_LIMITS.name_limit} حرف`;
+    }
+
+    if (product.meta_title && product.meta_title.length > FIELD_LIMITS.meta_title) {
+      newErrors.meta_title = `Page Title يجب ألا يتجاوز ${FIELD_LIMITS.meta_title} حرف`;
+    }
+
+    if (product.meta_description && product.meta_description.length > FIELD_LIMITS.meta_description) {
+      newErrors.meta_description = `Page Description يجب ألا يتجاوز ${FIELD_LIMITS.meta_description} حرف`;
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  }, [product]);
+
+  const handleSave = useCallback(async () => {
+    if (!validateProduct()) {
+      toast.error("يرجى تصحيح الأخطاء قبل الحفظ");
+      return;
+    }
+
+    setSaving(true);
+    setErrors(prev => ({ ...prev, save: null }));
+
+    try {
+      const payload = {
+        name: product.name || "",
+        description: product.description || "",
+        meta_title: product.meta_title || "",
+        meta_description: product.meta_description || "",
+        url_path: product.url_path || "",
+        keyword: product.keyword || "",
+        category: product.category || "",
+        target_audience: product.target_audience || "",
+        tone: product.tone || "",
+        best_story_arc: product.best_story_arc || "",
+        imageAlt: product.imageAlt || "",
+        lastUpdated: new Date().toISOString()
+      };
+
+      // Try API first
+      const token = localStorage.getItem("token");
+      if (token && product.id) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/product/${product.id}`, {
+            method: "PUT",
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            console.log("✅ API save successful:", result);
+          }
+        } catch (apiError) {
+          console.log("API not available, saving locally only");
+        }
+      }
+
+      // Update localStorage
+      const saved = JSON.parse(localStorage.getItem("saved_products") || "[]");
+      const index = saved.findIndex(p => p.id === product.id);
+      const updatedProduct = { ...product, ...payload };
+      
+      if (index !== -1) {
+        saved[index] = updatedProduct;
+      } else {
+        saved.push(updatedProduct);
+      }
+      
+      localStorage.setItem("saved_products", JSON.stringify(saved));
+      setProduct(updatedProduct);
+      setOriginalProduct(JSON.parse(JSON.stringify(updatedProduct)));
+
+      toast.success("تم حفظ التعديلات بنجاح! ✅");
+    } catch (error) {
+      console.error("Error saving product:", error);
+      const errorMessage = error?.response?.data?.message || error?.message || "حدث خطأ أثناء الحفظ";
+      setErrors(prev => ({ ...prev, save: errorMessage }));
+      toast.error("❌ " + errorMessage);
+    } finally {
+      setSaving(false);
+    }
+  }, [product, validateProduct]);
+
+  const copyToClipboard = useCallback(async (text, label) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success(`تم نسخ ${label} للحافظة! 📋`);
+    } catch (error) {
+      toast.error("فشل في النسخ");
+    }
+  }, []);
+
+  const renderInputField = useCallback((label, key, multiline = false, placeholder = "", icon = null) => {
+    const hasError = errors[key];
+    const isLoading = fieldLoading === key;
+    const fieldValue = product[key] || "";
+    const isLocked = userPlan === "free" && isTrialExpired;
+    
+    // Character count for limited fields
+    const showCharCount = ['meta_title', 'meta_description', 'name'].includes(key);
+    const charLimit = FIELD_LIMITS[key + '_limit'] || FIELD_LIMITS[key];
+    const charCount = fieldValue.length;
+    const isOverLimit = charLimit && charCount > charLimit;
+
+    if (key === "description") {
+      return (
+        <div className={`relative bg-white p-6 rounded-2xl shadow-sm border transition-colors ${
+          isLocked ? 'border-red-200 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+        }`}>
+          <div className="flex items-center justify-between mb-4">
+            <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+              {icon}
+              {label}
+              {!isLocked && <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">Rich Text Editor</span>}
+              {isLocked && <span className="text-xs text-red-600 bg-red-100 px-2 py-1 rounded">🔒 مؤمن</span>}
+            </label>
+            <div className="flex items-center gap-2">
+              {fieldValue && !isLocked && (
+                <button
+                  onClick={() => copyToClipboard(fieldValue, label)}
+                  className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors"
+                  title="نسخ"
+                >
+                  <Copy className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+          </div>
+          
+          {isLocked ? (
+            <div className="w-full p-3 border border-red-300 rounded-lg bg-red-50 text-red-700 text-center">
+              🔒 انتهت التجربة المجانية. ترقية مطلوبة للمتابعة
+            </div>
+          ) : (
+            <TiptapEditor
+              value={fieldValue}
+              onChange={(val) => handleProductChange(key, val)}
+              placeholder={placeholder}
+            />
+          )}
+          
+          {hasError && (
+            <div className="text-red-500 text-xs mt-2 flex items-center gap-1">
+              <XCircle className="w-3 h-3" />
+              {hasError}
+            </div>
+          )}
+          
+          {/* Rich text editor note */}
+          {!isLocked && (
+            <div className="text-xs text-gray-500 mt-2">
+              💡 استخدم المحرر لإضافة <strong>التنسيق</strong>، <strong>الروابط الداخلية</strong>، والقوائم المنظمة
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div className={`relative bg-white p-6 rounded-2xl shadow-sm border transition-colors ${
+        isLocked ? 'border-red-200 bg-red-50' : 'border-gray-200 hover:border-gray-300'
+      }`}>
+        <div className="flex items-center justify-between mb-3">
+          <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+            {icon}
+            {label}
+            {isLocked && <span className="text-xs text-red-600 bg-red-100 px-2 py-1 rounded">🔒 مؤمن</span>}
+          </label>
+          <div className="flex items-center gap-2">
+            {showCharCount && (
+              <span className={`text-xs ${isOverLimit ? 'text-red-500' : 'text-gray-500'}`}>
+                {charCount}{charLimit && `/${charLimit}`}
+              </span>
+            )}
+            {fieldValue && !isLocked && (
+              <button
+                onClick={() => copyToClipboard(fieldValue, label)}
+                className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors"
+                title="نسخ"
+              >
+                <Copy className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+        </div>
+        
+        {isLocked ? (
+          <div className="w-full p-3 border border-red-300 rounded-lg bg-red-50 text-red-700 text-center">
+            🔒 انتهت التجربة المجانية. ترقية مطلوبة للمتابعة
+          </div>
+        ) : multiline ? (
+          <textarea
+            value={fieldValue}
+            onChange={(e) => handleProductChange(key, e.target.value)}
+            placeholder={placeholder}
+            className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 resize-y min-h-[120px] transition-colors ${
+              hasError ? "border-red-300 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+            }`}
+            rows={4}
+          />
+        ) : (
+          <input
+            type="text"
+            value={fieldValue}
+            onChange={(e) => handleProductChange(key, e.target.value)}
+            placeholder={placeholder}
+            className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
+              hasError ? "border-red-300 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+            }`}
+          />
+        )}
+        
+        {hasError && (
+          <div className="text-red-500 text-xs mt-2 flex items-center gap-1">
+            <XCircle className="w-3 h-3" />
+            {hasError}
+          </div>
+        )}
+
+        {/* Field-specific hints */}
+        {key === 'meta_title' && !isLocked && (
+          <div className="text-xs text-gray-500 mt-2">
+            💡 Page Title المثالي: 50-60 حرف، يحتوي الكلمة المفتاحية، جذاب للنقر
+          </div>
+        )}
+        {key === 'meta_description' && !isLocked && (
+          <div className="text-xs text-gray-500 mt-2">
+            💡 Page Description المثالي: 150-160 حرف، يحتوي الكلمة المفتاحية، يحفز على الزيارة
+          </div>
+        )}
+        {key === 'keyword' && !isLocked && (
+          <div className="text-xs text-gray-500 mt-2">
+            💡 اختر كلمة مفتاحية بحجم بحث عالي ومنافسة معقولة
+          </div>
+        )}
+        {key === 'url_path' && !isLocked && (
+          <div className="text-xs text-amber-600 bg-amber-50 p-2 rounded mt-2">
+            ⚠️ إذا كان الموقع مفهرس مسبقاً، لا تعدل هذا الحقل حيث قد يؤثر على الفهرسة
+          </div>
+        )}
+      </div>
+    );
+  }, [product, errors, fieldLoading, userPlan, isTrialExpired, handleProductChange, copyToClipboard]);
 
   // Progress calculation using core criteria
   const progress = useMemo(() => {
@@ -757,8 +1115,42 @@ export default function ProductSEO() {
                 <Eye className="w-4 h-4" />
                 {showPreview ? 'إخفاء المعاينة' : 'معاينة Google'}
               </button>
+              <button
+                onClick={handleSave}
+                disabled={saving || !hasUnsavedChanges}
+                className={`px-6 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                  saving 
+                    ? "bg-blue-100 text-blue-700 cursor-not-allowed"
+                    : hasUnsavedChanges
+                      ? "bg-blue-600 text-white hover:bg-blue-700" 
+                      : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                }`}
+              >
+                {saving ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border border-blue-600 border-t-transparent"></div>
+                    جاري الحفظ...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    حفظ التغييرات
+                  </>
+                )}
+              </button>
             </div>
           </div>
+
+          {/* Error Display */}
+          {(errors.save || errors.generate || errors.analyze) && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center gap-2 text-red-800">
+                <XCircle className="w-5 h-5" />
+                <span className="font-medium">خطأ:</span>
+                <span>{errors.save || errors.generate || errors.analyze}</span>
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
             
@@ -795,9 +1187,97 @@ export default function ProductSEO() {
                 </div>
               )}
 
-              {/* Rest of the form fields... */}
-              {/* [Include all existing form sections with the renderInputField function] */}
-              
+              {/* SEO Fields */}
+              <div className="space-y-6">
+                
+                {/* Basic Info */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
+                    <Type className="w-5 h-5 text-blue-500" />
+                    المعلومات الأساسية
+                  </h3>
+                  
+                  {renderInputField(
+                    "اسم المنتج", 
+                    "name", 
+                    false, 
+                    "أدخل اسم المنتج الجذاب والواضح...", 
+                    <Package className="w-4 h-4 text-blue-500" />
+                  )}
+                  
+                  {renderInputField(
+                    "الكلمة المفتاحية الرئيسية", 
+                    "keyword", 
+                    false, 
+                    "الكلمة المفتاحية التي تريد الظهور بها في نتائج البحث...", 
+                    <Search className="w-4 h-4 text-green-500" />
+                  )}
+                </div>
+
+                {/* Description */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
+                    <FileText className="w-5 h-5 text-green-500" />
+                    وصف المنتج
+                  </h3>
+                  
+                  {renderInputField(
+                    "وصف المنتج التفصيلي", 
+                    "description", 
+                    true, 
+                    "اكتب وصفاً شاملاً ومقنعاً للمنتج يجذب العملاء ويحسن السيو...", 
+                    <FileText className="w-4 h-4 text-green-500" />
+                  )}
+                </div>
+
+                {/* Page Title & Description */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
+                    <Globe className="w-5 h-5 text-purple-500" />
+                    Page Title & Description
+                  </h3>
+                  
+                  {renderInputField(
+                    "Page Title عنوان السيو", 
+                    "meta_title", 
+                    false, 
+                    "عنوان قصير وجذاب يظهر في نتائج البحث...", 
+                    <Type className="w-4 h-4 text-purple-500" />
+                  )}
+                  
+                  {renderInputField(
+                    "Page Description وصف الميتا", 
+                    "meta_description", 
+                    true, 
+                    "وصف موجز ومقنع يظهر أسفل العنوان في نتائج البحث...", 
+                    <FileText className="w-4 h-4 text-purple-500" />
+                  )}
+                </div>
+
+                {/* Technical SEO */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
+                    <TrendingUp className="w-5 h-5 text-orange-500" />
+                    السيو التقني
+                  </h3>
+                  
+                  {renderInputField(
+                    "مسار الرابط (URL Slug)", 
+                    "url_path", 
+                    false, 
+                    "product-name-seo-friendly", 
+                    <Globe className="w-4 h-4 text-orange-500" />
+                  )}
+                  
+                  {renderInputField(
+                    "النص البديل للصورة (Image Alt)", 
+                    "imageAlt", 
+                    false, 
+                    "وصف الصورة للمكفوفين ومحركات البحث...", 
+                    <Image className="w-4 h-4 text-orange-500" />
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* Sidebar */}
@@ -806,7 +1286,7 @@ export default function ProductSEO() {
               {/* SEO Score */}
               <EnhancedSEODisplay analysis={score} product={product} />
 
-              {/* Quick Tips - Updated */}
+              {/* Quick Tips */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <Lightbulb className="w-5 h-5 text-yellow-500" />
@@ -830,7 +1310,7 @@ export default function ProductSEO() {
                   <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
                     <div className="text-purple-500 mt-0.5">📝</div>
                     <div>
-                      <strong>المحتوى الذكي:</strong> استخدم الأزرار الذكية لتوليد محتوى محسن
+                      <strong>المحتوى الذكي:</strong> استخدم أدوات التحرير لإنشاء محتوى محسن
                     </div>
                   </div>
                 </div>
@@ -868,6 +1348,60 @@ export default function ProductSEO() {
                     {progress >= 50 && progress < 70 && "يحتاج تحسين 📈"}
                     {progress < 50 && "ابدأ التحسين 🚀"}
                   </div>
+                  
+                  {/* Core Field completion status */}
+                  <div className="pt-4 border-t border-gray-100">
+                    <div className="text-sm font-medium text-gray-700 mb-2">المعايير الأساسية:</div>
+                    <div className="grid grid-cols-1 gap-2 text-xs">
+                      {[
+                        { key: 'keyword', label: 'الكلمة المفتاحية' },
+                        { key: 'name', label: 'عنوان يحتوي الكلمة المفتاحية' },
+                        { key: 'description', label: 'وصف 120+ كلمة' },
+                        { key: 'meta_title', label: 'Page Title' },
+                        { key: 'meta_description', label: 'Page Description' },
+                        { key: 'imageAlt', label: 'Image Alt' }
+                      ].map(field => {
+                        const coreResults = checkCoreCriteria(product);
+                        const criterion = coreResults.criteria.find(c => c.id.includes(field.key) || c.text.includes(field.label));
+                        const isComplete = criterion?.status === 'pass';
+                        
+                        return (
+                          <div key={field.key} className="flex items-center gap-2">
+                            {isComplete ? (
+                              <CheckCircle className="w-3 h-3 text-green-500" />
+                            ) : (
+                              <XCircle className="w-3 h-3 text-gray-400" />
+                            )}
+                            <span className={isComplete ? 'text-green-700' : 'text-gray-500'}>
+                              {field.label}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">إجراءات سريعة</h3>
+                <div className="space-y-3">
+                  <button
+                    onClick={() => copyToClipboard(JSON.stringify(product, null, 2), "بيانات المنتج")}
+                    className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 justify-center"
+                  >
+                    <Copy className="w-4 h-4" />
+                    نسخ البيانات كـ JSON
+                  </button>
+                  
+                  <Link
+                    to="/products"
+                    className="w-full px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors flex items-center gap-2 justify-center"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    العودة للمنتجات
+                  </Link>
                 </div>
               </div>
             </div>
