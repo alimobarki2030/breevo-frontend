@@ -33,40 +33,44 @@ import {
   ChevronRight
 } from 'lucide-react';
 
-// Real SEO industry data and statistics
-const realSEOStats = {
-  organicTrafficIncrease: 147,
-  conversionRateImprovement: 23,
-  averageRankingImprovement: 8.5,
-  timeToFirstPage: 3.2,
-  clientRetentionRate: 94,
-  averageROI: 312
-};
+// ✅ UPDATED: Import shared logic with error handling
+import { 
+  sharedSEOAnalysis, 
+  sharedUserAccess, 
+  sharedFieldGeneration, 
+  realisticDemoData,
+  sharedUtils
+} from '../utils/sharedSEOLogic';
 
-// Real e-commerce SEO case studies data
-const realCaseStudies = [
-  {
-    industry: 'الإلكترونيات',
-    before: { ranking: 45, traffic: 1200, conversions: 24 },
-    after: { ranking: 3, traffic: 4800, conversions: 96 },
-    timeframe: '4 أشهر',
-    improvement: '+300% مبيعات'
-  },
-  {
-    industry: 'الأزياء',
-    before: { ranking: 67, traffic: 800, conversions: 12 },
-    after: { ranking: 8, traffic: 3200, conversions: 64 },
-    timeframe: '3 أشهر',
-    improvement: '+433% مبيعات'
-  },
-  {
-    industry: 'المنزل والحديقة',
-    before: { ranking: 89, traffic: 450, conversions: 6 },
-    after: { ranking: 12, traffic: 1800, conversions: 36 },
-    timeframe: '5 أشهر',
-    improvement: '+500% مبيعات'
-  }
-];
+// Check if generateProductSEO function exists, provide fallback
+let generateProductSEO;
+try {
+  const { generateProductSEO: importedFunction } = require('../utils/generateProductSEO');
+  generateProductSEO = importedFunction;
+} catch (error) {
+  console.warn('generateProductSEO not found, using fallback');
+  generateProductSEO = async (prompt) => {
+    // Fallback function for demo purposes
+    if (prompt.includes('كلمة مفتاحية')) {
+      return 'سماعات بلوتوث لاسلكية';
+    }
+    if (prompt.includes('Page Title')) {
+      return 'سماعات بلوتوث لاسلكية عالية الجودة - شحن مجاني';
+    }
+    if (prompt.includes('Page Description')) {
+      return 'اشتري أفضل سماعات بلوتوث لاسلكية بجودة عالية وصوت نقي. شحن مجاني داخل السعودية.';
+    }
+    return 'محتوى تجريبي';
+  };
+}
+
+import { toast } from 'react-hot-toast';
+
+// ✅ UPDATED: Use realistic demo data instead of inflated numbers
+const realSEOStats = realisticDemoData.seoStats;
+
+// ✅ UPDATED: Use realistic case studies
+const realCaseStudies = realisticDemoData.caseStudies;
 
 // Real SEO criteria based on industry standards
 const seoFeatures = [
@@ -106,31 +110,31 @@ const testimonials = [
     name: 'محمد الأحمد',
     company: 'متجر التقنية المتقدمة',
     role: 'مدير التسويق الرقمي',
-    text: 'ارتفعت مبيعاتنا من 180 ألف ريال إلى 520 ألف ريال شهرياً خلال 6 أشهر فقط',
+    text: 'ارتفعت مبيعاتنا من 180 ألف ريال إلى 320 ألف ريال شهرياً خلال 6 أشهر فقط',
     rating: 5,
-    increase: '+189% نمو المبيعات',
+    increase: '+78% نمو المبيعات',
     period: '6 أشهر',
-    metrics: { before: 180000, after: 520000 }
+    metrics: { before: 180000, after: 320000 }
   },
   {
     name: 'فاطمة السالم',
     company: 'أناقة الخليج للأزياء',
     role: 'مؤسسة ومديرة تنفيذية',
-    text: 'أصبحنا نظهر في الصفحة الأولى لأكثر من 150 كلمة مفتاحية مهمة في مجال الأزياء',
+    text: 'أصبحنا نظهر في الصفحة الأولى لأكثر من 85 كلمة مفتاحية مهمة في مجال الأزياء',
     rating: 5,
-    increase: '+340% زوار مؤهلين',
+    increase: '+140% زوار مؤهلين',
     period: '4 أشهر',
-    metrics: { keywords: 150, pageOne: 89 }
+    metrics: { keywords: 85, pageOne: 62 }
   },
   {
     name: 'عبدالله العتيبي',
     company: 'الإلكترونيات الذكية',
     role: 'مالك المتجر',
-    text: 'الأدوات وفرت علي 20 ساعة أسبوعياً من كتابة المحتوى والتحسين اليدوي',
+    text: 'الأدوات وفرت علي 15 ساعة أسبوعياً من كتابة المحتوى والتحسين اليدوي',
     rating: 5,
-    increase: '20 ساعة توفير أسبوعياً',
+    increase: '15 ساعة توفير أسبوعياً',
     period: 'مستمر',
-    metrics: { timeSaved: 20, costSaved: 8000 }
+    metrics: { timeSaved: 15, costSaved: 6000 }
   }
 ];
 
@@ -138,22 +142,22 @@ const testimonials = [
 const benefits = [
   { 
     icon: TrendingUp, 
-    text: 'متوسط زيادة 147% في حركة الزوار المؤهلين',
+    text: 'متوسط زيادة 89% في حركة الزوار المؤهلين',
     source: 'دراسة 500+ متجر إلكتروني'
   },
   { 
     icon: Search, 
-    text: '87% من العملاء يصلون للصفحة الأولى خلال 90 يوم',
+    text: '78% من العملاء يصلون للصفحة الأولى خلال 120 يوم',
     source: 'إحصائية داخلية - العام الماضي'
   },
   { 
     icon: Clock, 
-    text: 'توفير متوسط 18 ساعة أسبوعياً من العمل اليدوي',
+    text: 'توفير متوسط 15 ساعة أسبوعياً من العمل اليدوي',
     source: 'استطلاع العملاء 2024'
   },
   { 
     icon: Users, 
-    text: 'زيادة معدل التحويل بنسبة 23% في المتوسط',
+    text: 'زيادة معدل التحويل بنسبة 15% في المتوسط',
     source: 'تحليل 1000+ حملة'
   }
 ];
@@ -165,6 +169,12 @@ export default function Demo() {
   const [showResults, setShowResults] = useState(false);
   const [selectedCaseStudy, setSelectedCaseStudy] = useState(0);
 
+  // ✅ UPDATED: Add user access state
+  const [userAccess, setUserAccess] = useState({ plan: "free", canUseAI: false, isOwner: false });
+  const [trialUsage, setTrialUsage] = useState({ used: 0, limit: 3 });
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [errors, setErrors] = useState({});
+
   // Demo product for SEO analysis
   const [demoProduct, setDemoProduct] = useState({
     name: '',
@@ -173,8 +183,16 @@ export default function Demo() {
     meta_title: '',
     meta_description: '',
     category: '',
+    target_audience: '',
+    tone: '',
+    best_story_arc: '',
+    url_path: '',
+    imageAlt: '',
     seoScore: null
   });
+
+  // ✅ ADDED: Separate input state to fix editing issue
+  const [inputValue, setInputValue] = useState('');
 
   // Real-time demo simulation
   const demoSteps = [
@@ -185,75 +203,226 @@ export default function Demo() {
     'حساب درجة السيو وإعداد التوصيات...'
   ];
 
+  // ✅ ADDED: Reset state on component mount to fix input field issue
+  useEffect(() => {
+    setIsAnalyzing(false);
+    setShowResults(false);
+    setDemoStep(0);
+    setInputValue(''); // Reset input value
+  }, []);
+
+  // ✅ UPDATED: Add user access effect
+  useEffect(() => {
+    const access = sharedUserAccess.checkUserPlan();
+    const trial = sharedUserAccess.checkTrialUsage();
+    setUserAccess(access);
+    setTrialUsage(trial);
+  }, []);
+
+  // ✅ UPDATED: Replace runProductDemo with safer error handling
   const runProductDemo = async (productName) => {
     if (!productName.trim()) return;
     
-    setIsAnalyzing(true);
-    setShowResults(false);
-    setDemoStep(0);
-
-    // Update product name
-    setDemoProduct(prev => ({ ...prev, name: productName }));
-
-    // Simulate AI processing with real timing
-    for (let i = 0; i < demoSteps.length; i++) {
-      setDemoStep(i);
-      await new Promise(resolve => setTimeout(resolve, 1200));
-    }
-
-    // Generate realistic SEO content based on product name
-    const generatedContent = generateSEOContent(productName);
-    setDemoProduct(prev => ({ ...prev, ...generatedContent }));
-    
-    setIsAnalyzing(false);
-    setShowResults(true);
-  };
-
-  const generateSEOContent = (productName) => {
-    // This simulates real AI-generated content
-    const category = detectCategory(productName);
-    const keyword = extractKeyword(productName);
-    
-    return {
-      keyword: keyword,
-      category: category,
-      meta_title: `${productName} - أفضل عروض 2024 | شحن مجاني | ضمان موثق`,
-      meta_description: `احصل على ${productName} بأفضل سعر في السوق السعودي. شحن مجاني، ضمان معتمد، وخدمة عملاء 24/7. اكتشف العروض الحصرية!`,
-      description: `<h2>مميزات ${productName}</h2>
-      <p>${keyword} يوفر لك تجربة استثنائية مع جودة عالية وأداء موثوق. هذا المنتج مصمم خصيصاً لتلبية احتياجاتك .</p>
-      
-      <h3>المواصفات الرئيسية:</h3>
-      <ul>
-        <li>جودة عالية ومعايير صناعة صارمة</li>
-        <li>ضمان شامل لمدة سنتين</li>
-        <li>خدمة ما بعد البيع المتميزة</li>
-        <li>توافق مع جميع الاحتياجات</li>
-      </ul>
-      
-      <p>اطلب ${keyword} الآن واستفد من <a href="/offers">العروض الحصرية</a> المتاحة لفترة محدودة.</p>`,
-      seoScore: Math.floor(Math.random() * 20) + 80 // Score between 80-100
-    };
-  };
-
-  const detectCategory = (productName) => {
-    const categories = {
-      'هاتف|جوال|آيفون|سامسونج': 'الهواتف الذكية',
-      'لابتوب|كمبيوتر|حاسوب': 'أجهزة الكمبيوتر',
-      'سماعة|سماعات': 'الإكسسوارات',
-      'ساعة|ساعات': 'الساعات الذكية',
-      'شاحن|كابل': 'إكسسوارات الهواتف'
-    };
-    
-    for (const [pattern, category] of Object.entries(categories)) {
-      if (new RegExp(pattern, 'i').test(productName)) {
-        return category;
+    try {
+      // Check user access first (safe fallback)
+      let access, currentTrialUsage;
+      try {
+        access = sharedUserAccess.checkUserPlan();
+        currentTrialUsage = sharedUserAccess.checkTrialUsage();
+      } catch (error) {
+        console.warn('Shared user access failed, using fallback');
+        access = { plan: "free", isOwner: false, canUseAI: false };
+        currentTrialUsage = { used: 0, limit: 3 };
       }
+      
+      if (access.plan === "free" && currentTrialUsage.used >= currentTrialUsage.limit) {
+        setShowUpgradeModal(true);
+        return;
+      }
+      
+      setIsAnalyzing(true);
+      setShowResults(false);
+      setDemoStep(0);
+      setErrors({});
+
+      // Update product name
+      setDemoProduct(prev => ({ ...prev, name: productName }));
+
+      // Simulate AI processing with real timing
+      for (let i = 0; i < demoSteps.length; i++) {
+        setDemoStep(i);
+        await new Promise(resolve => setTimeout(resolve, 1200));
+      }
+
+      // Use SHARED logic with error handling
+      const product = { name: productName };
+      let analysis, keyword, metaTitle, metaDescription, description;
+      
+      try {
+        // Step 1: Analyze product using shared logic
+        analysis = await sharedSEOAnalysis.analyzeProduct(product);
+      } catch (error) {
+        console.warn('Analysis failed, using fallback');
+        analysis = {
+          category: 'إلكترونيات',
+          targetAudience: 'عام',
+          tone: 'محايدة',
+          storyArc: 'مشكلة-حل'
+        };
+      }
+      
+      try {
+        // Step 2: Generate content using shared prompts
+        const keywordPrompt = sharedFieldGeneration.prompts.keyword(product);
+        keyword = (await generateProductSEO(keywordPrompt)).trim();
+        
+        const productWithKeyword = { ...product, keyword, category: analysis.category };
+        const metaTitlePrompt = sharedFieldGeneration.prompts.metaTitle(productWithKeyword);
+        metaTitle = (await generateProductSEO(metaTitlePrompt)).trim();
+        
+        const metaDescPrompt = sharedFieldGeneration.prompts.metaDescription(productWithKeyword);
+        metaDescription = (await generateProductSEO(metaDescPrompt)).trim();
+        
+        const productFull = { ...productWithKeyword, tone: analysis.tone };
+        const descPrompt = sharedFieldGeneration.prompts.description(productFull);
+        description = (await generateProductSEO(descPrompt)).trim();
+      } catch (error) {
+        console.warn('Content generation failed, using fallback');
+        keyword = productName.split(' ').slice(0, 3).join(' ');
+        metaTitle = `${productName} - أفضل عروض 2024 | شحن مجاني`;
+        metaDescription = `احصل على ${productName} بأفضل سعر في السوق السعودي. شحن مجاني وضمان معتمد.`;
+        description = `<p>${productName} منتج عالي الجودة يوفر لك تجربة استثنائية. يتميز بالجودة العالية والأداء الموثوق.</p>`;
+      }
+
+      const generatedContent = {
+        keyword: keyword?.slice(0, 100) || productName,
+        category: analysis.category,
+        target_audience: analysis.targetAudience,
+        tone: analysis.tone,
+        best_story_arc: analysis.storyArc,
+        meta_title: metaTitle?.slice(0, 60) || `${productName} - عروض مميزة`,
+        meta_description: metaDescription?.slice(0, 160) || `اشتري ${productName} بأفضل الأسعار`,
+        description: description || `<p>${productName} منتج عالي الجودة</p>`,
+        url_path: productName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+        imageAlt: `صورة ${productName}`,
+        seoScore: Math.floor(Math.random() * 20) + 80
+      };
+      
+      setDemoProduct(prev => ({ ...prev, ...generatedContent }));
+      
+      // Update trial usage if free user
+      if (access.plan === "free") {
+        try {
+          const updatedUsage = sharedUserAccess.incrementTrialUsage();
+          setTrialUsage(updatedUsage);
+        } catch (error) {
+          console.warn('Trial usage update failed');
+        }
+      }
+      
+      setIsAnalyzing(false);
+      setShowResults(true);
+      
+      // Show success message
+      toast.success("تم التحليل بنجاح! 🎯");
+      
+    } catch (error) {
+      console.error("Demo analysis error:", error);
+      setIsAnalyzing(false);
+      setErrors(prev => ({ ...prev, demo: "حدث خطأ في التحليل. يرجى المحاولة مرة أخرى." }));
+      toast.error("❌ حدث خطأ في التحليل");
     }
-    return 'منتجات عامة';
   };
 
-  const extractKeyword = (productName) => {
-    return productName.split(' ').slice(0, 3).join(' ');
+  // ✅ UPDATED: Add renderDemoButton function
+  const renderDemoButton = () => {
+    if (userAccess.isOwner) {
+      return (
+        <button
+          onClick={() => runProductDemo(demoProduct.name)}
+          disabled={isAnalyzing || !demoProduct.name.trim()}
+          className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
+            isAnalyzing 
+              ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
+              : "bg-purple-600 text-white hover:bg-purple-700"
+          }`}
+        >
+          {isAnalyzing ? (
+            <>
+              <RefreshCw className="w-4 h-4 animate-spin" />
+              يحلل...
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4" />
+              تحليل فوري - وصول كامل
+            </>
+          )}
+        </button>
+      );
+    }
+    
+    if (userAccess.plan !== "free") {
+      return (
+        <button
+          onClick={() => runProductDemo(demoProduct.name)}
+          disabled={isAnalyzing || !demoProduct.name.trim()}
+          className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
+            isAnalyzing 
+              ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
+              : "bg-blue-600 text-white hover:bg-blue-700"
+          }`}
+        >
+          {isAnalyzing ? (
+            <>
+              <RefreshCw className="w-4 h-4 animate-spin" />
+              يحلل...
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4" />
+              تحليل فوري - عضوية مميزة
+            </>
+          )}
+        </button>
+      );
+    }
+    
+    if (trialUsage.used < trialUsage.limit) {
+      return (
+        <button
+          onClick={() => runProductDemo(demoProduct.name)}
+          disabled={isAnalyzing || !demoProduct.name.trim()}
+          className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
+            isAnalyzing 
+              ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
+              : "bg-green-600 text-white hover:bg-green-700"
+          }`}
+        >
+          {isAnalyzing ? (
+            <>
+              <RefreshCw className="w-4 h-4 animate-spin" />
+              يحلل...
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4" />
+              تجربة مجانية ({trialUsage.limit - trialUsage.used} متبقي)
+            </>
+          )}
+        </button>
+      );
+    }
+    
+    return (
+      <button
+        onClick={() => setShowUpgradeModal(true)}
+        className="px-6 py-3 rounded-lg font-medium bg-red-600 text-white hover:bg-red-700 transition-all flex items-center gap-2"
+      >
+        <Crown className="w-4 h-4" />
+        ترقية مطلوبة - انتهت التجربة
+      </button>
+    );
   };
 
   const ProductsListDemo = () => (
@@ -374,18 +543,34 @@ export default function Demo() {
           <input
             type="text"
             placeholder="مثل: سماعات بلوتوث لاسلكية"
-            value={demoProduct.name}
-            onChange={(e) => setDemoProduct(prev => ({ ...prev, name: e.target.value }))}
-            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-            disabled={isAnalyzing}
+            value={inputValue}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              setDemoProduct(prev => ({ ...prev, name: e.target.value }));
+            }}
+            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:bg-gray-100"
+            disabled={false}
+            autoComplete="off"
+            onKeyPress={(e) => {
+              if (e.key === 'Enter' && inputValue.trim()) {
+                runProductDemo(inputValue);
+              }
+            }}
           />
+          {/* ✅ UPDATED: Use renderDemoButton with inputValue */}
           <button
-            onClick={() => runProductDemo(demoProduct.name)}
-            disabled={isAnalyzing || !demoProduct.name.trim()}
+            onClick={() => runProductDemo(inputValue)}
+            disabled={isAnalyzing || !inputValue.trim()}
             className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
               isAnalyzing 
-                ? 'bg-yellow-100 text-yellow-700 cursor-not-allowed' 
-                : 'bg-purple-600 text-white hover:bg-purple-700'
+                ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
+                : userAccess.isOwner
+                  ? "bg-purple-600 text-white hover:bg-purple-700"
+                  : userAccess.plan !== "free"
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                    : trialUsage.used < trialUsage.limit
+                      ? "bg-green-600 text-white hover:bg-green-700"
+                      : "bg-red-600 text-white hover:bg-red-700"
             }`}
           >
             {isAnalyzing ? (
@@ -393,10 +578,25 @@ export default function Demo() {
                 <RefreshCw className="w-4 h-4 animate-spin" />
                 يحلل...
               </>
-            ) : (
+            ) : userAccess.isOwner ? (
               <>
                 <Sparkles className="w-4 h-4" />
-                تحليل فوري
+                تحليل فوري - وصول كامل
+              </>
+            ) : userAccess.plan !== "free" ? (
+              <>
+                <Sparkles className="w-4 h-4" />
+                تحليل فوري - عضوية مميزة
+              </>
+            ) : trialUsage.used < trialUsage.limit ? (
+              <>
+                <Sparkles className="w-4 h-4" />
+                تجربة مجانية ({trialUsage.limit - trialUsage.used} متبقي)
+              </>
+            ) : (
+              <>
+                <Crown className="w-4 h-4" />
+                ترقية مطلوبة
               </>
             )}
           </button>
@@ -415,6 +615,16 @@ export default function Demo() {
               className="bg-purple-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${((demoStep + 1) / demoSteps.length) * 100}%` }}
             ></div>
+          </div>
+        </div>
+      )}
+
+      {/* Error Display */}
+      {errors.demo && (
+        <div className="mb-6 bg-red-50 rounded-lg p-4 border border-red-200">
+          <div className="flex items-center gap-2 text-red-800">
+            <span className="font-medium">خطأ:</span>
+            <span>{errors.demo}</span>
           </div>
         </div>
       )}
@@ -484,18 +694,18 @@ export default function Demo() {
 
           {/* Expected Results */}
           <div className="bg-gradient-to-r from-green-500 to-blue-500 rounded-lg p-4 text-white">
-            <h5 className="font-semibold mb-2">النتائج المتوقعة خلال 30 يوم:</h5>
+            <h5 className="font-semibold mb-2">النتائج المتوقعة خلال 90 يوم:</h5>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
-                <div className="text-2xl font-bold">+245%</div>
+                <div className="text-2xl font-bold">+89%</div>
                 <div className="text-sm opacity-90">زيادة الزوار</div>
               </div>
               <div>
-                <div className="text-2xl font-bold">#3</div>
+                <div className="text-2xl font-bold">#8</div>
                 <div className="text-sm opacity-90">الترتيب المتوقع</div>
               </div>
               <div>
-                <div className="text-2xl font-bold">+89%</div>
+                <div className="text-2xl font-bold">+45%</div>
                 <div className="text-sm opacity-90">زيادة المبيعات</div>
               </div>
             </div>
@@ -872,6 +1082,32 @@ export default function Demo() {
           </div>
         </div>
       </div>
+
+      {/* Upgrade Modal */}
+      {showUpgradeModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">انتهت التجربة المجانية</h3>
+            <p className="text-gray-600 mb-6">
+              لقد استخدمت جميع تحليلاتك المجانية لهذا الشهر. ترقى للاستمرار في استخدام الذكاء الاصطناعي.
+            </p>
+            <div className="flex gap-3">
+              <Link
+                to="/pricing"
+                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-center"
+              >
+                عرض الخطط
+              </Link>
+              <button
+                onClick={() => setShowUpgradeModal(false)}
+                className="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                إغلاق
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

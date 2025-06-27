@@ -8,96 +8,98 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-white font-arabic">
       {/* Navigation */}
-      <nav className="w-full px-4 py-4 flex items-center justify-between relative">
-        <img src="/logo2.png" alt="Logo" className="h-8 md:h-12" />
-        
-        {/* Desktop Menu */}
-        <div className="hidden md:flex items-center space-x-8 space-x-reverse">
-          <Link to="/features" className="hover:text-[#83dcc9] transition-colors">المميزات</Link>
-          <Link to="/pricing" className="hover:text-[#83dcc9] transition-colors">الأسعار</Link>
-          <Link to="/how-it-works" className="hover:text-[#83dcc9] transition-colors">كيف يعمل</Link>
-          <Link to="/about" className="hover:text-[#83dcc9] transition-colors">من نحن</Link>
-          <Link to="/contact" className="hover:text-[#83dcc9] transition-colors">اتصل بنا</Link>
-          {/* FIXED: Changed to /checkout for direct conversion path */}
-          <Link to="/checkout?plan=free" className="bg-[#83dcc9] text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-[#6cc9b9] transition">
-            ابدأ مجاناً
-          </Link>
-        </div>
-        
-        {/* Mobile menu button */}
-        <button 
-          className="md:hidden text-white z-50 relative"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          <svg 
-            className={`w-6 h-6 transition-transform ${isMobileMenuOpen ? 'rotate-90' : ''}`} 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
+      <nav className="w-full px-4 py-4">
+        <div className="max-w-screen-xl mx-auto flex items-center justify-between relative">
+          <img src="/logo2.png" alt="Logo" className="h-8 md:h-12" />
+          
+          {/* Desktop Menu - REMOVED keyword research and competitor analysis */}
+          <div className="hidden md:flex items-center space-x-8 space-x-reverse">
+            <Link to="/features" className="hover:text-[#83dcc9] transition-colors">المميزات</Link>
+            <Link to="/pricing" className="hover:text-[#83dcc9] transition-colors">الأسعار</Link>
+            <Link to="/how-it-works" className="hover:text-[#83dcc9] transition-colors">كيف يعمل</Link>
+            <Link to="/about" className="hover:text-[#83dcc9] transition-colors">من نحن</Link>
+            <Link to="/contact" className="hover:text-[#83dcc9] transition-colors">اتصل بنا</Link>
+            {/* REMOVED: Keyword research and competitor analysis links - these are now only in authenticated areas */}
+            <Link to="/checkout?plan=free" className="bg-[#83dcc9] text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-[#6cc9b9] transition">
+              ابدأ مجاناً
+            </Link>
+          </div>
+          
+          {/* Mobile menu button */}
+          <button 
+            className="md:hidden text-white z-50 relative"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
-            {isMobileMenuOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
+            <svg 
+              className={`w-6 h-6 transition-transform ${isMobileMenuOpen ? 'rotate-90' : ''}`} 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              {isMobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
 
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="absolute top-full left-4 right-4 bg-gray-900 border border-gray-700 rounded-xl mt-2 py-4 px-4 shadow-2xl z-40"
-          >
-            <div className="flex flex-col space-y-4">
-              <Link 
-                to="/features" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                المميزات
-              </Link>
-              <Link 
-                to="/pricing" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                الأسعار
-              </Link>
-              <Link 
-                to="/how-it-works" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                كيف يعمل
-              </Link>
-              <Link 
-                to="/about" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                من نحن
-              </Link>
-              <Link 
-                to="/contact" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                اتصل بنا
-              </Link>
-              {/* FIXED: Changed to /checkout for direct conversion path */}
-              <Link 
-                to="/checkout?plan=free" 
-                className="bg-[#83dcc9] text-gray-900 font-bold py-3 px-4 rounded-lg hover:bg-[#6cc9b9] transition text-center mt-4"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                ابدأ مجاناً
-              </Link>
-            </div>
-          </motion.div>
-        )}
+          {/* Mobile Menu - REMOVED keyword research and competitor analysis */}
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="absolute top-full left-0 right-0 bg-gray-900 border border-gray-700 rounded-xl mt-2 py-4 px-4 shadow-2xl z-40"
+            >
+              <div className="flex flex-col space-y-4">
+                <Link 
+                  to="/features" 
+                  className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  المميزات
+                </Link>
+                <Link 
+                  to="/pricing" 
+                  className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  الأسعار
+                </Link>
+                <Link 
+                  to="/how-it-works" 
+                  className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  كيف يعمل
+                </Link>
+                <Link 
+                  to="/about" 
+                  className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  من نحن
+                </Link>
+                <Link 
+                  to="/contact" 
+                  className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  اتصل بنا
+                </Link>
+                {/* REMOVED: Keyword research and competitor analysis links */}
+                <Link 
+                  to="/checkout?plan=free" 
+                  className="bg-[#83dcc9] text-gray-900 font-bold py-3 px-4 rounded-lg hover:bg-[#6cc9b9] transition text-center mt-4"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  ابدأ مجاناً
+                </Link>
+              </div>
+            </motion.div>
+          )}
+        </div>
       </nav>
 
       {/* Hero Section */}
@@ -116,7 +118,6 @@ export default function LandingPage() {
             تحليل سيو ذكي، توليد تلقائي، أداء حقيقي. منصة صممت لتجعل متجرك يتألق.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-            {/* FIXED: Changed to /checkout for direct conversion path */}
             <Link to="/checkout?plan=free" className="w-full sm:w-auto">
               <button className="w-full bg-[#83dcc9] text-gray-900 font-bold py-3 px-6 rounded-xl hover:bg-[#6cc9b9] transition">
                 ابدأ الآن مجانًا
@@ -229,7 +230,6 @@ export default function LandingPage() {
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {/* FIXED: All checkout links now consistent */}
             <Link to="/checkout?plan=free" className="w-full sm:w-auto">
               <button className="w-full bg-[#83dcc9] text-gray-900 font-bold py-4 px-8 rounded-xl hover:bg-[#6cc9b9] transition text-lg">
                 🚀 ابدأ مجاناً الآن
@@ -249,7 +249,6 @@ export default function LandingPage() {
         <h2 className="text-2xl sm:text-3xl font-bold mb-4">جاهز تبدأ تحسين متجرك؟</h2>
         <p className="text-gray-300 mb-6 text-sm sm:text-base px-4 sm:px-0">ابدأ الآن مجانًا وبدون بطاقة ائتمانية.</p>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-md mx-auto">
-          {/* FIXED: Consistent checkout link */}
           <Link to="/checkout?plan=free" className="w-full sm:w-auto">
             <button className="w-full bg-[#83dcc9] text-gray-900 font-bold py-3 px-6 rounded-xl hover:bg-[#6cc9b9] transition">
               جرب المنصة مجانًا

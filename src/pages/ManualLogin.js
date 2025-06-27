@@ -5,7 +5,7 @@ import { Eye, EyeOff } from "lucide-react";
 import Footer from "../components/Footer";
 
 // إعداد Google Client ID
-const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = "403864871499-59f26jiafopipeplaq09bplabe594q0o.apps.googleusercontent.com";
 
 // تعريف الخطط
 const PLAN_INFO = {
@@ -77,18 +77,32 @@ export default function ManualLogin() {
       document.head.appendChild(script);
     };
 
+    // 🔥 FIXED: Updated Google initialization with better error handling
     const initializeGoogle = () => {
-      if (window.google && GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== "YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com") {
-        try {
-          window.google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
-            callback: handleGoogleResponse,
-            auto_select: false,
-            cancel_on_tap_outside: true
-          });
-        } catch (error) {
-          console.error('خطأ في تهيئة Google Sign-In:', error);
-        }
+      if (!window.google) {
+        console.error('Google script not loaded');
+        return;
+      }
+      
+      if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com") {
+        console.error('Google Client ID not configured');
+        toast.error("إعداد Google غير مكتمل");
+        return;
+      }
+
+      try {
+        window.google.accounts.id.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: handleGoogleResponse,
+          auto_select: false,
+          cancel_on_tap_outside: true,
+          use_fedcm_for_prompt: false  // 🔥 KEY FIX: Disables newer API that causes errors
+        });
+        
+        console.log('✅ Google Sign-In initialized successfully');
+      } catch (error) {
+        console.error('خطأ في تهيئة Google Sign-In:', error);
+        toast.error("فشل في تهيئة Google Sign-In");
       }
     };
 
@@ -109,7 +123,7 @@ export default function ManualLogin() {
     try {
       const payload = JSON.parse(atob(response.credential.split('.')[1]));
       
-      const res = await fetch("https://breevo-backend.onrender.com/auth/google-login", {
+      const res = await fetch("http://localhost:8000/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id_token: response.credential }),
@@ -147,15 +161,18 @@ export default function ManualLogin() {
       }
 
     } catch (err) {
+      console.error('Google login error:', err);
       toast.error("حدث خطأ أثناء تسجيل الدخول بـ Google");
     } finally {
       setGoogleLoading(false);
     }
   };
 
+  // 🔥 FIXED: Updated Google login handler with better error handling and fallback
   const handleGoogleLogin = () => {
     if (!window.google) {
       toast.error("خدمة Google غير متاحة حالياً");
+      console.error('Google object not available');
       return;
     }
 
@@ -165,8 +182,35 @@ export default function ManualLogin() {
     }
 
     try {
-      window.google.accounts.id.prompt();
+      console.log('🚀 Attempting Google Sign-In...');
+      window.google.accounts.id.prompt((notification) => {
+        console.log('Google prompt notification:', notification);
+        
+        if (notification.isNotDisplayed()) {
+          console.log('Google prompt not displayed, trying alternative method');
+          // Fallback: try rendering button first
+          const buttonDiv = document.createElement('div');
+          buttonDiv.id = 'g_id_signin_temp';
+          buttonDiv.style.visibility = 'hidden';
+          document.body.appendChild(buttonDiv);
+          
+          window.google.accounts.id.renderButton(buttonDiv, {
+            theme: "outline",
+            size: "large"
+          });
+          
+          setTimeout(() => {
+            window.google.accounts.id.prompt();
+            document.body.removeChild(buttonDiv);
+          }, 100);
+        }
+        
+        if (notification.isSkippedMoment()) {
+          console.log('Google Sign-In was skipped by user');
+        }
+      });
     } catch (error) {
+      console.error('Google login error:', error);
       toast.error("حدث خطأ في خدمة Google");
     }
   };
@@ -206,7 +250,7 @@ export default function ManualLogin() {
     setLoading(true);
 
     try {
-      const res = await fetch("https://breevo-backend.onrender.com/auth/login", {
+      const res = await fetch("http://localhost:8000/auth/google-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -256,7 +300,7 @@ export default function ManualLogin() {
     setLoading(true);
 
     try {
-      const res = await fetch("https://breevo-backend.onrender.com/auth/register", {
+      const res = await fetch("http://localhost:8000/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

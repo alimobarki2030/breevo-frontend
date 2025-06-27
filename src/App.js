@@ -20,6 +20,12 @@ import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
 import Pricing from "./pages/Pricing";
 import Demo from './pages/Demo';
+import KeywordResearch from './pages/KeywordResearch';
+import CompetitorAnalysis from './pages/CompetitorAnalysis';
+import DataForSEOTest from './components/DataForSEOTest';
+import AdminVideoUpload from './pages/AdminVideoUpload';
+
+
 
 import "./index.css";
 
@@ -53,6 +59,11 @@ function App() {
           <Route path="/faq" element={<FAQ />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/demo" element={<Demo />} />
+          <Route path="/keyword-research" element={<KeywordResearch />} />
+          <Route path="/competitor-analysis" element={<CompetitorAnalysis />} />
+          <Route path="/api-test" element={<DataForSEOTest />} />
+          <Route path="/admin/videos" element={<AdminVideoUpload />} />
+
 
 
 
