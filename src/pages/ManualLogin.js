@@ -3,7 +3,7 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
 import Footer from "../components/Footer";
-import { API_ENDPOINTS, apiCall } from "../config/api"; // Import API configuration
+import { API_ENDPOINTS, apiCall } from "../config/api";
 
 // إعداد Google Client ID
 const GOOGLE_CLIENT_ID = "403864871499-59f26jiafopipeplaq09bplabe594q0o.apps.googleusercontent.com";
@@ -18,8 +18,8 @@ const PLAN_INFO = {
 export default function ManualLogin() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isLogin, setIsLogin] = useState(true);
-  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [isLogin, setIsLogin] = useState(true); // التبديل بين الدخول والتسجيل
+  const [selectedPlan, setSelectedPlan] = useState(null); // الخطة المختارة
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -49,6 +49,7 @@ export default function ManualLogin() {
     
     if (planParam && PLAN_INFO[planParam]) {
       setSelectedPlan(planParam);
+      // إذا كانت خطة مدفوعة، اعرض نموذج التسجيل
       if (planParam !== 'free') {
         setIsLogin(false);
       }
@@ -77,6 +78,7 @@ export default function ManualLogin() {
       document.head.appendChild(script);
     };
 
+    // تهيئة Google Sign-In
     const initializeGoogle = () => {
       if (!window.google) {
         console.error('Google script not loaded');
@@ -115,39 +117,51 @@ export default function ManualLogin() {
     }
   }, [selectedPlan]);
 
-  // معالجة Google Login
+  // ✅ معالجة Google Login - مُصححة لاستخدام endpoint الصحيح
   const handleGoogleResponse = async (response) => {
     setGoogleLoading(true);
     
     try {
-      const payload = JSON.parse(atob(response.credential.split('.')[1]));
+      console.log('🔑 Google Sign-In Response received');
       
-      // استخدام API_ENDPOINTS بدلاً من localhost
-      const res = await apiCall(API_ENDPOINTS.auth.login, {
+      // البيانات المطلوبة - فقط id_token
+      const requestData = {
+        id_token: response.credential
+      };
+      
+      console.log('📤 Sending to /auth/google-login:', requestData);
+      
+      // ✅ استخدام endpoint الصحيح للـ Google Login
+      const res = await apiCall(API_ENDPOINTS.auth.googleLogin, {
         method: "POST",
-        body: JSON.stringify({ id_token: response.credential }),
+        body: JSON.stringify(requestData),
       });
 
       if (!res.ok) {
         const errData = await res.json();
+        console.error('❌ Google login failed:', errData);
         toast.error(errData.detail || "فشل تسجيل الدخول بـ Google");
         return;
       }
 
       const data = await res.json();
+      console.log('✅ Google Sign-In successful:', data);
+      
       const token = data.access_token || data.token;
-      const clientName = data.client_name || payload.name;
+      const clientName = data.client_name;
+      const email = data.email;
 
       localStorage.setItem("token", token);
       localStorage.setItem("clientName", clientName);
       localStorage.setItem("user", JSON.stringify({ 
         name: clientName,
-        email: data.email || payload.email,
+        email: email,
         provider: 'google'
       }));
 
       toast.success(`مرحباً ${clientName}، تم تسجيل الدخول بنجاح`);
       
+      // التحقق من الخطة المختارة للتوجيه المناسب
       if (selectedPlan && selectedPlan !== 'free') {
         setTimeout(() => {
           navigate(`/checkout?plan=${selectedPlan}`);
@@ -166,6 +180,7 @@ export default function ManualLogin() {
     }
   };
 
+  // معالجة Google Login Button
   const handleGoogleLogin = () => {
     if (!window.google) {
       toast.error("خدمة Google غير متاحة حالياً");
@@ -211,7 +226,7 @@ export default function ManualLogin() {
     }
   };
 
-  // معالجة تغيير النماذج
+  // معالجة تغيير نماذج الدخول
   const handleLoginChange = (e) => {
     const { name, value, type, checked } = e.target;
     setLoginForm(prev => ({
@@ -220,32 +235,55 @@ export default function ManualLogin() {
     }));
   };
 
+  // معالجة تغيير نماذج التسجيل
   const handleRegisterChange = (e) => {
     const { name, value } = e.target;
-    setRegisterForm(prev => ({ ...prev, [name]: value }));
+    let processedValue = value;
 
-    if (name === "phone" && value) {
-      if (!/^\d*$/.test(value)) {
-        toast.error("يجب أن يحتوي رقم الجوال على أرقام فقط");
-        return;
-      }
-      
-      if (value.length === 9 && !value.startsWith('5')) {
+    // معالجة خاصة للحقول
+    switch (name) {
+      case 'phone':
+        // السماح بالأرقام فقط وتحديد الطول
+        processedValue = value.replace(/\D/g, '').slice(0, 9);
+        break;
+        
+      case 'email':
+        // تحويل إلى أحرف صغيرة
+        processedValue = value.toLowerCase().trim();
+        break;
+        
+      case 'fullName':
+        // إزالة المسافات الزائدة
+        processedValue = value.trim();
+        break;
+        
+      case 'storeUrl':
+        // معالجة أساسية للـ URL
+        processedValue = value.trim();
+        break;
+        
+      default:
+        processedValue = value;
+    }
+
+    setRegisterForm(prev => ({ ...prev, [name]: processedValue }));
+
+    // التحقق من رقم الهاتف
+    if (name === "phone" && processedValue.length > 0) {
+      if (processedValue.length === 9 && !processedValue.startsWith('5')) {
         toast.error("رقم الجوال يجب أن يبدأ بـ 5");
-      } else if (value.length > 9) {
-        toast.error("رقم الجوال يجب أن يكون 9 أرقام فقط");
       }
     }
   };
 
-  // تسجيل الدخول - Updated to use API_ENDPOINTS
+  // تسجيل الدخول اليدوي
   const handleLogin = async (e) => {
     e.preventDefault();
     if (loading) return;
     setLoading(true);
 
     try {
-      const res = await apiCall(API_ENDPOINTS.auth.googleLogin, {
+      const res = await apiCall(API_ENDPOINTS.auth.login, {
         method: "POST",
         body: JSON.stringify({
           email: loginForm.email,
@@ -287,21 +325,54 @@ export default function ManualLogin() {
     }
   };
 
-  // التسجيل - Updated to use API_ENDPOINTS
+  // التسجيل اليدوي
   const handleRegister = async (e) => {
     e.preventDefault();
     if (loading) return;
+    
+    // التحقق من صحة البيانات
+    if (!registerForm.fullName?.trim()) {
+      toast.error("يرجى إدخال الاسم الكامل");
+      return;
+    }
+
+    if (!registerForm.email || !/\S+@\S+\.\S+/.test(registerForm.email)) {
+      toast.error("يرجى إدخال بريد إلكتروني صحيح");
+      return;
+    }
+
+    if (!registerForm.password || registerForm.password.length < 6) {
+      toast.error("كلمة المرور يجب أن تكون 6 أحرف على الأقل");
+      return;
+    }
+
+    if (!registerForm.phone || registerForm.phone.length !== 9 || !registerForm.phone.startsWith('5')) {
+      toast.error("رقم الجوال يجب أن يكون 9 أرقام ويبدأ بـ 5");
+      return;
+    }
+
+    if (!registerForm.storeUrl?.trim()) {
+      toast.error("يرجى إدخال رابط متجر صحيح");
+      return;
+    }
+
     setLoading(true);
 
     try {
+      // إعداد URL إذا لم يحتوي على بروتوكول
+      let storeUrl = registerForm.storeUrl.trim();
+      if (!storeUrl.startsWith('http://') && !storeUrl.startsWith('https://')) {
+        storeUrl = 'https://' + storeUrl;
+      }
+
       const res = await apiCall(API_ENDPOINTS.auth.register, {
         method: "POST",
         body: JSON.stringify({
-          full_name: registerForm.fullName,
-          email: registerForm.email,
+          full_name: registerForm.fullName.trim(),
+          email: registerForm.email.trim().toLowerCase(),
           password: registerForm.password,
           phone: registerForm.phone,
-          store_url: registerForm.storeUrl,
+          store_url: storeUrl,
           plan: registerForm.plan,
         }),
       });
@@ -320,8 +391,13 @@ export default function ManualLogin() {
       if (data.token) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("clientName", registerForm.fullName);
-        localStorage.setItem("user", JSON.stringify({ name: registerForm.fullName }));
+        localStorage.setItem("user", JSON.stringify({ 
+          name: registerForm.fullName,
+          email: registerForm.email,
+          provider: 'manual'
+        }));
         
+        // رسالة نجاح مخصصة حسب الخطة
         if (selectedPlan && selectedPlan !== 'free') {
           toast.success(`🎉 تم إنشاء الحساب بنجاح! سيتم توجيهك لإتمام الدفع للخطة ${PLAN_INFO[selectedPlan].name}`);
           setTimeout(() => {
@@ -340,12 +416,26 @@ export default function ManualLogin() {
     }
   };
 
+  // نسيان كلمة المرور
   const handleForgotPassword = () => {
     if (!loginForm.email) {
       toast.error("يرجى إدخال البريد الإلكتروني أولاً");
       return;
     }
     toast.success("تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني");
+  };
+
+  // التحقق من صحة النموذج
+  const isFormValid = () => {
+    return (
+      registerForm.fullName?.length >= 2 &&
+      /\S+@\S+\.\S+/.test(registerForm.email) &&
+      registerForm.password?.length >= 6 &&
+      registerForm.phone?.length === 9 &&
+      registerForm.phone?.startsWith('5') &&
+      registerForm.storeUrl?.includes('.') &&
+      registerForm.plan
+    );
   };
 
   return (
@@ -551,8 +641,10 @@ export default function ManualLogin() {
                   placeholder="الاسم الكامل" 
                   value={registerForm.fullName}
                   onChange={handleRegisterChange} 
+                  minLength={2}
                   className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" 
                 />
+                
                 <input 
                   name="email" 
                   type="email" 
@@ -562,14 +654,16 @@ export default function ManualLogin() {
                   onChange={handleRegisterChange} 
                   className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" 
                 />
+                
                 <div className="relative">
                   <input 
                     name="password" 
                     type={showPassword ? "text" : "password"} 
                     required 
-                    placeholder="كلمة المرور" 
+                    placeholder="كلمة المرور (6 أحرف على الأقل)" 
                     value={registerForm.password}
                     onChange={handleRegisterChange} 
+                    minLength={6}
                     className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 pr-4 pl-12 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" 
                   />
                   <button
@@ -580,6 +674,7 @@ export default function ManualLogin() {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
+                
                 <div className="relative">
                   <div className="absolute top-1/2 right-4 transform -translate-y-1/2 text-sm text-gray-500 flex items-center gap-1">
                     <span>🇸🇦</span>
@@ -592,18 +687,39 @@ export default function ManualLogin() {
                     placeholder="مثال: 512345678" 
                     value={registerForm.phone}
                     onChange={handleRegisterChange} 
-                    className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 pr-24 pl-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" 
+                    pattern="5[0-9]{8}"
+                    maxLength={9}
+                    className={`w-full bg-gray-100 border text-sm text-gray-800 rounded-xl py-3 pr-24 pl-4 text-right focus:outline-none focus:ring-2 placeholder:text-gray-400 ${
+                      registerForm.phone && (registerForm.phone.length !== 9 || !registerForm.phone.startsWith('5'))
+                        ? 'border-red-300 focus:ring-red-600' 
+                        : 'border-gray-300 focus:ring-green-600'
+                    }`}
                   />
+                  {registerForm.phone && registerForm.phone.length > 0 && (
+                    <div className="text-xs mt-1">
+                      {registerForm.phone.length !== 9 && (
+                        <span className="text-red-500">يجب أن يكون 9 أرقام</span>
+                      )}
+                      {registerForm.phone.length === 9 && !registerForm.phone.startsWith('5') && (
+                        <span className="text-red-500">يجب أن يبدأ بـ 5</span>
+                      )}
+                      {registerForm.phone.length === 9 && registerForm.phone.startsWith('5') && (
+                        <span className="text-green-500">✓ رقم صحيح</span>
+                      )}
+                    </div>
+                  )}
                 </div>
+                
                 <input 
                   name="storeUrl" 
                   type="url" 
                   required 
-                  placeholder="رابط متجرك https://" 
+                  placeholder="رابط متجرك (مثال: mystore.salla.sa)" 
                   value={registerForm.storeUrl}
                   onChange={handleRegisterChange} 
                   className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" 
                 />
+                
                 <select 
                   name="plan" 
                   value={registerForm.plan} 
@@ -624,9 +740,11 @@ export default function ManualLogin() {
 
                 <button 
                   type="submit" 
-                  disabled={loading} 
+                  disabled={loading || !isFormValid()} 
                   className={`w-full py-3 rounded-xl font-bold text-white transition duration-300 ${
-                    loading ? "bg-green-600 animate-pulse cursor-default" : "bg-green-600 hover:bg-green-700"
+                    loading || !isFormValid() 
+                      ? "bg-gray-400 cursor-not-allowed" 
+                      : "bg-green-600 hover:bg-green-700"
                   }`}
                 >
                   {loading ? "🎉 جاري التسجيل..." : 
