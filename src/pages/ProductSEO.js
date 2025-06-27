@@ -46,24 +46,24 @@ const FIELD_LIMITS = {
 
 const TONE_OPTIONS = [
   { value: "", label: "اختر النغمة" },
-  { value: "مقنعة", label: "مقنعة - تحفز الشراء الفوري" },
-  { value: "موثوقة", label: "موثوقة - تبني الثقة والأمان" },
-  { value: "حماسية", label: "حماسية - تثير الإعجاب والرغبة" },
-  { value: "احترافية", label: "احترافية - للمنتجات التقنية والطبية" },
-  { value: "دافئة", label: "دافئة - للمنتجات العائلية والشخصية" },
-  { value: "عصرية", label: "عصرية - للمنتجات الحديثة والترند" },
-  { value: "فاخرة", label: "فاخرة - للمنتجات المميزة والغالية" },
-  { value: "عملية", label: "عملية - للأدوات والمعدات الوظيفية" }
+  { value: "رسمية", label: "رسمية - للشركات الكبيرة" },
+  { value: "حماسية", label: "حماسية - للمنتجات الرياضية" },
+  { value: "دافئة", label: "دافئة - للمنتجات العائلية" },
+  { value: "محايدة", label: "محايدة - للمنتجات التقنية" },
+  { value: "ناعمة", label: "ناعمة - للمنتجات النسائية" },
+  { value: "لطيفة", label: "لطيفة - لمنتجات الأطفال" },
+  { value: "فاخرة", label: "فاخرة - للمنتجات المميزة" },
+  { value: "عملية", label: "عملية - للأدوات والمعدات" }
 ];
 
 const STORY_ARC_OPTIONS = [
   { value: "", label: "اختر الحبكة" },
-  { value: "مشكلة-حل", label: "مشكلة ← حل (الأكثر فعالية)" },
-  { value: "قبل-بعد", label: "قبل ← بعد (للتحولات المرئية)" },
-  { value: "الفوائد-الحصرية", label: "الفوائد الحصرية (للمنتجات المميزة)" },
-  { value: "المقارنة-التفوق", label: "المقارنة والتفوق (ضد المنافسين)" },
-  { value: "التجربة-الشخصية", label: "التجربة الشخصية (قصص العملاء)" },
-  { value: "الاكتشاف-المبكر", label: "الاكتشاف المبكر (للمنتجات الجديدة)" }
+  { value: "مشكلة-حل", label: "مشكلة ← حل" },
+  { value: "قبل-بعد", label: "قبل ← بعد" },
+  { value: "رحلة-التحول", label: "رحلة التحول" },
+  { value: "الاكتشاف", label: "قصة الاكتشاف" },
+  { value: "المقارنة", label: "مقارنة الخيارات" },
+  { value: "التجربة", label: "التجربة الشخصية" }
 ];
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
@@ -676,8 +676,8 @@ export default function ProductSEO() {
 
       const keyword = cleanText(product.keyword) || "منتج";
 
-      // ✅ ENHANCED: Better comprehensive generation prompt for E-commerce
-      const prompt = `أنت مساعد تسويق محترف متخصص في SEO للتجارة الإلكترونية في السوق السعودي.
+      // ✅ ENHANCED: Better comprehensive generation prompt
+      const prompt = `أنت مساعد تسويق محترف متخصص في SEO للسوق السعودي.
 
 المنتج المطلوب تحسينه:
 الاسم: "${product.name}"
@@ -687,36 +687,35 @@ export default function ProductSEO() {
 النغمة: "${analysisData.tone}"
 الحبكة: "${analysisData.best_story_arc}"
 
-مهمتك: توليد محتوى متكامل لصفحة منتج في متجر إلكتروني يحقق أفضل نتائج SEO للتجارة الإلكترونية.
+مهمتك: توليد محتوى متكامل لصفحة هذا المنتج يحقق أفضل نتائج SEO.
 
-معايير SEO الإلزامية للتجارة الإلكترونية:
-✅ الوصف يبدأ بالكلمة المفتاحية "${keyword}" في أول 25 كلمة
-✅ طول الوصف 150+ كلمة (ليس أقل) مناسب للمتاجر الإلكترونية
-✅ استخدام HTML منظم مع عناصر تحفز الشراء
-✅ توزيع طبيعي للكلمة المفتاحية في النص
-✅ ذكر مواصفات المنتج (الحجم، الكمية، الأبعاد)
-✅ دعوة واضحة لاتخاذ إجراء (اشتري الآن، اطلب، احصل على)
-✅ عناصر الثقة والضمان للمتاجر الإلكترونية
+معايير SEO الإلزامية:
+✅ الوصف يبدأ بالكلمة المفتاحية في أول 25 كلمة
+✅ طول الوصف 100+ كلمة (ليس أقل)
+✅ استخدام HTML منظم ومنسق مع روابط داخلية
+✅ توزيع طبيعي للكلمة المفتاحية
+✅ دعوة واضحة لاتخاذ إجراء في النهاية
+✅ استخدام كلمات تحفيزية للشراء
 
-هيكل الوصف المطلوب للتجارة الإلكترونية:
-1. فقرة افتتاحية قوية تبدأ بـ "${keyword}" وتحفز الشراء <p>
-2. قسم "المميزات والفوائد" <h3>
-3. قائمة 4-6 مميزات أساسية للمنتج <ul><li>
-4. قسم "المواصفات والتفاصيل" <h3>  
-5. شرح المواصفات التقنية أو طريقة الاستخدام <p>
-6. فقرة ختامية تحفيزية مع ضمانات ودعوة واضحة للشراء <p>
+هيكل الوصف المطلوب (مهم جداً):
+1. فقرة افتتاحية قوية تبدأ بالكلمة المفتاحية <p>
+2. قسم "المميزات الرئيسية" <h3>
+3. قائمة 4-6 مميزات <ul><li>
+4. قسم "كيفية الاستخدام" <h3>  
+5. شرح بسيط للاستخدام <p>
+6. فقرة ختامية تحفيزية مع CTA <p>
 
-تنبيه مهم للتجارة الإلكترونية: المحتوى يجب أن يركز على فوائد الشراء، الثقة، والضمانات.
+تنبيه مهم: يجب أن يكون المحتوى متناسب تماماً مع طبيعة المنتج "${product.name}".
 
 أعد JSON فقط:
 {
-  "name": "عنوان محسن يحتوي الكلمة المفتاحية ${keyword} (أقل من 70 حرف)",
-  "description": "وصف HTML منسق حسب المعايير أعلاه يبدأ بـ ${keyword}",
+  "name": "عنوان محسن يحتوي الكلمة المفتاحية (أقل من 70 حرف)",
+  "description": "وصف HTML منسق حسب المعايير أعلاه مع مواصفات ودعوة للشراء",
   "keyword": "${keyword}",
-  "meta_title": "Page Title يحتوي ${keyword} + كلمات تجارية (50-60 حرف)",
-  "meta_description": "Page Description يحتوي ${keyword} + CTA واضح (145-150 حرف)",
-  "url_path": "مسار-url-يحتوي-الكلمة-المفتاحية",
-  "imageAlt": "وصف صورة يحتوي ${keyword} ووصف المنتج"
+  "meta_title": "Page Title عنوان السيو جذاب (50-60 حرف)",
+  "meta_description": "Page Description وصف الميتا مقنع يحتوي الكلمة المفتاحية (145-150 حرف)",
+  "url_path": "مسار-url-صديق-لمحركات-البحث",
+  "imageAlt": "وصف بديل للصورة يحتوي الكلمة المفتاحية"
 }`;
 
       console.log('📤 Sending comprehensive generation request...');
@@ -800,41 +799,31 @@ Description requirements:
 
 Provide only the HTML content in Arabic.`,
 
-  meta_title: `أنشئ عنوان SEO احترافي للتجارة الإلكترونية يحتوي على الكلمة المفتاحية ولا يتجاوز 60 حرفًا:
+  meta_title: `Create a compelling Arabic SEO page title for this product targeting the Saudi market.
 
 Product: ${product.name}
 Target keyword: ${cleanText(product.keyword) || 'منتج'}
-Description: ${product.description || 'غير متوفر'}
 
 Title requirements:
 - Between 50 and 60 characters
-- MUST include the target keyword "${cleanText(product.keyword) || 'منتج'}" naturally
+- Include the target keyword naturally
 - Attractive and persuasive for Google search results
-- Include purchase-encouraging words like "شراء", "أفضل", "سعر", "مضمون"
 
-Examples for inspiration:
-- "شراء ${cleanText(product.keyword) || 'منتج'} بأفضل سعر"
-- "${cleanText(product.keyword) || 'منتج'} أصلي مضمون - توصيل مجاني"
+Provide only the title text in Arabic.`,
 
-Provide only the title text in Arabic that CONTAINS the target keyword.`,
-
-  meta_description: `اكتب وصف ميتا تسويقي للتجارة الإلكترونية يحتوي الكلمة المفتاحية ويحفز الشراء، بين 145-150 حرفًا:
+  meta_description: `Write an Arabic meta description for this product optimized for the Saudi market.
 
 Product: ${product.name}
 Target keyword: ${cleanText(product.keyword) || 'منتج'}
 Category: ${product.category || 'عام'}
 
 Description requirements:
-- Exactly 145-150 characters
-- MUST naturally include the target keyword "${cleanText(product.keyword) || 'منتج'}"
+- Exactly 150 characters
+- Naturally include the target keyword
 - Clearly communicate the main customer benefit
-- Include a clear call-to-action (CTA)
-- Encourage clicks with purchase motivation
+- Encourage clicks
 
-Example format:
-"اشتري ${cleanText(product.keyword) || 'منتج'} بأفضل جودة وسعر. توصيل مجاني وضمان استرداد. اطلب الآن واحصل على خصم!"
-
-Provide only the description text in Arabic that CONTAINS the target keyword.`,
+Provide only the description text in Arabic.`,
 
   url_path: `Generate an SEO-friendly English URL path for this product.
 
@@ -954,8 +943,8 @@ Provide only the Arabic ALT text.`
                   </>
                 ) : (
                   <>
-                    <div className="animate-pulse">🤖</div>
-                    AI
+                    <Wand2 className="w-3 h-3" />
+                    توليد ذكي
                   </>
                 )}
               </button>
@@ -1022,8 +1011,8 @@ Provide only the Arabic ALT text.`
                 </>
               ) : (
                 <>
-                  <div className="animate-pulse">🤖</div>
-                  AI
+                  <Wand2 className="w-3 h-3" />
+                  توليد
                 </>
               )}
             </button>
@@ -1203,7 +1192,7 @@ Provide only the Arabic ALT text.`
                     <button
                       onClick={handleGenerateAll}
                       disabled={generating}
-                      className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ${
+                      className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
                         generating 
                           ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
                           : "bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600"
@@ -1216,8 +1205,8 @@ Provide only the Arabic ALT text.`
                         </>
                       ) : (
                         <>
-                          <div className="animate-pulse">🤖</div>
-                          التوليد الشامل
+                          <Sparkles className="w-4 h-4" />
+                          توليد شامل بالذكاء الاصطناعي
                         </>
                       )}
                     </button>
@@ -1278,7 +1267,7 @@ Provide only the Arabic ALT text.`
                         </>
                       ) : (
                         <>
-                          <div className="animate-pulse">🤖</div>
+                          <Zap className="w-3 h-3" />
                           تحليل ذكي
                         </>
                       )}
@@ -1465,44 +1454,44 @@ Provide only the Arabic ALT text.`
                 </h3>
                 <div className="space-y-3 text-sm text-gray-600">
                   <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
-                    <div className="text-blue-500 mt-0.5">🎯</div>
+                    <div className="text-blue-500 mt-0.5">💡</div>
                     <div>
-                      <strong>الكلمة المفتاحية:</strong> اختر كلمة مرتبطة بنية الشراء مثل "شراء [منتج]" أو "[منتج] أصلي"
+                      <strong>الكلمة المفتاحية:</strong> اختر كلمة لها حجم بحث جيد ومنافسة معقولة
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
-                    <div className="text-green-500 mt-0.5">📍</div>
+                    <div className="text-green-500 mt-0.5">🎯</div>
                     <div>
-                      <strong>Page Title:</strong> يجب أن يحتوي الكلمة المفتاحية + كلمات تحفز الشراء (أفضل سعر، مضمون، توصيل مجاني)
+                      <strong>Page Title:</strong> يجب أن يكون بين 50-60 حرف ويحتوي الكلمة المفتاحية
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
-                    <div className="text-purple-500 mt-0.5">🛒</div>
+                    <div className="text-purple-500 mt-0.5">📝</div>
                     <div>
-                      <strong>Page Description:</strong> يجب أن يحتوي الكلمة المفتاحية + دعوة واضحة للشراء مع فوائد محددة
+                      <strong>الوصف:</strong> ابدأ بالكلمة المفتاحية واجعل المحتوى 100+ كلمة مع روابط داخلية
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3 p-3 bg-orange-50 rounded-lg">
                     <div className="text-orange-500 mt-0.5">📏</div>
                     <div>
-                      <strong>مواصفات المنتج:</strong> اذكر تفاصيل مهمة للشراء (الحجم، الكمية، المادة، اللون، الضمان)
+                      <strong>مواصفات المنتج:</strong> اذكر الحجم، الكمية، أو الأبعاد (مثل: 50مل، 250جرام، 30سم)
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3 p-3 bg-red-50 rounded-lg">
-                    <div className="text-red-500 mt-0.5">🎁</div>
+                    <div className="text-red-500 mt-0.5">🛒</div>
                     <div>
-                      <strong>عناصر الثقة:</strong> أضف "ضمان الاسترداد"، "توصيل مجاني"، "منتج أصلي"، "خدمة عملاء 24/7"
+                      <strong>دعوة لاتخاذ إجراء:</strong> استخدم كلمات مثل "اشتري الآن"، "احصل على"، "اطلب"
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                     <div className="text-gray-500 mt-0.5">🔗</div>
                     <div>
-                      <strong>الروابط الداخلية:</strong> اربط بصفحات منتجات مشابهة، فئات، أو صفحة الضمانات لتحسين التجربة
+                      <strong>الروابط الداخلية:</strong> استخدم أداة الرابط 🔗 في المحرر لإضافة روابط لصفحات أخرى
                     </div>
                   </div>
                 </div>
