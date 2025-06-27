@@ -68,6 +68,365 @@ const STORY_ARC_OPTIONS = [
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
+// Enhanced Category-Specific Prompts
+const CATEGORY_KEYWORDS = {
+  "إلكترونيات": ["جودة عالية", "ضمان", "توصيل مجاني", "أحدث إصدار", "تقنية متطورة"],
+  "ملابس": ["موضة", "جودة القماش", "مقاسات متنوعة", "راحة", "أناقة"],
+  "تجميل": ["طبيعي", "آمن للبشرة", "نتائج مضمونة", "خالي من المواد الضارة"],
+  "طعام": ["طبيعي", "صحي", "طازج", "جودة عالية", "توصيل سريع"],
+  "منزل": ["عملي", "متين", "توفير المساحة", "سهل التنظيف", "ضمان طويل"],
+  "رياضة": ["أداء عالي", "راحة", "متانة", "مناسب للمحترفين", "نتائج أفضل"]
+};
+
+// ✅ ENHANCED: Advanced SEO Prompts System
+const ENHANCED_SEO_PROMPTS = {
+  
+  // Advanced Keyword Research with Market Analysis
+  generateKeyword: (product) => {
+    const category = product.category || 'عام';
+    const categoryKeywords = CATEGORY_KEYWORDS[category] || CATEGORY_KEYWORDS["إلكترونيات"];
+    
+    return `أنت خبير SEO محترف متخصص في السوق السعودي والخليجي مع 15+ سنة خبرة. مهمتك تحديد الكلمة المفتاحية الذهبية.
+
+معلومات المنتج:
+📦 المنتج: "${product.name}"
+📝 الوصف: "${product.description?.replace(/<[^>]*>/g, '').slice(0, 200) || 'غير متوفر'}"
+🎯 الفئة: "${category}"
+👥 الجمهور: "${product.target_audience || 'عام'}"
+
+تحليل السوق السعودي:
+✅ حجم البحث: 2000+ شهرياً
+✅ المنافسة: متوسطة إلى منخفضة (KD 20-60)
+✅ نية الشراء: عالية (Commercial/Transactional Intent)
+✅ CPC المتوقع: 0.5-3 ريال سعودي
+✅ الموسمية: مناسب للبحث على مدار السنة
+
+أنماط البحث السعودية الناجحة:
+🔍 [اسم المنتج] + [مواصفة رئيسية] + [السعودية/الرياض]
+🔍 [اسم المنتج] + [سعر/شراء/متجر] + [توصيل]
+🔍 [أفضل] + [اسم المنتج] + [للـ/في] + [الاستخدام]
+
+كلمات القوة للفئة "${category}":
+${categoryKeywords.map(kw => `• ${kw}`).join('\n')}
+
+معايير التقييم:
+1. البحث الشهري > 1000 في السعودية
+2. صعوبة الكلمة 20-50 (متوسطة)
+3. نية شراء قوية (80%+)
+4. صلة مباشرة بالمنتج (100%)
+5. تنافسية معقولة مع إمكانية الترتيب
+
+أمثلة كلمات مفتاحية ذهبية ناجحة:
+• تقنية: "ايفون 15 برو أسعار السعودية توصيل"
+• تجميل: "سيروم فيتامين سي للوجه الأصلي"
+• طعام: "عسل سدر جبلي طبيعي سعودي"
+• ملابس: "ثوب رجالي قطن فاخر مقاسات"
+
+اختر الكلمة المفتاحية المثالية فقط (2-5 كلمات):`;
+  },
+
+  // Enhanced Description Generation
+  generateDescription: (product) => {
+    const keyword = product.keyword || product.name;
+    const category = product.category || 'عام';
+    const tone = product.tone || 'محايدة';
+    const audience = product.target_audience || 'عام';
+    
+    return `أنت كاتب محتوى تسويقي محترف متخصص في السوق السعودي. اكتب وصف منتج متقدم يحقق أهداف SEO والتحويل.
+
+معلومات المنتج:
+🏷️ المنتج: "${product.name}"
+🎯 الكلمة المفتاحية: "${keyword}"
+📂 الفئة: "${category}"
+👥 الجمهور المستهدف: "${audience}"
+🎭 النغمة: "${tone}"
+
+متطلبات SEO الإلزامية:
+✅ ابدأ الفقرة الأولى بالكلمة المفتاحية في أول 15 كلمة
+✅ طول الوصف: 150-250 كلمة (ليس أقل من 120 كلمة)
+✅ كثافة الكلمة المفتاحية: 2-3% (طبيعية وغير مكررة)
+✅ استخدم HTML منظم: <h3>, <p>, <ul>, <li>, <strong>
+✅ أضف 2-3 روابط داخلية ذات صلة
+✅ اذكر مواصفات محددة (حجم، وزن، كمية، أبعاد)
+✅ دعوة واضحة لاتخاذ إجراء في النهاية
+
+هيكل الوصف المطلوب:
+
+<p><strong>${keyword}</strong> [جملة افتتاحية قوية تشرح الفائدة الرئيسية والمشكلة التي يحلها]</p>
+
+<h3>🌟 المميزات الرئيسية</h3>
+<ul>
+<li><strong>الجودة العالية:</strong> [تفصيل مع مواصفات محددة]</li>
+<li><strong>سهولة الاستخدام:</strong> [شرح كيفية الاستفادة]</li>
+<li><strong>الضمان والأمان:</strong> [معلومات الضمان والجودة]</li>
+<li><strong>التوصيل السريع:</strong> [معلومات الشحن في السعودية]</li>
+</ul>
+
+<h3>📋 المواصفات التقنية</h3>
+<p>[اذكر الحجم، الوزن، الأبعاد، المواد، الألوان المتاحة، etc.]</p>
+
+<h3>💡 كيفية الاستخدام</h3>
+<p>[شرح بسيط وواضح لطريقة الاستخدام المثلى]</p>
+
+<p><strong>🛒 اطلب ${keyword} الآن مع ضمان الجودة وتوصيل مجاني في جميع أنحاء السعودية!</strong> <a href="/category/${category.replace(/\s+/g, '-')}" title="تصفح المزيد من منتجات ${category}">تصفح المزيد من منتجات ${category}</a></p>
+
+نصائح للكتابة:
+• استخدم الأرقام والإحصائيات عند الإمكان
+• اذكر فوائد ملموسة وليس فقط مميزات
+• تجنب المبالغة واستخدم لغة واقعية
+• اربط بصفحات ذات صلة في الموقع
+• استخدم كلمات تحفز العاطفة والثقة
+
+اكتب الوصف باللغة العربية فقط:`;
+  },
+
+  // Enhanced Meta Title Generation
+  generateMetaTitle: (product) => {
+    const keyword = product.keyword || product.name;
+    const category = product.category || '';
+    
+    return `أنت خبير SEO متخصص في كتابة عناوين صفحات محسنة للسوق السعودي. اكتب Page Title مثالي.
+
+المنتج: "${product.name}"
+الكلمة المفتاحية: "${keyword}"
+الفئة: "${category}"
+
+معايير Page Title المثالي:
+✅ الطول: 50-58 حرف بالضبط (مهم جداً)
+✅ يبدأ بالكلمة المفتاحية أو يحتويها في البداية
+✅ يحتوي على كلمة تحفيزية (أفضل، حصري، عروض، جديد)
+✅ يذكر السعودية أو التوصيل إذا كان هناك مساحة
+✅ جذاب للنقر بمعدل CTR عالي
+✅ يتجنب التكرار والحشو
+
+أمثلة ناجحة:
+• "ايفون 15 برو ماكس أسعار حصرية السعودية | توصيل مجاني"
+• "كريم فيتامين سي الأصلي للبشرة | عروض محدودة"
+• "ساعة ذكية سامسونج جديدة | ضمان سنتين السعودية"
+
+قوالب مجربة:
+• [الكلمة المفتاحية] | [ميزة فريدة] | [مكان/ضمان]
+• أفضل [الكلمة المفتاحية] في السعودية | [فائدة رئيسية]
+• [الكلمة المفتاحية] [صفة مميزة] | توصيل مجاني السعودية
+
+تجنب هذه الأخطاء:
+❌ تجاوز 60 حرف
+❌ تكرار الكلمات
+❌ استخدام رموز غريبة
+❌ المبالغة غير المبررة
+
+اكتب العنوان فقط (50-58 حرف):`;
+  },
+
+  // Enhanced Meta Description Generation
+  generateMetaDescription: (product) => {
+    const keyword = product.keyword || product.name;
+    const category = product.category || '';
+    
+    return `أنت خبير في كتابة Meta Description محسنة لمحركات البحث. اكتب وصف ميتا مثالي يحقق أعلى CTR.
+
+المنتج: "${product.name}"
+الكلمة المفتاحية: "${keyword}"
+الفئة: "${category}"
+
+معايير Meta Description المثالية:
+✅ الطول: 150-155 حرف بالضبط
+✅ تحتوي الكلمة المفتاحية في النصف الأول
+✅ تشرح الفائدة الرئيسية والقيمة المضافة
+✅ تحتوي على دعوة لاتخاذ إجراء
+✅ تذكر ميزة تنافسية (توصيل مجاني، ضمان، سعر مميز)
+✅ تستخدم أرقام أو إحصائيات إذا أمكن
+✅ تبدأ بفعل أو صفة قوية
+
+صيغ مجربة ناجحة:
+• "اكتشف [الكلمة المفتاحية] بجودة عالية وأسعار منافسة. توصيل مجاني في السعودية وضمان سنتين. اطلب الآن!"
+• "احصل على [الكلمة المفتاحية] الأصلي مع خصم 20%. أكثر من 1000 عميل راضي. شحن سريع لجميع المناطق."
+• "[الكلمة المفتاحية] بأفضل الأسعار في السعودية. جودة مضمونة وخدمة عملاء 24/7. اطلب الآن واستفد من العروض!"
+
+عناصر القوة:
+🎯 الفوائد الواضحة
+💰 الأسعار/العروض  
+🚚 معلومات التوصيل
+⭐ الجودة والضمان
+📱 سهولة الطلب
+👥 رضا العملاء
+
+كلمات تحفيزية:
+• احصل على، اكتشف، استفد من
+• حصري، محدود، مميز
+• مجاني، خصم، عرض
+• ضمان، جودة، أصلي
+• سريع، فوري، سهل
+
+اكتب Meta Description فقط (150-155 حرف):`;
+  },
+
+  // Enhanced URL Path Generation
+  generateUrlPath: (product) => {
+    const keyword = product.keyword || product.name;
+    
+    return `أنت خبير في إنشاء URL صديق لمحركات البحث. أنشئ مسار URL مثالي.
+
+المنتج: "${product.name}"
+الكلمة المفتاحية: "${keyword}"
+
+معايير URL المثالي:
+✅ باللغة الإنجليزية فقط
+✅ قصير ووصفي (3-5 كلمات)
+✅ يحتوي على الكلمة المفتاحية المترجمة
+✅ يستخدم الشرطات (-) لفصل الكلمات
+✅ بدون أحرف خاصة أو مسافات
+✅ أحرف صغيرة فقط
+✅ سهل الحفظ والمشاركة
+
+أمثلة URL ناجحة:
+• كريم فيتامين سي → vitamin-c-serum-original
+• ايفون 15 برو → iphone-15-pro-saudi
+• ساعة ذكية → smart-watch-samsung
+• عسل سدر → sidr-honey-natural
+
+قواعد الترجمة:
+• استخدم الكلمات الإنجليزية الشائعة
+• ترجم المفاهيم وليس الكلمات حرفياً
+• اختصر بذكاء مع الحفاظ على المعنى
+• أضف كلمة مميزة إذا لزم الأمر
+
+اكتب مسار URL فقط (بدون http أو نقاط):`;
+  },
+
+  // Enhanced Image Alt Text Generation
+  generateImageAlt: (product) => {
+    const keyword = product.keyword || product.name;
+    
+    return `أنت خبير في كتابة النص البديل للصور (Alt Text) المحسن للسيو. اكتب alt text مثالي.
+
+المنتج: "${product.name}"
+الكلمة المفتاحية: "${keyword}"
+
+معايير Alt Text المثالي:
+✅ الطول: 10-15 كلمة
+✅ يحتوي على الكلمة المفتاحية بشكل طبيعي
+✅ يصف الصورة بدقة للمكفوفين
+✅ يذكر اللون والحجم والشكل إذا أمكن
+✅ يساعد في فهم المحتوى بدون رؤية الصورة
+✅ لا يستخدم كلمات "صورة" أو "صورة لـ"
+
+أمثلة alt text ناجحة:
+• "${keyword} باللون الأبيض على خلفية بيضاء"
+• "${keyword} عالي الجودة مع العبوة الأصلية"
+• "${keyword} يظهر من الأمام مع الملحقات"
+
+عناصر وصفية مهمة:
+🎨 الألوان الواضحة
+📏 الحجم أو القياس
+🔍 التفاصيل المرئية
+📦 العبوة أو التغليف
+⚡ الحالة (جديد، مستعمل، etc.)
+
+اكتب Alt Text فقط (10-15 كلمة):`;
+  },
+
+  // Comprehensive Generation Prompt
+  generateAll: (product) => {
+    const keyword = product.keyword || 'منتج';
+    const category = product.category || 'عام';
+    const tone = product.tone || 'محايدة';
+    const audience = product.target_audience || 'عام';
+    const storyArc = product.best_story_arc || 'مشكلة-حل';
+    
+    return `أنت خبير تسويق رقمي ومتخصص SEO محترف مع 15+ سنة خبرة في السوق السعودي. مهمتك إنشاء حملة SEO متكاملة لهذا المنتج.
+
+معلومات المشروع:
+🏷️ المنتج: "${product.name}"
+🎯 الكلمة المفتاحية المستهدفة: "${keyword}"
+📂 فئة المنتج: "${category}"
+👥 الجمهور المستهدف: "${audience}"
+🎭 النغمة المطلوبة: "${tone}"
+📖 الحبكة التسويقية: "${storyArc}"
+
+أهداف الحملة:
+🎯 ترتيب أول صفحة لـ "${keyword}"
+📈 تحسين معدل التحويل CTR بـ 25%
+🛒 زيادة المبيعات من البحث العضوي
+🌟 بناء سلطة في فئة "${category}"
+📱 تحسين تجربة المستخدم للجوال
+
+معايير SEO الإجبارية (يجب تطبيقها 100%):
+
+1️⃣ تحسين الكلمة المفتاحية:
+- استخدام "${keyword}" في أول 25 كلمة من الوصف
+- كثافة 2-3% في المحتوى
+- توزيع طبيعي بدون حشو
+
+2️⃣ جودة المحتوى:
+- وصف 150+ كلمة (مفصل ومفيد)
+- هيكل HTML منظم ومنسق
+- معلومات تقنية دقيقة ومواصفات
+- روابط داخلية ذات صلة
+
+3️⃣ تحسين العناوين:
+- Page Title: 50-58 حرف بالضبط
+- يحتوي الكلمة المفتاحية والفائدة الرئيسية
+- جذاب للنقر (High CTR)
+
+4️⃣ Meta Description:
+- 150-155 حرف بالضبط
+- دعوة واضحة للعمل
+- فوائد ملموسة
+
+5️⃣ العناصر التقنية:
+- URL صديق لمحركات البحث
+- Alt Text وصفي ومحسن
+- تحسين للجوال والسرعة
+
+هيكل الوصف المطلوب (اتبعه بدقة):
+
+المقدمة القوية (25 كلمة):
+"${keyword} [شرح الفائدة الرئيسية والحل المقدم للعميل في ${category}]"
+
+القسم الرئيسي:
+<h3>🌟 لماذا ${keyword} هو الخيار الأمثل؟</h3>
+<ul>
+<li><strong>الجودة المضمونة:</strong> [تفاصيل الجودة والمواد]</li>
+<li><strong>السعر التنافسي:</strong> [قيمة مقابل المال]</li>
+<li><strong>الضمان والخدمة:</strong> [معلومات الضمان وخدمة العملاء]</li>
+<li><strong>التوصيل السريع:</strong> [معلومات الشحن في السعودية]</li>
+</ul>
+
+<h3>📋 المواصفات التفصيلية</h3>
+<p>[مواصفات دقيقة: الحجم، الوزن، المواد، الألوان، الأبعاد، etc.]</p>
+
+<h3>💡 طريقة الاستخدام المثلى</h3>
+<p>[خطوات واضحة لأفضل استفادة من المنتج]</p>
+
+<h3>⭐ آراء العملاء ولماذا يختارونا</h3>
+<p>[فوائد حقيقية يحصل عليها العملاء + إحصائيات إن أمكن]</p>
+
+الخاتمة مع CTA:
+<p><strong>🛒 احصل على ${keyword} الآن بأفضل سعر في السعودية!</strong> ضمان الجودة وإرجاع مجاني لمدة 14 يوم. <a href="/category/${category}" title="المزيد من منتجات ${category}">تصفح المزيد من منتجات ${category}</a> أو <a href="/offers" title="العروض الحالية">شاهد العروض الحالية</a>.</p>
+
+المخرج المطلوب (JSON فقط):
+{
+  "name": "عنوان محسن للمنتج يحتوي الكلمة المفتاحية (أقل من 70 حرف)",
+  "description": "الوصف HTML الكامل حسب الهيكل أعلاه",
+  "keyword": "${keyword}",
+  "meta_title": "Page Title محسن (50-58 حرف بالضبط)",
+  "meta_description": "Meta Description جذاب (150-155 حرف بالضبط)",
+  "url_path": "مسار-url-صديق-للسيو-باللغة-الانجليزية",
+  "imageAlt": "وصف بديل للصورة يحتوي الكلمة المفتاحية (10-15 كلمة)"
+}
+
+⚠️ تنبيهات مهمة:
+- اجعل المحتوى طبيعي وغير مكرر
+- استخدم البيانات الحقيقية للمنتج المذكور
+- لا تبالغ في الادعاءات
+- تأكد من دقة أطوال النصوص
+- اجعل الروابط الداخلية منطقية وذات صلة
+
+ابدأ بكتابة JSON الآن:`;
+  }
+};
+
 // ✅ FIXED: Enhanced utility functions
 const cleanText = (text) => {
   if (!text || typeof text !== "string") return "";
@@ -150,8 +509,8 @@ const checkCoreCriteria = (product) => {
   // 6. Description length at least 120 words
   criteria.push({
     id: 'description_length',
-    text: `طول الوصف لا يقل عن 100 كلمة (حالياً: ${descriptionWords.length} كلمة)`,
-    status: descriptionWords.length >= 100 ? 'pass' : 'fail'
+    text: `طول الوصف لا يقل عن 120 كلمة (حالياً: ${descriptionWords.length} كلمة)`,
+    status: descriptionWords.length >= 120 ? 'pass' : 'fail'
   });
 
   // 7. Using internal backlinks (check for any links in description)
@@ -213,7 +572,7 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-green-500" />
-            تحليل السيو
+            تحليل السيو المتقدم
           </h2>
           <div className="text-right">
             <div className="text-2xl font-bold text-gray-600">--</div>
@@ -222,7 +581,7 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
         </div>
         <div className="text-center text-gray-400 py-8">
           <BarChart3 className="w-8 h-8 mx-auto mb-2 opacity-50" />
-          <p className="text-sm">أدخل بيانات المنتج لبدء التحليل</p>
+          <p className="text-sm">أدخل بيانات المنتج لبدء التحليل المتقدم</p>
         </div>
       </div>
     );
@@ -252,14 +611,14 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
           <BarChart3 className="w-5 h-5 text-green-500" />
-          تحليل السيو
+          تحليل السيو المتقدم
         </h2>
         <div className="text-right">
           <div className={`text-2xl font-bold ${getScoreColor(coreResults.score)}`}>
             {coreResults.score}%
           </div>
           <div className="text-xs text-gray-500">
-            {coreResults.passedCount}/{coreResults.totalCount} معيار
+            {coreResults.passedCount}/{coreResults.totalCount} معيار متقدم
           </div>
         </div>
       </div>
@@ -280,7 +639,7 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
       <div className="mb-6">
         <h3 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-          المعايير الأساسية
+          المعايير المتقدمة للسيو
         </h3>
         
         <div className="space-y-2">
@@ -303,13 +662,13 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
       {/* Score Interpretation */}
       <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl">
         <div className="text-sm font-medium text-blue-900 mb-1">
-          {coreResults.score >= 85 && "ممتاز! جميع المعايير الأساسية مكتملة تقريباً"}
-          {coreResults.score >= 70 && coreResults.score < 85 && "جيد جداً! معظم المعايير الأساسية مكتملة"}
-          {coreResults.score >= 50 && coreResults.score < 70 && "يحتاج تحسين في المعايير الأساسية"}
-          {coreResults.score < 50 && "ابدأ بتطبيق المعايير الأساسية"}
+          {coreResults.score >= 85 && "🏆 مستوى احترافي! SEO متقدم ومكتمل"}
+          {coreResults.score >= 70 && coreResults.score < 85 && "⭐ جيد جداً! قريب من المستوى الاحترافي"}
+          {coreResults.score >= 50 && coreResults.score < 70 && "📈 متوسط - يحتاج تحسينات مهمة"}
+          {coreResults.score < 50 && "🚀 ابدأ رحلة التحسين للوصول للمستوى المطلوب"}
         </div>
         <div className="text-xs text-blue-700">
-          أكمل المعايير الأساسية أولاً للحصول على أفضل نتائج السيو
+          تطبيق المعايير المتقدمة يضمن ترتيب أفضل ومنافسة قوية في نتائج البحث
         </div>
       </div>
     </div>
@@ -583,29 +942,12 @@ export default function ProductSEO() {
     setErrors(prev => ({ ...prev, analyze: null }));
 
     try {
-      console.log('🔄 Starting product analysis...');
+      console.log('🔄 Starting advanced product analysis...');
 
-      // ✅ FIXED: Enhanced keyword generation
-      const keywordPrompt = `أنت خبير SEO محترف. استخرج أفضل كلمة مفتاحية لهذا المنتج:
-
-المنتج: "${product.name}"
-
-معايير الكلمة المفتاحية المثالية:
-- حجم بحث عالي في السعودية
-- منافسة معقولة
-- صلة مباشرة بالمنتج
-- احتمالية تحويل عالية
-- 2-4 كلمات فقط
-
-أمثلة جيدة:
-- منتج: "كريم مرطب للوجه" → كلمة مفتاحية: "كريم مرطب للوجه"
-- منتج: "ساعة ذكية سامسونج" → كلمة مفتاحية: "ساعة ذكية سامسونج"
-- منتج: "شامبو للشعر الجاف" → كلمة مفتاحية: "شامبو للشعر الجاف"
-
-أعد الكلمة المفتاحية فقط بدون علامات اقتباس أو شرح:`;
-
-      const keyword = cleanText(await generateProductSEO(keywordPrompt));
-      console.log('✅ Generated keyword:', keyword);
+      // ✅ ENHANCED: Use new advanced keyword generation
+      const keywordResponse = await generateProductSEO(ENHANCED_SEO_PROMPTS.generateKeyword(product));
+      const keyword = cleanText(keywordResponse);
+      console.log('✅ Generated advanced keyword:', keyword);
 
       // Category analysis
       const categoryPrompt = await categorizeProduct(product);
@@ -638,7 +980,7 @@ export default function ProductSEO() {
 
       setProductAnalysis(analysis);
       
-      toast.success("تم تحليل المنتج بنجاح! 🎯");
+      toast.success("تم التحليل المتقدم بنجاح! 🎯");
       
     } catch (error) {
       console.error("Error analyzing product:", error);
@@ -660,7 +1002,7 @@ export default function ProductSEO() {
     setErrors(prev => ({ ...prev, generate: null }));
 
     try {
-      console.log('🔄 Starting comprehensive generation...');
+      console.log('🔄 Starting comprehensive enhanced generation...');
 
       // Ensure we have analysis data
       let analysisData = productAnalysis;
@@ -674,63 +1016,20 @@ export default function ProductSEO() {
         };
       }
 
-      const keyword = cleanText(product.keyword) || "منتج";
-
-      // ✅ ENHANCED: Better comprehensive generation prompt
-      const prompt = `أنت مساعد تسويق محترف متخصص في SEO للسوق السعودي.
-
-المنتج المطلوب تحسينه:
-الاسم: "${product.name}"
-الكلمة المفتاحية: "${keyword}"
-الفئة: "${analysisData.category}"
-الجمهور: "${analysisData.target_audience}"
-النغمة: "${analysisData.tone}"
-الحبكة: "${analysisData.best_story_arc}"
-
-مهمتك: توليد محتوى متكامل لصفحة هذا المنتج يحقق أفضل نتائج SEO.
-
-معايير SEO الإلزامية:
-✅ الوصف يبدأ بالكلمة المفتاحية في أول 25 كلمة
-✅ طول الوصف 100+ كلمة (ليس أقل)
-✅ استخدام HTML منظم ومنسق مع روابط داخلية
-✅ توزيع طبيعي للكلمة المفتاحية
-✅ دعوة واضحة لاتخاذ إجراء في النهاية
-✅ استخدام كلمات تحفيزية للشراء
-
-هيكل الوصف المطلوب (مهم جداً):
-1. فقرة افتتاحية قوية تبدأ بالكلمة المفتاحية <p>
-2. قسم "المميزات الرئيسية" <h3>
-3. قائمة 4-6 مميزات <ul><li>
-4. قسم "كيفية الاستخدام" <h3>  
-5. شرح بسيط للاستخدام <p>
-6. فقرة ختامية تحفيزية مع CTA <p>
-
-تنبيه مهم: يجب أن يكون المحتوى متناسب تماماً مع طبيعة المنتج "${product.name}".
-
-أعد JSON فقط:
-{
-  "name": "عنوان محسن يحتوي الكلمة المفتاحية (أقل من 70 حرف)",
-  "description": "وصف HTML منسق حسب المعايير أعلاه مع مواصفات ودعوة للشراء",
-  "keyword": "${keyword}",
-  "meta_title": "Page Title عنوان السيو جذاب (50-60 حرف)",
-  "meta_description": "Page Description وصف الميتا مقنع يحتوي الكلمة المفتاحية (145-150 حرف)",
-  "url_path": "مسار-url-صديق-لمحركات-البحث",
-  "imageAlt": "وصف بديل للصورة يحتوي الكلمة المفتاحية"
-}`;
-
-      console.log('📤 Sending comprehensive generation request...');
-      const generated = await generateProductSEO(prompt);
-      console.log('📥 Received response:', generated.substring(0, 200) + '...');
+      // ✅ ENHANCED: Use new comprehensive generation prompt
+      console.log('📤 Sending enhanced comprehensive generation request...');
+      const generated = await generateProductSEO(ENHANCED_SEO_PROMPTS.generateAll(product));
+      console.log('📥 Received enhanced response:', generated.substring(0, 200) + '...');
       
       const jsonMatch = generated.match(/{[\s\S]*}/);
       
       if (!jsonMatch) {
-        throw new Error("لم يتم العثور على JSON صالح في الإجابة");
+        throw new Error("لم يتم العثور على JSON صالح في الإجابة المحسنة");
       }
 
       const fields = JSON.parse(jsonMatch[0]);
 
-      // ✅ FIXED: Clean all generated fields
+      // ✅ ENHANCED: Clean and validate all generated fields
       const processedFields = {
         name: truncateText(fields.name, FIELD_LIMITS.name_limit),
         description: fields.description || "",
@@ -741,18 +1040,18 @@ export default function ProductSEO() {
         imageAlt: cleanText(fields.imageAlt),
       };
 
-      console.log('✅ Processed fields:', processedFields);
+      console.log('✅ Processed enhanced fields:', processedFields);
 
       setProduct(prev => ({
         ...prev,
         ...processedFields,
       }));
 
-      toast.success("تم توليد جميع الحقول بنجاح! ✨");
+      toast.success("تم توليد المحتوى المتقدم بنجاح! ⭐✨");
 
     } catch (error) {
-      console.error("Error generating fields:", error);
-      const errorMessage = error?.response?.data?.message || error?.message || "فشل في توليد المحتوى";
+      console.error("Error generating enhanced fields:", error);
+      const errorMessage = error?.response?.data?.message || error?.message || "فشل في توليد المحتوى المتقدم";
       setErrors(prev => ({ ...prev, generate: errorMessage }));
       toast.error("❌ " + errorMessage);
     } finally {
@@ -765,97 +1064,21 @@ export default function ProductSEO() {
     setErrors(prev => ({ ...prev, [fieldType]: null }));
 
     try {
-      console.log(`🔄 Generating field: ${fieldType}`);
+      console.log(`🔄 Generating enhanced field: ${fieldType}`);
       
+      // ✅ ENHANCED: Use new field-specific prompts
       const prompts = {
-  keyword: `You are a professional Arabic SEO expert. Choose the most relevant Arabic target keyword for this product in the Saudi market.
-
-Product: ${product.name}
-Description: ${product.description || 'غير متوفر'}
-Category: ${product.category || 'عام'}
-
-Selection criteria:
-- High search volume in Saudi Arabia
-- Reasonable competition
-- Strong product relevance
-- High conversion potential
-
-Provide only the keyword in Arabic without quotation marks.`,
-
-  description: `You are a professional Arabic marketing copywriter specialized in SEO. Write an HTML formatted product description in Arabic.
-
-Product: ${product.name}
-Target keyword: ${cleanText(product.keyword) || 'منتج'}
-Tone: ${product.tone || 'محايدة'}
-
-Description requirements:
-- At least 100 words
-- Start the first paragraph with the target keyword
-- Use proper HTML tags (<p>, <ul>, <li>, <h3>)
-- Include at least one internal link
-- Mention product specifications (size, quantity)
-- Add a clear call to action
-- Suitable for the Saudi market
-
-Provide only the HTML content in Arabic.`,
-
-  meta_title: `Create a compelling Arabic SEO page title for this product targeting the Saudi market.
-
-Product: ${product.name}
-Target keyword: ${cleanText(product.keyword) || 'منتج'}
-
-Title requirements:
-- Between 50 and 60 characters
-- Include the target keyword naturally
-- Attractive and persuasive for Google search results
-
-Provide only the title text in Arabic.`,
-
-  meta_description: `Write an Arabic meta description for this product optimized for the Saudi market.
-
-Product: ${product.name}
-Target keyword: ${cleanText(product.keyword) || 'منتج'}
-Category: ${product.category || 'عام'}
-
-Description requirements:
-- Exactly 150 characters
-- Naturally include the target keyword
-- Clearly communicate the main customer benefit
-- Encourage clicks
-
-Provide only the description text in Arabic.`,
-
-  url_path: `Generate an SEO-friendly English URL path for this product.
-
-Product: ${product.name}
-Target keyword: ${cleanText(product.keyword) || 'product'}
-
-URL requirements:
-- All lowercase
-- Words separated by hyphens
-- Short and clear
-- No special characters
-
-Provide only the URL path without http.`,
-
-  imageAlt: `Create a descriptive Arabic ALT text for this product image.
-
-Product: ${product.name}
-Target keyword: ${cleanText(product.keyword) || 'منتج'}
-
-ALT text requirements:
-- Accurately describe the image
-- Include the target keyword naturally
-- Between 10 and 15 words
-- Help visually impaired users understand the image
-
-Provide only the Arabic ALT text.`
-};
-
+        keyword: ENHANCED_SEO_PROMPTS.generateKeyword(product),
+        description: ENHANCED_SEO_PROMPTS.generateDescription(product),
+        meta_title: ENHANCED_SEO_PROMPTS.generateMetaTitle(product),
+        meta_description: ENHANCED_SEO_PROMPTS.generateMetaDescription(product),
+        url_path: ENHANCED_SEO_PROMPTS.generateUrlPath(product),
+        imageAlt: ENHANCED_SEO_PROMPTS.generateImageAlt(product)
+      };
 
       const prompt = prompts[fieldType];
       if (!prompt) {
-        throw new Error(`لا يوجد برومبت للحقل: ${fieldType}`);
+        throw new Error(`لا يوجد برومبت محسن للحقل: ${fieldType}`);
       }
 
       const response = await generateProductSEO(prompt);
@@ -868,7 +1091,7 @@ Provide only the Arabic ALT text.`
         value = truncateText(value, FIELD_LIMITS.meta_description);
       }
 
-      console.log(`✅ Generated ${fieldType}:`, value);
+      console.log(`✅ Generated enhanced ${fieldType}:`, value);
 
       setProduct(prev => ({
         ...prev,
@@ -876,19 +1099,19 @@ Provide only the Arabic ALT text.`
       }));
 
       const fieldLabels = {
-        keyword: 'الكلمة المفتاحية',
-        description: 'الوصف',
-        meta_title: 'Page Title عنوان السيو',
-        meta_description: 'Page Description وصف الميتا',
-        url_path: 'مسار الرابط',
-        imageAlt: 'النص البديل للصورة'
+        keyword: 'الكلمة المفتاحية المتقدمة',
+        description: 'الوصف المحسن',
+        meta_title: 'Page Title المحسن',
+        meta_description: 'Page Description المحسن',
+        url_path: 'مسار الرابط المحسن',
+        imageAlt: 'النص البديل المحسن'
       };
 
-      toast.success(`تم توليد ${fieldLabels[fieldType]} بنجاح! 🎯`);
+      toast.success(`تم توليد ${fieldLabels[fieldType]} بنجاح! 🎯⭐`);
 
     } catch (error) {
-      console.error(`Error generating ${fieldType}:`, error);
-      const errorMessage = error?.response?.data?.message || error?.message || `فشل في توليد ${fieldType}`;
+      console.error(`Error generating enhanced ${fieldType}:`, error);
+      const errorMessage = error?.response?.data?.message || error?.message || `فشل في توليد ${fieldType} المحسن`;
       setErrors(prev => ({ ...prev, [fieldType]: errorMessage }));
       toast.error("❌ " + errorMessage);
     } finally {
@@ -923,7 +1146,7 @@ Provide only the Arabic ALT text.`
             <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
               {icon}
               {label}
-              <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">Rich Text Editor</span>
+              <span className="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded">Enhanced AI</span>
             </label>
             <div className="flex items-center gap-2">
               <button
@@ -931,20 +1154,20 @@ Provide only the Arabic ALT text.`
                 className={`px-3 py-1 text-xs rounded-lg font-medium transition-all flex items-center gap-1 ${
                   isLoading 
                     ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
-                    : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                    : "bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600"
                 }`}
                 disabled={isLoading}
-                title="توليد ذكي"
+                title="توليد متقدم بالذكاء الاصطناعي"
               >
                 {isLoading ? (
                   <>
                     <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent"></div>
-                    جاري التوليد...
+                    توليد متقدم...
                   </>
                 ) : (
                   <>
-                    <Wand2 className="w-3 h-3" />
-                    توليد ذكي
+                    <Sparkles className="w-3 h-3" />
+                    توليد متقدم
                   </>
                 )}
               </button>
@@ -973,9 +1196,9 @@ Provide only the Arabic ALT text.`
             </div>
           )}
           
-          {/* Rich text editor note */}
+          {/* Enhanced rich text editor note */}
           <div className="text-xs text-gray-500 mt-2">
-            💡 استخدم المحرر لإضافة <strong>التنسيق</strong>، <strong>الروابط الداخلية</strong>، والقوائم المنظمة
+            ⭐ المحرر المتقدم: يدعم <strong>التنسيق المتقدم</strong>، <strong>الروابط الداخلية المحسنة</strong>، والقوائم المنظمة للسيو
           </div>
         </div>
       );
@@ -987,6 +1210,7 @@ Provide only the Arabic ALT text.`
           <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
             {icon}
             {label}
+            {key === 'keyword' && <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">AI Advanced</span>}
           </label>
           <div className="flex items-center gap-2">
             {showCharCount && (
@@ -999,20 +1223,22 @@ Provide only the Arabic ALT text.`
               className={`px-3 py-1 text-xs rounded-lg font-medium transition-all flex items-center gap-1 ${
                 isLoading 
                   ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
-                  : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                  : key === 'keyword' 
+                    ? "bg-gradient-to-r from-green-500 to-blue-500 text-white hover:from-green-600 hover:to-blue-600"
+                    : "bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600"
               }`}
               disabled={isLoading}
-              title="توليد ذكي"
+              title="توليد متقدم بالذكاء الاصطناعي"
             >
               {isLoading ? (
                 <>
                   <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent"></div>
-                  جاري...
+                  متقدم...
                 </>
               ) : (
                 <>
-                  <Wand2 className="w-3 h-3" />
-                  توليد
+                  <Sparkles className="w-3 h-3" />
+                  متقدم
                 </>
               )}
             </button>
@@ -1057,20 +1283,20 @@ Provide only the Arabic ALT text.`
           </div>
         )}
 
-        {/* Field-specific hints */}
+        {/* Enhanced field-specific hints */}
         {key === 'meta_title' && (
-          <div className="text-xs text-gray-500 mt-2">
-            💡 Page Title المثالي: 50-60 حرف، يحتوي الكلمة المفتاحية، جذاب للنقر
+          <div className="text-xs text-purple-600 bg-purple-50 p-2 rounded mt-2">
+            ⭐ Page Title المتقدم: 50-58 حرف، كلمة مفتاحية قوية، عنصر تحفيزي، معدل نقر عالي
           </div>
         )}
         {key === 'meta_description' && (
-          <div className="text-xs text-gray-500 mt-2">
-            💡 Page Description المثالي: 150-160 حرف، يحتوي الكلمة المفتاحية، يحفز على الزيارة
+          <div className="text-xs text-purple-600 bg-purple-50 p-2 rounded mt-2">
+            ⭐ Page Description المتقدم: 150-155 حرف، فائدة واضحة، دعوة للعمل، ميزة تنافسية
           </div>
         )}
         {key === 'keyword' && (
-          <div className="text-xs text-gray-500 mt-2">
-            💡 اختر كلمة مفتاحية بحجم بحث عالي ومنافسة معقولة
+          <div className="text-xs text-green-600 bg-green-50 p-2 rounded mt-2">
+            🎯 الكلمة المفتاحية المتقدمة: تحليل حجم البحث، المنافسة، نية الشراء، والسوق السعودي
           </div>
         )}
         {key === 'url_path' && (
@@ -1093,8 +1319,8 @@ Provide only the Arabic ALT text.`
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">جاري تحميل بيانات المنتج...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">جاري تحميل نظام السيو المتقدم...</p>
         </div>
       </div>
     );
@@ -1116,7 +1342,7 @@ Provide only the Arabic ALT text.`
             </button>
             <button
               onClick={loadProduct}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
             >
               إعادة المحاولة
             </button>
@@ -1133,19 +1359,20 @@ Provide only the Arabic ALT text.`
         <Sidebar />
         <main className="flex-1 p-6 max-w-7xl mx-auto">
           
-          {/* Header */}
+          {/* Enhanced Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
               <Link 
                 to="/products" 
-                className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
+                className="flex items-center gap-2 text-purple-600 hover:text-purple-800 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 العودة للمنتجات
               </Link>
               <div className="h-6 w-px bg-gray-300"></div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                تحليل وتحسين السيو
+              <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <Crown className="w-6 h-6 text-purple-500" />
+                تحليل وتحسين السيو المتقدم
               </h1>
               {hasUnsavedChanges && (
                 <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
@@ -1181,12 +1408,12 @@ Provide only the Arabic ALT text.`
             {/* Main Content */}
             <div className="xl:col-span-2 space-y-6">
               
-              {/* Product Header */}
+              {/* Enhanced Product Header */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                    <Package className="w-5 h-5 text-blue-500" />
-                    معلومات المنتج
+                    <Package className="w-5 h-5 text-purple-500" />
+                    معلومات المنتج المتقدمة
                   </h2>
                   <div className="flex gap-2">
                     <button
@@ -1195,18 +1422,18 @@ Provide only the Arabic ALT text.`
                       className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
                         generating 
                           ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
-                          : "bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600"
+                          : "bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 shadow-lg"
                       }`}
                     >
                       {generating ? (
                         <>
                           <div className="animate-spin rounded-full h-4 w-4 border border-yellow-600 border-t-transparent"></div>
-                          جاري التوليد...
+                          توليد متقدم جاري...
                         </>
                       ) : (
                         <>
-                          <Sparkles className="w-4 h-4" />
-                          توليد شامل بالذكاء الاصطناعي
+                          <Crown className="w-4 h-4" />
+                          توليد شامل متقدم بالـ AI
                         </>
                       )}
                     </button>
@@ -1215,15 +1442,15 @@ Provide only the Arabic ALT text.`
                       disabled={saving || !hasUnsavedChanges}
                       className={`px-6 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
                         saving 
-                          ? "bg-blue-100 text-blue-700 cursor-not-allowed"
+                          ? "bg-purple-100 text-purple-700 cursor-not-allowed"
                           : hasUnsavedChanges
-                            ? "bg-blue-600 text-white hover:bg-blue-700" 
+                            ? "bg-purple-600 text-white hover:bg-purple-700" 
                             : "bg-gray-100 text-gray-400 cursor-not-allowed"
                       }`}
                     >
                       {saving ? (
                         <>
-                          <div className="animate-spin rounded-full h-4 w-4 border border-blue-600 border-t-transparent"></div>
+                          <div className="animate-spin rounded-full h-4 w-4 border border-purple-600 border-t-transparent"></div>
                           جاري الحفظ...
                         </>
                       ) : (
@@ -1244,12 +1471,13 @@ Provide only the Arabic ALT text.`
                   </div>
                 )}
 
-                {/* Product Analysis Section */}
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 mb-6 border border-blue-100">
+                {/* Enhanced Product Analysis Section */}
+                <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-4 mb-6 border border-purple-100">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-                      <Target className="w-4 h-4 text-blue-500" />
-                      تحليل المنتج والجمهور
+                      <Target className="w-4 h-4 text-purple-500" />
+                      تحليل المنتج والسوق المتقدم
+                      <span className="text-xs text-purple-600 bg-purple-100 px-2 py-1 rounded">AI Enhanced</span>
                     </h3>
                     <button
                       onClick={handleAnalyzeProduct}
@@ -1257,18 +1485,18 @@ Provide only the Arabic ALT text.`
                       className={`px-3 py-1 text-xs rounded-lg font-medium transition-all flex items-center gap-1 ${
                         generating 
                           ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
-                          : "bg-blue-600 text-white hover:bg-blue-700"
+                          : "bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700"
                       }`}
                     >
                       {generating ? (
                         <>
                           <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent"></div>
-                          تحليل...
+                          تحليل متقدم...
                         </>
                       ) : (
                         <>
-                          <Zap className="w-3 h-3" />
-                          تحليل ذكي
+                          <Crown className="w-3 h-3" />
+                          تحليل متقدم
                         </>
                       )}
                     </button>
@@ -1282,7 +1510,7 @@ Provide only the Arabic ALT text.`
                         value={product.category || ""}
                         onChange={(e) => handleProductChange('category', e.target.value)}
                         placeholder="مثل: إلكترونيات، ملابس، منزل..."
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                       />
                     </div>
                     
@@ -1293,7 +1521,7 @@ Provide only the Arabic ALT text.`
                         value={product.target_audience || ""}
                         onChange={(e) => handleProductChange('target_audience', e.target.value)}
                         placeholder="مثل: الشباب، العائلات، المهنيين..."
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                       />
                     </div>
                     
@@ -1302,7 +1530,7 @@ Provide only the Arabic ALT text.`
                       <select
                         value={product.tone || ""}
                         onChange={(e) => handleProductChange('tone', e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                       >
                         {TONE_OPTIONS.map(option => (
                           <option key={option.value} value={option.value}>{option.label}</option>
@@ -1315,7 +1543,7 @@ Provide only the Arabic ALT text.`
                       <select
                         value={product.best_story_arc || ""}
                         onChange={(e) => handleProductChange('best_story_arc', e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                       >
                         {STORY_ARC_OPTIONS.map(option => (
                           <option key={option.value} value={option.value}>{option.label}</option>
@@ -1326,35 +1554,36 @@ Provide only the Arabic ALT text.`
                 </div>
               </div>
 
-              {/* Google Preview */}
+              {/* Enhanced Google Preview */}
               {showPreview && (
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                     <Globe className="w-5 h-5 text-green-500" />
-                    معاينة نتائج Google
+                    معاينة نتائج Google المحسنة
+                    <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded">Live Preview</span>
                   </h3>
-                  <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-blue-500">
+                  <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-green-500">
                     <div className="text-blue-600 text-lg hover:underline cursor-pointer">
-                      {product.meta_title || product.name || "عنوان المنتج"}
+                      {product.meta_title || product.name || "عنوان المنتج المحسن"}
                     </div>
                     <div className="text-green-600 text-sm mt-1">
-                      https://example.com/{product.url_path || "product"}
+                      https://example.com/{product.url_path || "enhanced-product"}
                     </div>
                     <div className="text-gray-600 text-sm mt-2 leading-relaxed">
-                      {product.meta_description || "وصف المنتج سيظهر هنا..."}
+                      {product.meta_description || "وصف المنتج المحسن سيظهر هنا مع أفضل معايير السيو..."}
                     </div>
                   </div>
                 </div>
               )}
 
-              {/* SEO Fields */}
+              {/* Enhanced SEO Fields */}
               <div className="space-y-6">
                 
                 {/* Basic Info */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
-                    <Type className="w-5 h-5 text-blue-500" />
-                    المعلومات الأساسية
+                    <Type className="w-5 h-5 text-purple-500" />
+                    المعلومات الأساسية المحسنة
                   </h3>
                   
                   {renderInputField(
@@ -1362,151 +1591,151 @@ Provide only the Arabic ALT text.`
                     "name", 
                     false, 
                     "أدخل اسم المنتج الجذاب والواضح...", 
-                    <Package className="w-4 h-4 text-blue-500" />
+                    <Package className="w-4 h-4 text-purple-500" />
                   )}
                   
                   {renderInputField(
-                    "الكلمة المفتاحية الرئيسية", 
+                    "الكلمة المفتاحية المتقدمة", 
                     "keyword", 
                     false, 
-                    "الكلمة المفتاحية التي تريد الظهور بها في نتائج البحث...", 
+                    "سيتم تحليل حجم البحث والمنافسة في السوق السعودي...", 
                     <Search className="w-4 h-4 text-green-500" />
                   )}
                 </div>
 
-                {/* Description */}
+                {/* Enhanced Description */}
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
                     <FileText className="w-5 h-5 text-green-500" />
-                    وصف المنتج
+                    وصف المنتج المحسن للسيو
                   </h3>
                   
                   {renderInputField(
-                    "وصف المنتج التفصيلي", 
+                    "وصف المنتج التفصيلي المحسن", 
                     "description", 
                     true, 
-                    "اكتب وصفاً شاملاً ومقنعاً للمنتج يجذب العملاء ويحسن السيو...", 
+                    "سيتم إنشاء وصف احترافي محسن للسيو مع HTML منظم وروابط داخلية...", 
                     <FileText className="w-4 h-4 text-green-500" />
                   )}
                 </div>
 
-                {/* Page Title & Description */}
+                {/* Enhanced Page Title & Description */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
                     <Globe className="w-5 h-5 text-purple-500" />
-                    Page Title & Description
+                    Page Title & Description المحسنين
                   </h3>
                   
                   {renderInputField(
-                    "Page Title عنوان السيو", 
+                    "Page Title المحسن للسيو", 
                     "meta_title", 
                     false, 
-                    "عنوان قصير وجذاب يظهر في نتائج البحث...", 
+                    "سيتم إنشاء عنوان محسن بمعدل نقر عالي...", 
                     <Type className="w-4 h-4 text-purple-500" />
                   )}
                   
                   {renderInputField(
-                    "Page Description وصف الميتا", 
+                    "Page Description المحسن", 
                     "meta_description", 
                     true, 
-                    "وصف موجز ومقنع يظهر أسفل العنوان في نتائج البحث...", 
+                    "سيتم إنشاء وصف ميتا محسن يحفز على النقر...", 
                     <FileText className="w-4 h-4 text-purple-500" />
                   )}
                 </div>
 
-                {/* Technical SEO */}
+                {/* Enhanced Technical SEO */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
                     <TrendingUp className="w-5 h-5 text-orange-500" />
-                    السيو التقني
+                    السيو التقني المتقدم
                   </h3>
                   
                   {renderInputField(
-                    "مسار الرابط (URL Slug)", 
+                    "مسار الرابط المحسن (URL Slug)", 
                     "url_path", 
                     false, 
-                    "product-name-seo-friendly", 
+                    "enhanced-product-seo-optimized", 
                     <Globe className="w-4 h-4 text-orange-500" />
                   )}
                   
                   {renderInputField(
-                    "النص البديل للصورة (Image Alt)", 
+                    "النص البديل المحسن للصورة", 
                     "imageAlt", 
                     false, 
-                    "وصف الصورة للمكفوفين ومحركات البحث...", 
+                    "سيتم إنشاء وصف محسن للصورة مع الكلمة المفتاحية...", 
                     <Image className="w-4 h-4 text-orange-500" />
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Sidebar */}
+            {/* Enhanced Sidebar */}
             <div className="space-y-6">
               
-              {/* SEO Score */}
+              {/* Enhanced SEO Score */}
               <EnhancedSEODisplay analysis={score} product={product} />
 
-              {/* ✅ ENHANCED: Quick Tips with New SEO Criteria */}
+              {/* ✅ ENHANCED: Advanced Tips with New SEO Criteria */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5 text-yellow-500" />
-                  نصائح سريعة محسنة
+                  <Crown className="w-5 h-5 text-purple-500" />
+                  نصائح السيو المتقدمة
                 </h3>
                 <div className="space-y-3 text-sm text-gray-600">
-                  <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
-                    <div className="text-blue-500 mt-0.5">💡</div>
+                  <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
+                    <div className="text-purple-500 mt-0.5">🎯</div>
                     <div>
-                      <strong>الكلمة المفتاحية:</strong> اختر كلمة لها حجم بحث جيد ومنافسة معقولة
+                      <strong>الكلمة المفتاحية المتقدمة:</strong> تحليل حجم البحث +2000 شهرياً ومنافسة متوسطة في السوق السعودي
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
+                    <div className="text-blue-500 mt-0.5">📊</div>
+                    <div>
+                      <strong>Page Title المتقدم:</strong> 50-58 حرف بالضبط مع كلمة تحفيزية ومعدل نقر عالي (CTR 15%+)
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
-                    <div className="text-green-500 mt-0.5">🎯</div>
+                    <div className="text-green-500 mt-0.5">📝</div>
                     <div>
-                      <strong>Page Title:</strong> يجب أن يكون بين 50-60 حرف ويحتوي الكلمة المفتاحية
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
-                    <div className="text-purple-500 mt-0.5">📝</div>
-                    <div>
-                      <strong>الوصف:</strong> ابدأ بالكلمة المفتاحية واجعل المحتوى 100+ كلمة مع روابط داخلية
+                      <strong>الوصف المتقدم:</strong> 150+ كلمة، هيكل HTML منظم، كثافة كلمة مفتاحية 2-3%، روابط داخلية
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3 p-3 bg-orange-50 rounded-lg">
-                    <div className="text-orange-500 mt-0.5">📏</div>
+                    <div className="text-orange-500 mt-0.5">🎨</div>
                     <div>
-                      <strong>مواصفات المنتج:</strong> اذكر الحجم، الكمية، أو الأبعاد (مثل: 50مل، 250جرام، 30سم)
+                      <strong>المحتوى التفاعلي:</strong> استخدم العناوين الفرعية H3، القوائم المنظمة، والصور المحسنة
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3 p-3 bg-red-50 rounded-lg">
                     <div className="text-red-500 mt-0.5">🛒</div>
                     <div>
-                      <strong>دعوة لاتخاذ إجراء:</strong> استخدم كلمات مثل "اشتري الآن"، "احصل على"، "اطلب"
+                      <strong>تحفيز التحويل:</strong> دعوات واضحة للعمل، مواصفات دقيقة، وضمانات ملموسة
                     </div>
                   </div>
                   
-                  <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                    <div className="text-gray-500 mt-0.5">🔗</div>
+                  <div className="flex items-start gap-3 p-3 bg-yellow-50 rounded-lg">
+                    <div className="text-yellow-500 mt-0.5">⚡</div>
                     <div>
-                      <strong>الروابط الداخلية:</strong> استخدم أداة الرابط 🔗 في المحرر لإضافة روابط لصفحات أخرى
+                      <strong>السرعة والجوال:</strong> محسن للأجهزة المحمولة، سرعة تحميل عالية، وتجربة مستخدم متميزة
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Progress Summary */}
+              {/* Enhanced Progress Summary */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <BarChart3 className="w-5 h-5 text-green-500" />
-                  ملخص التقدم
+                  ملخص الأداء المتقدم
                 </h3>
                 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">النقاط الإجمالية</span>
+                    <span className="text-sm text-gray-600">نقاط السيو المتقدم</span>
                     <span className={`font-bold ${getScoreColor(progress)}`}>
                       {progress}%
                     </span>
@@ -1515,34 +1744,34 @@ Provide only the Arabic ALT text.`
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className={`h-2 rounded-full transition-all duration-500 ${
-                        progress >= 85 ? 'bg-green-500' : 
-                        progress >= 70 ? 'bg-blue-500' :
-                        progress >= 50 ? 'bg-amber-500' : 'bg-red-500'
+                        progress >= 85 ? 'bg-gradient-to-r from-green-400 to-green-600' : 
+                        progress >= 70 ? 'bg-gradient-to-r from-blue-400 to-blue-600' :
+                        progress >= 50 ? 'bg-gradient-to-r from-amber-400 to-amber-600' : 'bg-gradient-to-r from-red-400 to-red-600'
                       }`}
                       style={{ width: `${progress}%` }}
                     />
                   </div>
                   
                   <div className="text-xs text-gray-500 text-center">
-                    {progress >= 85 && "ممتاز! 🎉"}
-                    {progress >= 70 && progress < 85 && "جيد جداً! 👍"}
-                    {progress >= 50 && progress < 70 && "يحتاج تحسين 📈"}
-                    {progress < 50 && "ابدأ التحسين 🚀"}
+                    {progress >= 85 && "🏆 مستوى خبير! SEO احترافي متقدم"}
+                    {progress >= 70 && progress < 85 && "⭐ متقدم جداً! قريب من الكمال"}
+                    {progress >= 50 && progress < 70 && "📈 جيد - يحتاج تحسينات إضافية"}
+                    {progress < 50 && "🚀 ابدأ التحسين المتقدم"}
                   </div>
                   
-                  {/* Core Field completion status */}
+                  {/* Enhanced Core Field completion status */}
                   <div className="pt-4 border-t border-gray-100">
-                    <div className="text-sm font-medium text-gray-700 mb-2">المعايير الأساسية:</div>
+                    <div className="text-sm font-medium text-gray-700 mb-2">المعايير المتقدمة:</div>
                     <div className="grid grid-cols-1 gap-2 text-xs">
                       {[
-                        { key: 'keyword', label: 'الكلمة المفتاحية' },
-                        { key: 'name', label: 'عنوان يحتوي الكلمة المفتاحية' },
-                        { key: 'description', label: 'وصف 100+ كلمة' },
-                        { key: 'meta_title', label: 'Page Title' },
-                        { key: 'meta_description', label: 'Page Description' },
-                        { key: 'imageAlt', label: 'Image Alt' },
-                        { key: 'specs', label: 'مواصفات المنتج' },
-                        { key: 'cta', label: 'دعوة لاتخاذ إجراء' }
+                        { key: 'keyword', label: 'كلمة مفتاحية متقدمة' },
+                        { key: 'name', label: 'عنوان محسن' },
+                        { key: 'description', label: 'وصف متقدم 150+ كلمة' },
+                        { key: 'meta_title', label: 'Page Title محسن' },
+                        { key: 'meta_description', label: 'Meta Description متقدم' },
+                        { key: 'imageAlt', label: 'Image Alt محسن' },
+                        { key: 'specs', label: 'مواصفات تقنية' },
+                        { key: 'cta', label: 'دعوة للعمل قوية' }
                       ].map(field => {
                         const coreResults = checkCoreCriteria(product);
                         const criterion = coreResults.criteria.find(c => 
@@ -1571,21 +1800,21 @@ Provide only the Arabic ALT text.`
                 </div>
               </div>
 
-              {/* Actions */}
+              {/* Enhanced Actions */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">إجراءات سريعة</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">إجراءات متقدمة</h3>
                 <div className="space-y-3">
                   <button
-                    onClick={() => copyToClipboard(JSON.stringify(product, null, 2), "بيانات المنتج")}
-                    className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 justify-center"
+                    onClick={() => copyToClipboard(JSON.stringify(product, null, 2), "بيانات المنتج المحسنة")}
+                    className="w-full px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors flex items-center gap-2 justify-center"
                   >
                     <Copy className="w-4 h-4" />
-                    نسخ البيانات كـ JSON
+                    نسخ البيانات المحسنة
                   </button>
                   
                   <Link
                     to="/products"
-                    className="w-full px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors flex items-center gap-2 justify-center"
+                    className="w-full px-4 py-2 bg-gradient-to-r from-purple-100 to-blue-100 text-purple-700 rounded-lg hover:from-purple-200 hover:to-blue-200 transition-colors flex items-center gap-2 justify-center"
                   >
                     <ArrowLeft className="w-4 h-4" />
                     العودة للمنتجات
