@@ -647,167 +647,240 @@ const ProfessionalSEODisplay = ({ analysis, product }) => {
 };
 
 // ✅ ENHANCED: Professional AI Prompts
+// ✅ ENHANCED: Professional AI Prompts - English Instructions with Arabic Output
 const generateProfessionalContent = {
   
-  // Enhanced keyword generation
-  keyword: (productName) => `أنت خبير SEO محترف متخصص في السوق السعودي. مهمتك اختيار الكلمة المفتاحية الأمثل.
+  // Enhanced keyword generation with English instructions
+  keyword: (productName) => `You are a professional SEO expert specializing in the Saudi Arabian market with 10+ years of experience.
 
-المنتج: "${productName}"
+TASK: Generate the optimal Arabic keyword for this product targeting Saudi users.
 
-معايير اختيار الكلمة المفتاحية المثلى:
-✅ حجم بحث عالي في السعودية والخليج
-✅ منافسة معقولة (ليس مشبع جداً)
-✅ نية شراء واضحة من الباحثين
-✅ صلة مباشرة 100% بالمنتج
-✅ طول 2-4 كلمات (الأمثل لـ SEO)
+Product: "${productName}"
 
-أمثلة ناجحة:
-- "جهاز قياس الضغط" ← "جهاز قياس ضغط الدم"
-- "كريم للبشرة" ← "كريم مرطب للوجه"
-- "ساعة رياضية" ← "ساعة ذكية رياضية"
+CRITERIA for optimal keyword selection:
+✅ High search volume in Saudi Arabia/Gulf region (1000+ monthly searches)
+✅ Reasonable competition (not oversaturated)
+✅ Clear purchase intent from searchers
+✅ 100% direct relevance to the product
+✅ 2-4 words length (optimal for SEO)
+✅ Natural Arabic phrasing that Saudis actually use
 
-أعد الكلمة المفتاحية الأمثل فقط (بدون اقتباس):`,
+PROVEN EXAMPLES:
+- "Blood pressure monitor" → "جهاز قياس ضغط الدم"
+- "Face moisturizer" → "كريم مرطب للوجه"
+- "Smart sports watch" → "ساعة ذكية رياضية"
+- "Wireless headphones" → "سماعات بلوتوث لاسلكية"
+
+IMPORTANT: 
+- Think like a Saudi consumer searching on Google
+- Use terms they naturally type, not formal Arabic
+- Consider regional variations and common misspellings
+- Focus on commercial intent keywords
+
+OUTPUT: Return ONLY the optimal Arabic keyword (no quotes, no explanations):`,
 
   // Enhanced comprehensive content generation
-  comprehensive: (product, keyword, category, tone, targetAudience) => `أنت كاتب محتوى SEO محترف متخصص في السوق السعودي مع خبرة 10+ سنوات.
+  comprehensive: (product, keyword, category, tone, targetAudience) => `You are an elite SEO content writer specializing in the Saudi Arabian e-commerce market with proven track record of ranking #1 on Google.
 
-بيانات المنتج:
-📦 الاسم: "${product.name}"
-🎯 الكلمة المفتاحية: "${keyword}"
-📂 الفئة: "${category}"
-👥 الجمهور: "${targetAudience}"
-🎭 النغمة: "${tone}"
+PRODUCT DATA:
+📦 Name: "${product.name}"
+🎯 Target Keyword: "${keyword}"
+📂 Category: "${category}"
+👥 Target Audience: "${targetAudience}"
+🎭 Tone: "${tone}"
 
-مهمتك: إنشاء محتوى متكامل يحقق أفضل نتائج SEO ويحفز على الشراء.
+MISSION: Create comprehensive Arabic content that ranks #1 on Google and converts browsers into buyers.
 
-معايير الجودة الإلزامية:
-✅ الوصف 150+ كلمة (ليس أقل)
-✅ يبدأ بالكلمة المفتاحية في أول 20 كلمة
-✅ HTML منسق ومهيكل احترافياً
-✅ رابط داخلي واحد على الأقل
-✅ مواصفات واضحة (حجم، كمية، أبعاد)
-✅ دعوة قوية لاتخاذ إجراء
-✅ عناوين فرعية منظمة
-✅ قوائم للمميزات الرئيسية
+MANDATORY SEO REQUIREMENTS:
+✅ Description: 150+ words minimum (strictly enforced)
+✅ Target keyword in first 25 words
+✅ Professional HTML structure with semantic markup
+✅ At least 1 internal link (crucial for SEO)
+✅ Specific product specifications (size, weight, dimensions)
+✅ Compelling call-to-action
+✅ Structured headings (H2, H3)
+✅ Bullet points for features
+✅ Natural keyword distribution (1-2% density)
 
-هيكل المحتوى المطلوب:
-1. فقرة افتتاحية تبدأ بالكلمة المفتاحية
-2. قسم "المميزات الرئيسية" مع قائمة
-3. قسم "المواصفات التقنية"
-4. قسم "طريقة الاستخدام" (إن كان مناسباً)
-5. فقرة ختامية مع دعوة للشراء
+CONTENT STRUCTURE (mandatory):
+1. Opening paragraph with target keyword in first sentence
+2. "المميزات الرئيسية" section with bulleted list
+3. "المواصفات التقنية" section with specific numbers
+4. "طريقة الاستخدام" section (if applicable)
+5. Closing paragraph with internal link and strong CTA
 
-نموذج HTML مطلوب:
-<p>كلمة مفتاحية في بداية الفقرة...</p>
+HTML TEMPLATE (follow exactly):
+<p>[Target keyword] في بداية الجملة الأولى مع وصف مقنع...</p>
 <h3>المميزات الرئيسية</h3>
-<ul><li>ميزة 1</li><li>ميزة 2</li></ul>
-<h3>المواصفات</h3>
-<p>تفاصيل المواصفات مع أرقام...</p>
-<p>فقرة ختامية مع <a href="/products">رابط داخلي</a> ودعوة للشراء.</p>
+<ul>
+<li>ميزة محددة مع فائدة واضحة</li>
+<li>ميزة ثانية مع أرقام إن أمكن</li>
+<li>ميزة ثالثة تميز المنتج</li>
+<li>ميزة رابعة تخاطب الجمهور المستهدف</li>
+</ul>
+<h3>المواصفات التقنية</h3>
+<p>الأبعاد: [أرقام]، الوزن: [رقم]، الكمية: [رقم]، اللون: [لون]</p>
+<h3>طريقة الاستخدام</h3>
+<p>خطوات بسيطة وواضحة للاستخدام الأمثل</p>
+<p>احصل على [Target keyword] بأفضل جودة وسعر. <a href="/products" class="text-blue-600 hover:text-blue-800 underline">تصفح المزيد من منتجاتنا</a> واطلب الآن مع ضمان الاستبدال خلال 14 يوم!</p>
 
-أعد JSON كامل:
+WRITING GUIDELINES:
+- Write for Saudi consumers (use their language style)
+- Include emotional triggers and urgency
+- Add trust signals (warranty, guarantee, fast delivery)
+- Use action verbs and benefit-focused language
+- Include social proof hints when relevant
+
+OUTPUT: Return valid JSON only:
 {
-  "name": "عنوان محسن بالكلمة المفتاحية (أقل من 70 حرف)",
-  "description": "HTML مهيكل حسب المواصفات أعلاه",
+  "name": "Optimized Arabic product title with target keyword (max 70 chars)",
+  "description": "Complete HTML content following above structure",
   "keyword": "${keyword}",
-  "meta_title": "عنوان SEO جذاب 50-60 حرف",
-  "meta_description": "وصف ميتا مقنع 150-160 حرف",
-  "url_path": "مسار-url-باللغة-الانجليزية",
-  "imageAlt": "وصف صورة يحتوي الكلمة المفتاحية"
+  "meta_title": "Compelling SEO title 50-60 chars with keyword and benefit",
+  "meta_description": "Persuasive meta description 140-160 chars with keyword and CTA",
+  "url_path": "seo-friendly-english-url-slug",
+  "imageAlt": "Descriptive alt text including target keyword (no word 'صورة')"
 }`,
 
   // Enhanced individual field generation
-  description: (product, keyword, tone) => `أنت كاتب محتوى SEO خبير. اكتب وصف HTML احترافي لهذا المنتج:
+  description: (product, keyword, tone) => `You are an expert Arabic SEO content writer. Create professional HTML content for this product.
 
-المنتج: ${product.name}
-الكلمة المفتاحية: ${keyword}
-النغمة: ${tone}
+PRODUCT: ${product.name}
+TARGET KEYWORD: ${keyword}
+TONE: ${tone}
 
-متطلبات الوصف:
-🎯 150+ كلمة (مهم جداً)
-🏗️ HTML منسق: <h3>، <p>، <ul>، <li>
-🔗 رابط داخلي واحد على الأقل
-📏 مواصفات المنتج (أرقام، أحجام)
-🛒 دعوة واضحة للشراء
-🔍 يبدأ بالكلمة المفتاحية
+STRICT REQUIREMENTS:
+🎯 150+ words minimum (critical for SEO ranking)
+🏗️ Semantic HTML: <h3>, <p>, <ul>, <li>
+🔗 At least 1 internal link with proper anchor text
+📏 Specific product specifications (numbers, sizes, measurements)
+🛒 Strong call-to-action at the end
+🔍 Target keyword in opening sentence
+💡 Include benefit-driven bullet points
+🎨 Use engaging, Saudi-appropriate language
 
-هيكل مطلوب:
-<p>الكلمة المفتاحية في بداية الوصف...</p>
+CONTENT STRUCTURE:
+<p>[TARGET KEYWORD] in first sentence with compelling description...</p>
 <h3>المميزات الرئيسية</h3>
-<ul><li>ميزة 1</li><li>ميزة 2</li></ul>
-<h3>المواصفات</h3>
-<p>تفاصيل تقنية...</p>
-<p>دعوة للشراء مع <a href="/category">رابط</a></p>
+<ul><li>Feature 1 with specific benefit</li><li>Feature 2 with numbers if possible</li><li>Feature 3 that differentiates</li><li>Feature 4 addressing target audience</li></ul>
+<h3>المواصفات التقنية</h3>
+<p>Detailed specs with exact measurements and specifications...</p>
+<p>Compelling closing with <a href="/related-category">internal link</a> and strong CTA</p>
 
-أعد HTML فقط:`,
+OUTPUT: Return ONLY the HTML content (no explanations):`,
 
-  metaTitle: (productName, keyword) => `أنشئ Page Title مثالي لمحركات البحث:
+  metaTitle: (productName, keyword) => `You are a Google Ads specialist creating the perfect meta title for Saudi market.
 
-المنتج: ${productName}
-الكلمة المفتاحية: ${keyword}
+PRODUCT: ${productName}
+TARGET KEYWORD: ${keyword}
 
-معايير العنوان:
-✅ 50-60 حرف بالضبط
-✅ يحتوي الكلمة المفتاحية
-✅ جذاب للنقر (CTR عالي)
-✅ يوضح الفائدة الأساسية
-✅ مناسب للسوق السعودي
+OPTIMIZATION CRITERIA:
+✅ Exactly 50-60 characters (strict limit)
+✅ Include target keyword naturally
+✅ High click-through rate potential
+✅ Show primary benefit or USP
+✅ Appeal to Saudi consumers
+✅ Include product size/quantity if relevant
+✅ Use action words or emotional triggers
 
-أمثلة ناجحة:
+PROVEN HIGH-CTR PATTERNS:
+- "[Keyword] + [Benefit] | [Action/Offer]"
+- "[Keyword] + [Size/Spec] + [Quality indicator]"
+- "[Keyword] - [Problem Solved] + [Guarantee]"
+
+EXAMPLES:
 - "ساعة ذكية رياضية مقاومة للماء | اشتري الآن"
-- "كريم مرطب للوجه الجاف | نتائج سريعة ومضمونة"
+- "كريم مرطب للوجه الجاف 50مل | نتائج مضمونة"
+- "سماعات بلوتوث لاسلكية عالية الجودة | توصيل مجاني"
 
-أعد العنوان فقط:`,
+OUTPUT: Return ONLY the optimized Arabic title:`,
 
-  metaDescription: (productName, keyword, benefits) => `اكتب Page Description محسن لمحركات البحث:
+  metaDescription: (productName, keyword, benefits) => `You are a conversion copywriter creating meta descriptions that drive clicks and sales.
 
-المنتج: ${productName}
-الكلمة المفتاحية: ${keyword}
+PRODUCT: ${productName}
+TARGET KEYWORD: ${keyword}
 
-معايير الوصف:
-✅ 150-160 حرف بالضبط
-✅ يحتوي الكلمة المفتاحية
-✅ يحفز على النقر والشراء
-✅ يذكر فائدة أساسية
-✅ يتضمن دعوة للعمل
+OPTIMIZATION REQUIREMENTS:
+✅ Exactly 140-160 characters (Google's sweet spot)
+✅ Include target keyword naturally in first half
+✅ Clear value proposition or main benefit
+✅ Create urgency or desire
+✅ Include call-to-action
+✅ Appeal to Saudi market preferences
 
-نموذج: "اشتري [الكلمة المفتاحية] عالية الجودة. [فائدة رئيسية]. توصيل سريع وضمان شامل. اطلب الآن!"
+PROVEN CONVERSION FORMULA:
+"[ACTION VERB] + [TARGET KEYWORD] + [QUALITY/BENEFIT] + [TRUST SIGNAL] + [CTA]"
 
-أعد الوصف فقط:`,
+HIGH-CONVERTING EXAMPLES:
+- "اشتري جهاز قياس ضغط الدم الألماني عالي الدقة. ضمان سنتين وتوصيل مجاني خلال 24 ساعة. اطلب الآن!"
+- "احصل على كريم مرطب للوجه الجاف من أفضل الماركات العالمية. نتائج ملحوظة خلال أسبوع. اشتري بأفضل سعر!"
 
-  urlPath: (productName, keyword) => `أنشئ مسار URL محسن:
+PSYCHOLOGICAL TRIGGERS TO INCLUDE:
+- Scarcity (محدود، حصري)
+- Authority (أفضل، المتخصص)
+- Social proof (الأكثر مبيعاً)
+- Guarantee (ضمان، مضمون)
 
-المنتج: ${productName}
-الكلمة المفتاحية: ${keyword}
+OUTPUT: Return ONLY the optimized Arabic meta description:`,
 
-معايير المسار:
-✅ باللغة الإنجليزية فقط
-✅ كلمات مفصولة بـ (-)
-✅ قصير وواضح
-✅ يحتوي الكلمة المفتاحية المترجمة
+  urlPath: (productName, keyword) => `You are a technical SEO expert creating URL slugs for maximum ranking potential.
 
-أمثلة:
-- "smart-sports-watch"
-- "moisturizing-face-cream"
-- "bluetooth-wireless-headphones"
+PRODUCT: ${productName}
+TARGET KEYWORD: ${keyword}
 
-أعد المسار فقط:`,
+SEO-OPTIMIZED URL REQUIREMENTS:
+✅ English only (for technical compatibility)
+✅ Words separated by hyphens (-)
+✅ Include main keyword translated to English
+✅ 3-5 words maximum (concise but descriptive)
+✅ No stop words (a, the, of, for, etc.)
+✅ Use exact match or close variant of English keyword
 
-  imageAlt: (productName, keyword) => `أنشئ نص ALT احترافي:
+KEYWORD TRANSLATION EXAMPLES:
+- "جهاز قياس ضغط الدم" → "blood-pressure-monitor"
+- "كريم مرطب للوجه" → "face-moisturizing-cream"
+- "ساعة ذكية رياضية" → "smart-sports-watch"
+- "سماعات بلوتوث لاسلكية" → "wireless-bluetooth-headphones"
 
-المنتج: ${productName}
-الكلمة المفتاحية: ${keyword}
+SEO BEST PRACTICES:
+- Use commercial intent keywords when possible
+- Include product category if it adds SEO value
+- Keep it readable and memorable
+- Avoid numbers unless they're part of the product model
 
-معايير النص:
-✅ وصف دقيق للصورة
-✅ يحتوي الكلمة المفتاحية
-✅ 8-12 كلمة
-✅ مفيد للمكفوفين
-✅ محسن لـ SEO
+OUTPUT: Return ONLY the URL slug (no explanations):`,
 
-نموذج: "صورة [الكلمة المفتاحية] عالية الجودة مع المواصفات"
+  imageAlt: (productName, keyword) => `You are an accessibility and SEO expert creating image alt text that serves both users and search engines.
 
-أعد النص فقط:`
+PRODUCT: ${productName}
+TARGET KEYWORD: ${keyword}
+
+ALT TEXT OPTIMIZATION CRITERIA:
+✅ Include target keyword naturally
+✅ Describe what's actually visible in the image
+✅ 8-15 words (optimal length)
+✅ Helpful for visually impaired users
+✅ SEO-optimized for image search
+✅ Never use the word "صورة" explicitly
+✅ Focus on product features visible in image
+
+EFFECTIVE ALT TEXT PATTERNS:
+- "[Target keyword] + [visible features/context]"
+- "[Product] + [key specifications] + [setting/context]"
+- "[Brand/quality indicator] + [target keyword] + [use case]"
+
+EXAMPLES:
+- "جهاز قياس ضغط الدم الرقمي مع شاشة LCD كبيرة"
+- "كريم مرطب للوجه الجاف في عبوة أنيقة 50 مل"
+- "ساعة ذكية رياضية سوداء مقاومة للماء مع حزام سيليكون"
+
+AVOID:
+- Generic descriptions
+- Starting with "صورة" or "صورة لـ"
+- Keyword stuffing
+- Overly technical jargon
+
+OUTPUT: Return ONLY the optimized Arabic alt text:`
 };
 
 // Main Component
@@ -1052,7 +1125,7 @@ export default function ProductSEO() {
       toast.success("تم حفظ التعديلات بنجاح! 🎉");
     } catch (error) {
       console.error("Error saving product:", error);
-      const errorMessage = error?.response?.data?.message || error?.message || "حدث خطأ أثناء الحفظ في localStorage";
+      const errorMessage = error?.response?.data?.message || error?.message || "حدث خطأ أثناء الحفظ";
       setErrors(prev => ({ ...prev, save: errorMessage }));
       toast.error("❌ " + errorMessage);
     } finally {
@@ -1066,49 +1139,36 @@ export default function ProductSEO() {
       return;
     }
 
+    const {
+      categorizeProduct,
+      analyzeTargetAudience,
+      selectTone,
+      selectStoryArc
+    } = analyzeSEO(product);
+
     setGenerating(true);
     setErrors(prev => ({ ...prev, analyze: null }));
 
     try {
       console.log('🔄 Starting enhanced product analysis...');
 
-      // ✅ FIXED: Use the enhanced English prompt
-      const keywordPrompt = `You are a professional SEO expert specializing in the Saudi Arabian market with 10+ years of experience.
-
-TASK: Generate the optimal Arabic keyword for this product targeting Saudi users.
-
-Product: "${product.name}"
-
-CRITERIA for optimal keyword selection:
-✅ High search volume in Saudi Arabia/Gulf region (1000+ monthly searches)
-✅ Reasonable competition (not oversaturated)
-✅ Clear purchase intent from searchers
-✅ 100% direct relevance to the product
-✅ 2-4 words length (optimal for SEO)
-✅ Natural Arabic phrasing that Saudis actually use
-
-PROVEN EXAMPLES:
-- "Blood pressure monitor" → "جهاز قياس ضغط الدم"
-- "Face moisturizer" → "كريم مرطب للوجه"
-- "Smart sports watch" → "ساعة ذكية رياضية"
-- "Wireless headphones" → "سماعات بلوتوث لاسلكية"
-
-IMPORTANT: 
-- Think like a Saudi consumer searching on Google
-- Use terms they naturally type, not formal Arabic
-- Consider regional variations and common misspellings
-- Focus on commercial intent keywords
-
-OUTPUT: Return ONLY the optimal Arabic keyword (no quotes, no explanations):`;
-
+      // Enhanced keyword generation
+      const keywordPrompt = generateProfessionalContent.keyword(product.name);
       const keyword = cleanText(await generateProductSEO(keywordPrompt));
       console.log('✅ Generated keyword:', keyword);
 
-      // Simple category and audience analysis (fallback to basic if needed)
-      const category = product.category || "عام";
-      const targetAudience = product.target_audience || "عام";
-      const tone = product.tone || "محايدة";
-      const bestStoryArc = product.best_story_arc || "مشكلة-حل";
+      // Category analysis
+      const categoryPrompt = await categorizeProduct(product);
+      const category = cleanText(await generateProductSEO(categoryPrompt));
+      console.log('✅ Generated category:', category);
+
+      // Target audience analysis
+      const audiencePrompt = await analyzeTargetAudience(product, category);
+      const targetAudience = cleanText(await generateProductSEO(audiencePrompt));
+      console.log('✅ Generated audience:', targetAudience);
+
+      const tone = selectTone(category, targetAudience);
+      const bestStoryArc = selectStoryArc(category);
 
       const analysis = {
         category: category,
@@ -1132,21 +1192,13 @@ OUTPUT: Return ONLY the optimal Arabic keyword (no quotes, no explanations):`;
       
     } catch (error) {
       console.error("Error analyzing product:", error);
-      
-      // Enhanced error handling
-      let errorMessage = "فشل في تحليل المنتج";
-      if (error.message?.includes("401") || error.message?.includes("Failed to fetch")) {
-        errorMessage = "فشل في الاتصال بخدمة الذكاء الاصطناعي. يرجى المحاولة لاحقاً أو الكتابة يدوياً.";
-      } else if (error.message?.includes("network") || error.message?.includes("connection")) {
-        errorMessage = "مشكلة في الاتصال بالإنترنت. تحقق من الاتصال وأعد المحاولة.";
-      }
-      
+      const errorMessage = error?.response?.data?.message || error?.message || "فشل في تحليل المنتج";
       setErrors(prev => ({ ...prev, analyze: errorMessage }));
       toast.error("❌ " + errorMessage);
     } finally {
       setGenerating(false);
     }
-  }, [product.name]);
+  }, [product.name, product.description]);
 
   const handleGenerateAll = useCallback(async () => {
     if (!product.name?.trim()) {
@@ -1163,6 +1215,7 @@ OUTPUT: Return ONLY the optimal Arabic keyword (no quotes, no explanations):`;
       // Ensure we have analysis data
       let analysisData = productAnalysis;
       if (!analysisData) {
+        await handleAnalyzeProduct();
         analysisData = {
           category: product.category || "عام",
           target_audience: product.target_audience || "عام",
@@ -1173,68 +1226,14 @@ OUTPUT: Return ONLY the optimal Arabic keyword (no quotes, no explanations):`;
 
       const keyword = cleanText(product.keyword) || "منتج";
 
-      // ✅ FIXED: Use enhanced comprehensive prompt directly
-      const prompt = `You are an elite SEO content writer specializing in the Saudi Arabian e-commerce market with proven track record of ranking #1 on Google.
-
-PRODUCT DATA:
-📦 Name: "${product.name}"
-🎯 Target Keyword: "${keyword}"
-📂 Category: "${analysisData.category}"
-👥 Target Audience: "${analysisData.target_audience}"
-🎭 Tone: "${analysisData.tone}"
-
-MISSION: Create comprehensive Arabic content that ranks #1 on Google and converts browsers into buyers.
-
-MANDATORY SEO REQUIREMENTS:
-✅ Description: 100+ words minimum (optimal for e-commerce)
-✅ Target keyword in first 25 words
-✅ Professional HTML structure with semantic markup
-✅ At least 1 internal link (crucial for SEO)
-✅ Specific product specifications (size, weight, dimensions)
-✅ Compelling call-to-action
-✅ Structured headings (H2, H3)
-✅ Bullet points for features
-✅ Natural keyword distribution (1-2% density)
-
-CONTENT STRUCTURE (mandatory):
-1. Opening paragraph with target keyword in first sentence
-2. "المميزات الرئيسية" section with bulleted list
-3. "المواصفات التقنية" section with specific numbers
-4. "طريقة الاستخدام" section (if applicable)
-5. Closing paragraph with internal link and strong CTA
-
-HTML TEMPLATE (follow exactly):
-<p>[Target keyword] في بداية الجملة الأولى مع وصف مقنع...</p>
-<h3>المميزات الرئيسية</h3>
-<ul>
-<li>ميزة محددة مع فائدة واضحة</li>
-<li>ميزة ثانية مع أرقام إن أمكن</li>
-<li>ميزة ثالثة تميز المنتج</li>
-<li>ميزة رابعة تخاطب الجمهور المستهدف</li>
-</ul>
-<h3>المواصفات التقنية</h3>
-<p>الأبعاد: [أرقام]، الوزن: [رقم]، الكمية: [رقم]، اللون: [لون]</p>
-<h3>طريقة الاستخدام</h3>
-<p>خطوات بسيطة وواضحة للاستخدام الأمثل</p>
-<p>احصل على [Target keyword] بأفضل جودة وسعر. <a href="/products" class="text-blue-600 hover:text-blue-800 underline">تصفح المزيد من منتجاتنا</a> واطلب الآن مع ضمان الاستبدال خلال 14 يوم!</p>
-
-WRITING GUIDELINES:
-- Write for Saudi consumers (use their language style)
-- Include emotional triggers and urgency
-- Add trust signals (warranty, guarantee, fast delivery)
-- Use action verbs and benefit-focused language
-- Include social proof hints when relevant
-
-OUTPUT: Return valid JSON only:
-{
-  "name": "Optimized Arabic product title with target keyword and size if applicable (max 70 chars)",
-  "description": "Complete HTML content following above structure (100+ words)",
-  "keyword": "${keyword}",
-  "meta_title": "Compelling SEO title 50-60 chars with keyword, size if present, and benefit",
-  "meta_description": "Persuasive meta description 140-160 chars with keyword and CTA",
-  "url_path": "seo-friendly-english-url-slug",
-  "imageAlt": "Descriptive alt text including target keyword (no word 'صورة')"
-}`;
+      // Use enhanced comprehensive prompt
+      const prompt = generateProfessionalContent.comprehensive(
+        product, 
+        keyword, 
+        analysisData.category, 
+        analysisData.tone, 
+        analysisData.target_audience
+      );
 
       console.log('📤 Sending enhanced generation request...');
       const generated = await generateProductSEO(prompt);
@@ -1270,23 +1269,13 @@ OUTPUT: Return valid JSON only:
 
     } catch (error) {
       console.error("Error generating fields:", error);
-      
-      // Enhanced error handling
-      let errorMessage = "فشل في توليد المحتوى";
-      if (error.message?.includes("401") || error.message?.includes("Failed to fetch")) {
-        errorMessage = "فشل في الاتصال بخدمة الذكاء الاصطناعي. يرجى المحاولة لاحقاً أو الكتابة يدوياً.";
-      } else if (error.message?.includes("network") || error.message?.includes("connection")) {
-        errorMessage = "مشكلة في الاتصال بالإنترنت. تحقق من الاتصال وأعد المحاولة.";
-      } else if (error.message?.includes("JSON")) {
-        errorMessage = "خطأ في معالجة الاستجابة. يرجى المحاولة مرة أخرى.";
-      }
-      
+      const errorMessage = error?.response?.data?.message || error?.message || "فشل في توليد المحتوى";
       setErrors(prev => ({ ...prev, generate: errorMessage }));
       toast.error("❌ " + errorMessage);
     } finally {
       setGenerating(false);
     }
-  }, [product, productAnalysis]);
+  }, [product, productAnalysis, handleAnalyzeProduct]);
 
   const handleGenerateField = useCallback(async (fieldType) => {
     setFieldLoading(fieldType);
@@ -1295,129 +1284,18 @@ OUTPUT: Return valid JSON only:
     try {
       console.log(`🔄 Generating enhanced field: ${fieldType}`);
       
-      // ✅ FIXED: Use direct prompts instead of object reference
-      let prompt = "";
-      
-      switch (fieldType) {
-        case 'keyword':
-          prompt = `You are a professional SEO expert specializing in the Saudi Arabian market with 10+ years of experience.
+      const prompts = {
+        keyword: generateProfessionalContent.keyword(product.name),
+        description: generateProfessionalContent.description(product, cleanText(product.keyword) || 'منتج', product.tone || 'محايدة'),
+        meta_title: generateProfessionalContent.metaTitle(product.name, cleanText(product.keyword) || 'منتج'),
+        meta_description: generateProfessionalContent.metaDescription(product.name, cleanText(product.keyword) || 'منتج'),
+        url_path: generateProfessionalContent.urlPath(product.name, cleanText(product.keyword) || 'منتج'),
+        imageAlt: generateProfessionalContent.imageAlt(product.name, cleanText(product.keyword) || 'منتج')
+      };
 
-TASK: Generate the optimal Arabic keyword for this product targeting Saudi users.
-
-Product: "${product.name}"
-
-CRITERIA for optimal keyword selection:
-✅ High search volume in Saudi Arabia/Gulf region (1000+ monthly searches)
-✅ Reasonable competition (not oversaturated)
-✅ Clear purchase intent from searchers
-✅ 100% direct relevance to the product
-✅ 2-4 words length (optimal for SEO)
-✅ Natural Arabic phrasing that Saudis actually use
-
-OUTPUT: Return ONLY the optimal Arabic keyword (no quotes, no explanations):`;
-          break;
-
-        case 'description':
-          prompt = `You are an expert Arabic SEO content writer. Create professional HTML content for this product.
-
-PRODUCT: ${product.name}
-TARGET KEYWORD: ${cleanText(product.keyword) || 'منتج'}
-TONE: ${product.tone || 'محايدة'}
-
-STRICT REQUIREMENTS:
-🎯 100+ words minimum (optimal for e-commerce conversion)
-🏗️ Semantic HTML: <h3>, <p>, <ul>, <li>
-🔗 At least 1 internal link with proper anchor text
-📏 Specific product specifications (numbers, sizes, measurements)
-🛒 Strong call-to-action at the end
-🔍 Target keyword in opening sentence
-
-CONTENT STRUCTURE:
-<p>[TARGET KEYWORD] in first sentence with compelling description...</p>
-<h3>المميزات الرئيسية</h3>
-<ul><li>Feature 1 with specific benefit</li><li>Feature 2 with numbers if possible</li></ul>
-<h3>المواصفات التقنية</h3>
-<p>Detailed specs with exact measurements...</p>
-<p>Compelling closing with <a href="/related-category">internal link</a> and strong CTA</p>
-
-OUTPUT: Return ONLY the HTML content (no explanations):`;
-          break;
-
-        case 'meta_title':
-          prompt = `You are a Google Ads specialist creating the perfect meta title for Saudi market.
-
-PRODUCT: ${product.name}
-TARGET KEYWORD: ${cleanText(product.keyword) || 'منتج'}
-
-OPTIMIZATION CRITERIA:
-✅ Exactly 50-60 characters (strict limit)
-✅ Include target keyword naturally
-✅ MUST include product size/quantity if present in product name (50مل، 250جرام، etc.)
-✅ High click-through rate potential
-✅ Show primary benefit or USP
-✅ Appeal to Saudi consumers
-
-EXAMPLES WITH SIZES:
-- "كريم مرطب للوجه الجاف 50مل | نتائج مضمونة"
-- "شامبو للشعر التالف 250مل | قوة وحيوية طبيعية"
-
-OUTPUT: Return ONLY the optimized Arabic title:`;
-          break;
-
-        case 'meta_description':
-          prompt = `You are a conversion copywriter creating meta descriptions that drive clicks and sales.
-
-PRODUCT: ${product.name}
-TARGET KEYWORD: ${cleanText(product.keyword) || 'منتج'}
-
-OPTIMIZATION REQUIREMENTS:
-✅ Exactly 140-160 characters (Google's sweet spot)
-✅ Include target keyword naturally in first half
-✅ Clear value proposition or main benefit
-✅ Create urgency or desire
-✅ Include call-to-action
-✅ Appeal to Saudi market preferences
-
-OUTPUT: Return ONLY the optimized Arabic meta description:`;
-          break;
-
-        case 'url_path':
-          prompt = `You are a technical SEO expert creating URL slugs for maximum ranking potential.
-
-PRODUCT: ${product.name}
-TARGET KEYWORD: ${cleanText(product.keyword) || 'منتج'}
-
-SEO-OPTIMIZED URL REQUIREMENTS:
-✅ English only (for technical compatibility)
-✅ Words separated by hyphens (-)
-✅ Include main keyword translated to English
-✅ 3-5 words maximum (concise but descriptive)
-
-EXAMPLES:
-- "جهاز قياس ضغط الدم" → "blood-pressure-monitor"
-- "كريم مرطب للوجه" → "face-moisturizing-cream"
-
-OUTPUT: Return ONLY the URL slug (no explanations):`;
-          break;
-
-        case 'imageAlt':
-          prompt = `You are an accessibility and SEO expert creating image alt text.
-
-PRODUCT: ${product.name}
-TARGET KEYWORD: ${cleanText(product.keyword) || 'منتج'}
-
-ALT TEXT OPTIMIZATION CRITERIA:
-✅ Include target keyword naturally
-✅ Describe what's actually visible in the image
-✅ 8-15 words (optimal length)
-✅ Helpful for visually impaired users
-✅ Never use the word "صورة" explicitly
-
-OUTPUT: Return ONLY the optimized Arabic alt text:`;
-          break;
-
-        default:
-          throw new Error(`لا يوجد برومبت للحقل: ${fieldType}`);
+      const prompt = prompts[fieldType];
+      if (!prompt) {
+        throw new Error(`لا يوجد برومبت للحقل: ${fieldType}`);
       }
 
       const response = await generateProductSEO(prompt);
@@ -1450,15 +1328,7 @@ OUTPUT: Return ONLY the optimized Arabic alt text:`;
 
     } catch (error) {
       console.error(`Error generating ${fieldType}:`, error);
-      
-      // Enhanced error handling  
-      let errorMessage = `فشل في توليد ${fieldType}`;
-      if (error.message?.includes("401") || error.message?.includes("Failed to fetch")) {
-        errorMessage = "فشل في الاتصال بخدمة الذكاء الاصطناعي. يرجى المحاولة لاحقاً أو الكتابة يدوياً.";
-      } else if (error.message?.includes("network") || error.message?.includes("connection")) {
-        errorMessage = "مشكلة في الاتصال بالإنترنت. تحقق من الاتصال وأعد المحاولة.";
-      }
-      
+      const errorMessage = error?.response?.data?.message || error?.message || `فشل في توليد ${fieldType}`;
       setErrors(prev => ({ ...prev, [fieldType]: errorMessage }));
       toast.error("❌ " + errorMessage);
     } finally {
@@ -1740,11 +1610,6 @@ OUTPUT: Return ONLY the optimized Arabic alt text:`;
                 <span className="font-medium">خطأ:</span>
                 <span>{errors.save || errors.generate || errors.analyze}</span>
               </div>
-              {(errors.generate || errors.analyze) && (
-                <div className="mt-2 text-xs text-red-600">
-                  💡 <strong>اقتراح:</strong> تأكد من اتصال الإنترنت وأعد المحاولة. إذا استمر الخطأ، يمكنك الكتابة يدوياً أو الانتظار قليلاً ثم المحاولة مرة أخرى.
-                </div>
-              )}
             </div>
           )}
 
@@ -1769,7 +1634,6 @@ OUTPUT: Return ONLY the optimized Arabic alt text:`;
                           ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
                           : "bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-500 text-white hover:from-purple-600 hover:via-blue-600 hover:to-indigo-600 shadow-lg hover:shadow-xl"
                       }`}
-                      title="توليد شامل بالذكاء الاصطناعي"
                     >
                       {generating ? (
                         <>
