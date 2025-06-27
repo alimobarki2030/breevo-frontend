@@ -647,240 +647,167 @@ const ProfessionalSEODisplay = ({ analysis, product }) => {
 };
 
 // ✅ ENHANCED: Professional AI Prompts
-// ✅ ENHANCED: Professional AI Prompts - English Instructions with Arabic Output
 const generateProfessionalContent = {
   
-  // Enhanced keyword generation with English instructions
-  keyword: (productName) => `You are a professional SEO expert specializing in the Saudi Arabian market with 10+ years of experience.
+  // Enhanced keyword generation
+  keyword: (productName) => `أنت خبير SEO محترف متخصص في السوق السعودي. مهمتك اختيار الكلمة المفتاحية الأمثل.
 
-TASK: Generate the optimal Arabic keyword for this product targeting Saudi users.
+المنتج: "${productName}"
 
-Product: "${productName}"
+معايير اختيار الكلمة المفتاحية المثلى:
+✅ حجم بحث عالي في السعودية والخليج
+✅ منافسة معقولة (ليس مشبع جداً)
+✅ نية شراء واضحة من الباحثين
+✅ صلة مباشرة 100% بالمنتج
+✅ طول 2-4 كلمات (الأمثل لـ SEO)
 
-CRITERIA for optimal keyword selection:
-✅ High search volume in Saudi Arabia/Gulf region (1000+ monthly searches)
-✅ Reasonable competition (not oversaturated)
-✅ Clear purchase intent from searchers
-✅ 100% direct relevance to the product
-✅ 2-4 words length (optimal for SEO)
-✅ Natural Arabic phrasing that Saudis actually use
+أمثلة ناجحة:
+- "جهاز قياس الضغط" ← "جهاز قياس ضغط الدم"
+- "كريم للبشرة" ← "كريم مرطب للوجه"
+- "ساعة رياضية" ← "ساعة ذكية رياضية"
 
-PROVEN EXAMPLES:
-- "Blood pressure monitor" → "جهاز قياس ضغط الدم"
-- "Face moisturizer" → "كريم مرطب للوجه"
-- "Smart sports watch" → "ساعة ذكية رياضية"
-- "Wireless headphones" → "سماعات بلوتوث لاسلكية"
-
-IMPORTANT: 
-- Think like a Saudi consumer searching on Google
-- Use terms they naturally type, not formal Arabic
-- Consider regional variations and common misspellings
-- Focus on commercial intent keywords
-
-OUTPUT: Return ONLY the optimal Arabic keyword (no quotes, no explanations):`,
+أعد الكلمة المفتاحية الأمثل فقط (بدون اقتباس):`,
 
   // Enhanced comprehensive content generation
-  comprehensive: (product, keyword, category, tone, targetAudience) => `You are an elite SEO content writer specializing in the Saudi Arabian e-commerce market with proven track record of ranking #1 on Google.
+  comprehensive: (product, keyword, category, tone, targetAudience) => `أنت كاتب محتوى SEO محترف متخصص في السوق السعودي مع خبرة 10+ سنوات.
 
-PRODUCT DATA:
-📦 Name: "${product.name}"
-🎯 Target Keyword: "${keyword}"
-📂 Category: "${category}"
-👥 Target Audience: "${targetAudience}"
-🎭 Tone: "${tone}"
+بيانات المنتج:
+📦 الاسم: "${product.name}"
+🎯 الكلمة المفتاحية: "${keyword}"
+📂 الفئة: "${category}"
+👥 الجمهور: "${targetAudience}"
+🎭 النغمة: "${tone}"
 
-MISSION: Create comprehensive Arabic content that ranks #1 on Google and converts browsers into buyers.
+مهمتك: إنشاء محتوى متكامل يحقق أفضل نتائج SEO ويحفز على الشراء.
 
-MANDATORY SEO REQUIREMENTS:
-✅ Description: 150+ words minimum (strictly enforced)
-✅ Target keyword in first 25 words
-✅ Professional HTML structure with semantic markup
-✅ At least 1 internal link (crucial for SEO)
-✅ Specific product specifications (size, weight, dimensions)
-✅ Compelling call-to-action
-✅ Structured headings (H2, H3)
-✅ Bullet points for features
-✅ Natural keyword distribution (1-2% density)
+معايير الجودة الإلزامية:
+✅ الوصف 150+ كلمة (ليس أقل)
+✅ يبدأ بالكلمة المفتاحية في أول 20 كلمة
+✅ HTML منسق ومهيكل احترافياً
+✅ رابط داخلي واحد على الأقل
+✅ مواصفات واضحة (حجم، كمية، أبعاد)
+✅ دعوة قوية لاتخاذ إجراء
+✅ عناوين فرعية منظمة
+✅ قوائم للمميزات الرئيسية
 
-CONTENT STRUCTURE (mandatory):
-1. Opening paragraph with target keyword in first sentence
-2. "المميزات الرئيسية" section with bulleted list
-3. "المواصفات التقنية" section with specific numbers
-4. "طريقة الاستخدام" section (if applicable)
-5. Closing paragraph with internal link and strong CTA
+هيكل المحتوى المطلوب:
+1. فقرة افتتاحية تبدأ بالكلمة المفتاحية
+2. قسم "المميزات الرئيسية" مع قائمة
+3. قسم "المواصفات التقنية"
+4. قسم "طريقة الاستخدام" (إن كان مناسباً)
+5. فقرة ختامية مع دعوة للشراء
 
-HTML TEMPLATE (follow exactly):
-<p>[Target keyword] في بداية الجملة الأولى مع وصف مقنع...</p>
+نموذج HTML مطلوب:
+<p>كلمة مفتاحية في بداية الفقرة...</p>
 <h3>المميزات الرئيسية</h3>
-<ul>
-<li>ميزة محددة مع فائدة واضحة</li>
-<li>ميزة ثانية مع أرقام إن أمكن</li>
-<li>ميزة ثالثة تميز المنتج</li>
-<li>ميزة رابعة تخاطب الجمهور المستهدف</li>
-</ul>
-<h3>المواصفات التقنية</h3>
-<p>الأبعاد: [أرقام]، الوزن: [رقم]، الكمية: [رقم]، اللون: [لون]</p>
-<h3>طريقة الاستخدام</h3>
-<p>خطوات بسيطة وواضحة للاستخدام الأمثل</p>
-<p>احصل على [Target keyword] بأفضل جودة وسعر. <a href="/products" class="text-blue-600 hover:text-blue-800 underline">تصفح المزيد من منتجاتنا</a> واطلب الآن مع ضمان الاستبدال خلال 14 يوم!</p>
+<ul><li>ميزة 1</li><li>ميزة 2</li></ul>
+<h3>المواصفات</h3>
+<p>تفاصيل المواصفات مع أرقام...</p>
+<p>فقرة ختامية مع <a href="/products">رابط داخلي</a> ودعوة للشراء.</p>
 
-WRITING GUIDELINES:
-- Write for Saudi consumers (use their language style)
-- Include emotional triggers and urgency
-- Add trust signals (warranty, guarantee, fast delivery)
-- Use action verbs and benefit-focused language
-- Include social proof hints when relevant
-
-OUTPUT: Return valid JSON only:
+أعد JSON كامل:
 {
-  "name": "Optimized Arabic product title with target keyword (max 70 chars)",
-  "description": "Complete HTML content following above structure",
+  "name": "عنوان محسن بالكلمة المفتاحية (أقل من 70 حرف)",
+  "description": "HTML مهيكل حسب المواصفات أعلاه",
   "keyword": "${keyword}",
-  "meta_title": "Compelling SEO title 50-60 chars with keyword and benefit",
-  "meta_description": "Persuasive meta description 140-160 chars with keyword and CTA",
-  "url_path": "seo-friendly-english-url-slug",
-  "imageAlt": "Descriptive alt text including target keyword (no word 'صورة')"
+  "meta_title": "عنوان SEO جذاب 50-60 حرف",
+  "meta_description": "وصف ميتا مقنع 150-160 حرف",
+  "url_path": "مسار-url-باللغة-الانجليزية",
+  "imageAlt": "وصف صورة يحتوي الكلمة المفتاحية"
 }`,
 
   // Enhanced individual field generation
-  description: (product, keyword, tone) => `You are an expert Arabic SEO content writer. Create professional HTML content for this product.
+  description: (product, keyword, tone) => `أنت كاتب محتوى SEO خبير. اكتب وصف HTML احترافي لهذا المنتج:
 
-PRODUCT: ${product.name}
-TARGET KEYWORD: ${keyword}
-TONE: ${tone}
+المنتج: ${product.name}
+الكلمة المفتاحية: ${keyword}
+النغمة: ${tone}
 
-STRICT REQUIREMENTS:
-🎯 150+ words minimum (critical for SEO ranking)
-🏗️ Semantic HTML: <h3>, <p>, <ul>, <li>
-🔗 At least 1 internal link with proper anchor text
-📏 Specific product specifications (numbers, sizes, measurements)
-🛒 Strong call-to-action at the end
-🔍 Target keyword in opening sentence
-💡 Include benefit-driven bullet points
-🎨 Use engaging, Saudi-appropriate language
+متطلبات الوصف:
+🎯 150+ كلمة (مهم جداً)
+🏗️ HTML منسق: <h3>، <p>، <ul>، <li>
+🔗 رابط داخلي واحد على الأقل
+📏 مواصفات المنتج (أرقام، أحجام)
+🛒 دعوة واضحة للشراء
+🔍 يبدأ بالكلمة المفتاحية
 
-CONTENT STRUCTURE:
-<p>[TARGET KEYWORD] in first sentence with compelling description...</p>
+هيكل مطلوب:
+<p>الكلمة المفتاحية في بداية الوصف...</p>
 <h3>المميزات الرئيسية</h3>
-<ul><li>Feature 1 with specific benefit</li><li>Feature 2 with numbers if possible</li><li>Feature 3 that differentiates</li><li>Feature 4 addressing target audience</li></ul>
-<h3>المواصفات التقنية</h3>
-<p>Detailed specs with exact measurements and specifications...</p>
-<p>Compelling closing with <a href="/related-category">internal link</a> and strong CTA</p>
+<ul><li>ميزة 1</li><li>ميزة 2</li></ul>
+<h3>المواصفات</h3>
+<p>تفاصيل تقنية...</p>
+<p>دعوة للشراء مع <a href="/category">رابط</a></p>
 
-OUTPUT: Return ONLY the HTML content (no explanations):`,
+أعد HTML فقط:`,
 
-  metaTitle: (productName, keyword) => `You are a Google Ads specialist creating the perfect meta title for Saudi market.
+  metaTitle: (productName, keyword) => `أنشئ Page Title مثالي لمحركات البحث:
 
-PRODUCT: ${productName}
-TARGET KEYWORD: ${keyword}
+المنتج: ${productName}
+الكلمة المفتاحية: ${keyword}
 
-OPTIMIZATION CRITERIA:
-✅ Exactly 50-60 characters (strict limit)
-✅ Include target keyword naturally
-✅ High click-through rate potential
-✅ Show primary benefit or USP
-✅ Appeal to Saudi consumers
-✅ Include product size/quantity if relevant
-✅ Use action words or emotional triggers
+معايير العنوان:
+✅ 50-60 حرف بالضبط
+✅ يحتوي الكلمة المفتاحية
+✅ جذاب للنقر (CTR عالي)
+✅ يوضح الفائدة الأساسية
+✅ مناسب للسوق السعودي
 
-PROVEN HIGH-CTR PATTERNS:
-- "[Keyword] + [Benefit] | [Action/Offer]"
-- "[Keyword] + [Size/Spec] + [Quality indicator]"
-- "[Keyword] - [Problem Solved] + [Guarantee]"
-
-EXAMPLES:
+أمثلة ناجحة:
 - "ساعة ذكية رياضية مقاومة للماء | اشتري الآن"
-- "كريم مرطب للوجه الجاف 50مل | نتائج مضمونة"
-- "سماعات بلوتوث لاسلكية عالية الجودة | توصيل مجاني"
+- "كريم مرطب للوجه الجاف | نتائج سريعة ومضمونة"
 
-OUTPUT: Return ONLY the optimized Arabic title:`,
+أعد العنوان فقط:`,
 
-  metaDescription: (productName, keyword, benefits) => `You are a conversion copywriter creating meta descriptions that drive clicks and sales.
+  metaDescription: (productName, keyword, benefits) => `اكتب Page Description محسن لمحركات البحث:
 
-PRODUCT: ${productName}
-TARGET KEYWORD: ${keyword}
+المنتج: ${productName}
+الكلمة المفتاحية: ${keyword}
 
-OPTIMIZATION REQUIREMENTS:
-✅ Exactly 140-160 characters (Google's sweet spot)
-✅ Include target keyword naturally in first half
-✅ Clear value proposition or main benefit
-✅ Create urgency or desire
-✅ Include call-to-action
-✅ Appeal to Saudi market preferences
+معايير الوصف:
+✅ 150-160 حرف بالضبط
+✅ يحتوي الكلمة المفتاحية
+✅ يحفز على النقر والشراء
+✅ يذكر فائدة أساسية
+✅ يتضمن دعوة للعمل
 
-PROVEN CONVERSION FORMULA:
-"[ACTION VERB] + [TARGET KEYWORD] + [QUALITY/BENEFIT] + [TRUST SIGNAL] + [CTA]"
+نموذج: "اشتري [الكلمة المفتاحية] عالية الجودة. [فائدة رئيسية]. توصيل سريع وضمان شامل. اطلب الآن!"
 
-HIGH-CONVERTING EXAMPLES:
-- "اشتري جهاز قياس ضغط الدم الألماني عالي الدقة. ضمان سنتين وتوصيل مجاني خلال 24 ساعة. اطلب الآن!"
-- "احصل على كريم مرطب للوجه الجاف من أفضل الماركات العالمية. نتائج ملحوظة خلال أسبوع. اشتري بأفضل سعر!"
+أعد الوصف فقط:`,
 
-PSYCHOLOGICAL TRIGGERS TO INCLUDE:
-- Scarcity (محدود، حصري)
-- Authority (أفضل، المتخصص)
-- Social proof (الأكثر مبيعاً)
-- Guarantee (ضمان، مضمون)
+  urlPath: (productName, keyword) => `أنشئ مسار URL محسن:
 
-OUTPUT: Return ONLY the optimized Arabic meta description:`,
+المنتج: ${productName}
+الكلمة المفتاحية: ${keyword}
 
-  urlPath: (productName, keyword) => `You are a technical SEO expert creating URL slugs for maximum ranking potential.
+معايير المسار:
+✅ باللغة الإنجليزية فقط
+✅ كلمات مفصولة بـ (-)
+✅ قصير وواضح
+✅ يحتوي الكلمة المفتاحية المترجمة
 
-PRODUCT: ${productName}
-TARGET KEYWORD: ${keyword}
+أمثلة:
+- "smart-sports-watch"
+- "moisturizing-face-cream"
+- "bluetooth-wireless-headphones"
 
-SEO-OPTIMIZED URL REQUIREMENTS:
-✅ English only (for technical compatibility)
-✅ Words separated by hyphens (-)
-✅ Include main keyword translated to English
-✅ 3-5 words maximum (concise but descriptive)
-✅ No stop words (a, the, of, for, etc.)
-✅ Use exact match or close variant of English keyword
+أعد المسار فقط:`,
 
-KEYWORD TRANSLATION EXAMPLES:
-- "جهاز قياس ضغط الدم" → "blood-pressure-monitor"
-- "كريم مرطب للوجه" → "face-moisturizing-cream"
-- "ساعة ذكية رياضية" → "smart-sports-watch"
-- "سماعات بلوتوث لاسلكية" → "wireless-bluetooth-headphones"
+  imageAlt: (productName, keyword) => `أنشئ نص ALT احترافي:
 
-SEO BEST PRACTICES:
-- Use commercial intent keywords when possible
-- Include product category if it adds SEO value
-- Keep it readable and memorable
-- Avoid numbers unless they're part of the product model
+المنتج: ${productName}
+الكلمة المفتاحية: ${keyword}
 
-OUTPUT: Return ONLY the URL slug (no explanations):`,
+معايير النص:
+✅ وصف دقيق للصورة
+✅ يحتوي الكلمة المفتاحية
+✅ 8-12 كلمة
+✅ مفيد للمكفوفين
+✅ محسن لـ SEO
 
-  imageAlt: (productName, keyword) => `You are an accessibility and SEO expert creating image alt text that serves both users and search engines.
+نموذج: "صورة [الكلمة المفتاحية] عالية الجودة مع المواصفات"
 
-PRODUCT: ${productName}
-TARGET KEYWORD: ${keyword}
-
-ALT TEXT OPTIMIZATION CRITERIA:
-✅ Include target keyword naturally
-✅ Describe what's actually visible in the image
-✅ 8-15 words (optimal length)
-✅ Helpful for visually impaired users
-✅ SEO-optimized for image search
-✅ Never use the word "صورة" explicitly
-✅ Focus on product features visible in image
-
-EFFECTIVE ALT TEXT PATTERNS:
-- "[Target keyword] + [visible features/context]"
-- "[Product] + [key specifications] + [setting/context]"
-- "[Brand/quality indicator] + [target keyword] + [use case]"
-
-EXAMPLES:
-- "جهاز قياس ضغط الدم الرقمي مع شاشة LCD كبيرة"
-- "كريم مرطب للوجه الجاف في عبوة أنيقة 50 مل"
-- "ساعة ذكية رياضية سوداء مقاومة للماء مع حزام سيليكون"
-
-AVOID:
-- Generic descriptions
-- Starting with "صورة" or "صورة لـ"
-- Keyword stuffing
-- Overly technical jargon
-
-OUTPUT: Return ONLY the optimized Arabic alt text:`
+أعد النص فقط:`
 };
 
 // Main Component
