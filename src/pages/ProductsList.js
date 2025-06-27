@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Dialog, Transition } from "@headlessui/react";
-// Add missing imports at the top
 import { 
   Search, 
   Filter, 
@@ -85,7 +84,7 @@ export default function ProductsList() {
   const [productToDelete, setProductToDelete] = useState(null);
   const [errors, setErrors] = useState({});
 
-  // Form state for new product - اسم المنتج فقط
+  // Form state for new product
   const [newProduct, setNewProduct] = useState({
     name: ""
   });
@@ -118,12 +117,11 @@ export default function ProductsList() {
     const currentLimit = limits[plan] || limits.free;
     setUsageStats(prev => ({
       ...prev,
-      productsLimit: currentLimit,
-      canAddMore: currentLimit === -1 || prev.productsUsed < currentLimit
+      productsLimit: currentLimit
     }));
   }, []);
 
-  // Load products
+  // ✅ FIXED: Load products from localStorage only (until backend is ready)
   useEffect(() => {
     loadProducts();
   }, []);
@@ -131,37 +129,22 @@ export default function ProductsList() {
   const loadProducts = useCallback(async () => {
     setLoading(true);
     try {
-      // Try to load from API first
-      const token = localStorage.getItem("token");
-      if (token) {
-        try {
-          const response = await fetch(`${API_BASE_URL}/products`, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          });
-          
-          if (response.ok) {
-            const data = await response.json();
-            setProducts(data);
-            setUsageStats(prev => ({ ...prev, productsUsed: data.length }));
-            localStorage.setItem("saved_products", JSON.stringify(data));
-            return;
-          }
-        } catch (apiError) {
-          console.log("API not available, loading from localStorage");
-        }
-      }
-
-      // Fallback to localStorage
+      console.log('🔄 Loading products from localStorage...');
+      
+      // Load from localStorage only (API endpoints not ready yet)
       const saved = JSON.parse(localStorage.getItem("saved_products") || "[]");
       
       if (saved.length > 0) {
+        console.log(`✅ Loaded ${saved.length} products from localStorage`);
         setProducts(saved);
-        setUsageStats(prev => ({ ...prev, productsUsed: saved.length }));
+        setUsageStats(prev => ({ 
+          ...prev, 
+          productsUsed: saved.length,
+          canAddMore: prev.productsLimit === -1 || saved.length < prev.productsLimit
+        }));
       } else {
         // Generate dummy data for demo
+        console.log('📝 Generating dummy products...');
         const dummyData = Array.from({ length: 5 }).map((_, i) => ({
           id: i + 1,
           name: `منتج تجريبي رقم ${i + 1}`,
@@ -173,13 +156,20 @@ export default function ProductsList() {
           targetKeyword: `كلمة مفتاحية ${i + 1}`,
           createdAt: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString()
         }));
+        
         setProducts(dummyData);
-        setUsageStats(prev => ({ ...prev, productsUsed: dummyData.length }));
+        setUsageStats(prev => ({ 
+          ...prev, 
+          productsUsed: dummyData.length,
+          canAddMore: prev.productsLimit === -1 || dummyData.length < prev.productsLimit
+        }));
         localStorage.setItem("saved_products", JSON.stringify(dummyData));
+        console.log('✅ Generated and saved dummy products');
       }
     } catch (error) {
       console.error("Error loading products:", error);
       setErrors(prev => ({ ...prev, load: "فشل في تحميل المنتجات" }));
+      toast.error("فشل في تحميل المنتجات");
     } finally {
       setLoading(false);
     }
@@ -280,12 +270,11 @@ export default function ProductsList() {
       const productData = {
         id: Date.now(),
         name: newProduct.name.trim(),
-        description: "", // فارغ سيتم ملؤه في صفحة التحسين
+        description: "",
         seoScore: null,
         status: "جديد",
         lastUpdated: new Date().toISOString(),
         createdAt: new Date().toISOString(),
-        // بيانات أساسية فارغة ستملأ بالذكاء الاصطناعي
         keyword: "",
         meta_title: "",
         meta_description: "",
@@ -297,27 +286,7 @@ export default function ProductsList() {
         imageAlt: ""
       };
 
-      // Try to save to API
-      const token = localStorage.getItem("token");
-      if (token) {
-        try {
-          const response = await fetch(`${API_BASE_URL}/products`, {
-            method: "POST",
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(productData)
-          });
-          
-          if (response.ok) {
-            const savedProduct = await response.json();
-            productData.id = savedProduct.id;
-          }
-        } catch (apiError) {
-          console.log("API not available, saving locally only");
-        }
-      }
+      console.log('💾 Saving new product to localStorage:', productData);
 
       const updatedProducts = [...products, productData];
       setProducts(updatedProducts);
@@ -328,7 +297,7 @@ export default function ProductsList() {
       }));
       localStorage.setItem("saved_products", JSON.stringify(updatedProducts));
 
-      toast.success("تم إضافة المنتج بنجاح! 🎉 ستنتقل الآن لصفحة التحسين");
+      toast.success("تم إضافة المنتج بنجاح! 🎉");
       setShowModal(false);
       setNewProduct({ name: "" });
       
@@ -337,7 +306,7 @@ export default function ProductsList() {
         navigate(`/product-seo/${productData.id}`, { 
           state: { 
             product: productData,
-            isNewProduct: true // flag مهم للصفحة الأخرى
+            isNewProduct: true
           } 
         });
       }, 1000);
@@ -350,22 +319,8 @@ export default function ProductsList() {
 
   const handleDeleteProduct = useCallback(async (productId) => {
     try {
-      // Try to delete from API
-      const token = localStorage.getItem("token");
-      if (token) {
-        try {
-          await fetch(`${API_BASE_URL}/products/${productId}`, {
-            method: "DELETE",
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          });
-        } catch (apiError) {
-          console.log("API not available, deleting locally only");
-        }
-      }
-
+      console.log('🗑️ Deleting product:', productId);
+      
       const updatedProducts = products.filter(p => p.id !== productId);
       setProducts(updatedProducts);
       setUsageStats(prev => ({ 
@@ -399,7 +354,6 @@ export default function ProductsList() {
         break;
       case "analyze":
         toast.info("سيتم تحليل المنتجات المختارة...");
-        // Implement bulk analysis
         break;
       default:
         toast.error("يرجى اختيار عملية");
@@ -450,6 +404,11 @@ export default function ProductsList() {
               ❌ {errors.load}
             </div>
           )}
+
+          {/* API Status Notice */}
+          <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded-lg mb-4">
+            ℹ️ <strong>وضع التطوير:</strong> يتم حفظ البيانات محلياً. سيتم ربط قاعدة البيانات قريباً.
+          </div>
 
           {/* Header Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -502,6 +461,7 @@ export default function ProductsList() {
             </div>
           </div>
 
+          {/* Rest of the component remains the same... */}
           {/* Toolbar */}
           <div className="bg-white rounded-xl p-6 shadow-sm border">
             <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
