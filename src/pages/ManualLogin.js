@@ -3,6 +3,7 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
 import Footer from "../components/Footer";
+import { API_ENDPOINTS, apiCall } from "../config/api"; // Import API configuration
 
 // إعداد Google Client ID
 const GOOGLE_CLIENT_ID = "403864871499-59f26jiafopipeplaq09bplabe594q0o.apps.googleusercontent.com";
@@ -17,8 +18,8 @@ const PLAN_INFO = {
 export default function ManualLogin() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isLogin, setIsLogin] = useState(true); // التبديل بين الدخول والتسجيل
-  const [selectedPlan, setSelectedPlan] = useState(null); // الخطة المختارة
+  const [isLogin, setIsLogin] = useState(true);
+  const [selectedPlan, setSelectedPlan] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -37,7 +38,7 @@ export default function ManualLogin() {
     password: "",
     phone: "",
     storeUrl: "",
-    plan: selectedPlan || "free" // استخدام الخطة المختارة أو المجانية افتراضياً
+    plan: selectedPlan || "free"
   });
 
   // تحميل Google Identity Services
@@ -48,7 +49,6 @@ export default function ManualLogin() {
     
     if (planParam && PLAN_INFO[planParam]) {
       setSelectedPlan(planParam);
-      // إذا كانت خطة مدفوعة، اعرض نموذج التسجيل
       if (planParam !== 'free') {
         setIsLogin(false);
       }
@@ -77,7 +77,6 @@ export default function ManualLogin() {
       document.head.appendChild(script);
     };
 
-    // 🔥 FIXED: Updated Google initialization with better error handling
     const initializeGoogle = () => {
       if (!window.google) {
         console.error('Google script not loaded');
@@ -96,7 +95,7 @@ export default function ManualLogin() {
           callback: handleGoogleResponse,
           auto_select: false,
           cancel_on_tap_outside: true,
-          use_fedcm_for_prompt: false  // 🔥 KEY FIX: Disables newer API that causes errors
+          use_fedcm_for_prompt: false
         });
         
         console.log('✅ Google Sign-In initialized successfully');
@@ -107,7 +106,7 @@ export default function ManualLogin() {
     };
 
     loadGoogleScript();
-  }, [location.search]); // إعادة التشغيل عند تغيير URL
+  }, [location.search]);
 
   // تحديث خطة التسجيل عند تغيير الخطة المختارة
   useEffect(() => {
@@ -123,9 +122,9 @@ export default function ManualLogin() {
     try {
       const payload = JSON.parse(atob(response.credential.split('.')[1]));
       
-      const res = await fetch("http://localhost:8000/auth/login", {
+      // استخدام API_ENDPOINTS بدلاً من localhost
+      const res = await apiCall(API_ENDPOINTS.auth.login, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id_token: response.credential }),
       });
 
@@ -149,7 +148,6 @@ export default function ManualLogin() {
 
       toast.success(`مرحباً ${clientName}، تم تسجيل الدخول بنجاح`);
       
-      // التحقق من الخطة المختارة للتوجيه المناسب
       if (selectedPlan && selectedPlan !== 'free') {
         setTimeout(() => {
           navigate(`/checkout?plan=${selectedPlan}`);
@@ -168,7 +166,6 @@ export default function ManualLogin() {
     }
   };
 
-  // 🔥 FIXED: Updated Google login handler with better error handling and fallback
   const handleGoogleLogin = () => {
     if (!window.google) {
       toast.error("خدمة Google غير متاحة حالياً");
@@ -188,7 +185,6 @@ export default function ManualLogin() {
         
         if (notification.isNotDisplayed()) {
           console.log('Google prompt not displayed, trying alternative method');
-          // Fallback: try rendering button first
           const buttonDiv = document.createElement('div');
           buttonDiv.id = 'g_id_signin_temp';
           buttonDiv.style.visibility = 'hidden';
@@ -228,7 +224,6 @@ export default function ManualLogin() {
     const { name, value } = e.target;
     setRegisterForm(prev => ({ ...prev, [name]: value }));
 
-    // التحقق من رقم الهاتف
     if (name === "phone" && value) {
       if (!/^\d*$/.test(value)) {
         toast.error("يجب أن يحتوي رقم الجوال على أرقام فقط");
@@ -243,16 +238,15 @@ export default function ManualLogin() {
     }
   };
 
-  // تسجيل الدخول
+  // تسجيل الدخول - Updated to use API_ENDPOINTS
   const handleLogin = async (e) => {
     e.preventDefault();
     if (loading) return;
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8000/auth/google-login", {
+      const res = await apiCall(API_ENDPOINTS.auth.googleLogin, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: loginForm.email,
           password: loginForm.password
@@ -293,16 +287,15 @@ export default function ManualLogin() {
     }
   };
 
-  // التسجيل
+  // التسجيل - Updated to use API_ENDPOINTS
   const handleRegister = async (e) => {
     e.preventDefault();
     if (loading) return;
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8000/auth/register", {
+      const res = await apiCall(API_ENDPOINTS.auth.register, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           full_name: registerForm.fullName,
           email: registerForm.email,
@@ -329,10 +322,8 @@ export default function ManualLogin() {
         localStorage.setItem("clientName", registerForm.fullName);
         localStorage.setItem("user", JSON.stringify({ name: registerForm.fullName }));
         
-        // رسالة نجاح مخصصة حسب الخطة
         if (selectedPlan && selectedPlan !== 'free') {
           toast.success(`🎉 تم إنشاء الحساب بنجاح! سيتم توجيهك لإتمام الدفع للخطة ${PLAN_INFO[selectedPlan].name}`);
-          // توجيه إلى صفحة الدفع للخطط المدفوعة
           setTimeout(() => {
             navigate(`/checkout?plan=${selectedPlan}`);
           }, 1500);
@@ -618,7 +609,7 @@ export default function ManualLogin() {
                   value={registerForm.plan} 
                   onChange={handleRegisterChange} 
                   className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600"
-                  disabled={selectedPlan} // تعطيل التغيير إذا تم اختيار خطة من الرابط
+                  disabled={selectedPlan}
                 >
                   <option value="free">الخطة المجانية</option>
                   <option value="pro">الخطة المدفوعة - Pro</option>
