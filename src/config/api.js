@@ -1,402 +1,42 @@
-// src/config/api.js
+// API Configuration
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
-// ✅ API Base URL Configuration
-const API_BASE_URL =
-  process.env.NODE_ENV === "production"
-    ? "https://breevo-backend.onrender.com"
-    : "http://localhost:8000";
-
-// ✅ Alternative API URLs (if needed)
-const API_URLS = {
-  development: "http://localhost:8000",
-  staging: "https://breevo-staging.onrender.com",
-  production: "https://breevo-backend.onrender.com"
-};
-
-// ✅ Get API URL based on environment
-export const getApiUrl = () => {
-  const environment = process.env.NODE_ENV || "development";
-  return API_URLS[environment] || API_URLS.development;
-};
-
-// ✅ Complete API Endpoints Configuration
+// API endpoints
 export const API_ENDPOINTS = {
-  // 🔐 Authentication & User Management
   auth: {
     login: `${API_BASE_URL}/auth/login`,
-    register: `${API_BASE_URL}/auth/register`,
-    logout: `${API_BASE_URL}/auth/logout`,
     googleLogin: `${API_BASE_URL}/auth/google-login`,
-    facebookLogin: `${API_BASE_URL}/auth/facebook-login`,
-    refresh: `${API_BASE_URL}/auth/refresh`,
-    forgotPassword: `${API_BASE_URL}/auth/forgot-password`,
-    resetPassword: `${API_BASE_URL}/auth/reset-password`,
-    verifyEmail: `${API_BASE_URL}/auth/verify-email`,
-    resendVerification: `${API_BASE_URL}/auth/resend-verification`,
+    register: `${API_BASE_URL}/auth/register`,
   },
-
-  // 👤 User Profile & Settings
-  user: {
-    profile: `${API_BASE_URL}/user/profile`,
-    updateProfile: `${API_BASE_URL}/user/profile`,
-    changePassword: `${API_BASE_URL}/user/change-password`,
-    uploadAvatar: `${API_BASE_URL}/user/avatar`,
-    deleteAccount: `${API_BASE_URL}/user/delete`,
-    preferences: `${API_BASE_URL}/user/preferences`,
-  },
-
-  // 📦 Products Management
   products: {
-    list: `${API_BASE_URL}/products`,
-    create: `${API_BASE_URL}/products/create`,
-    update: (id) => `${API_BASE_URL}/products/${id}`,
-    delete: (id) => `${API_BASE_URL}/products/${id}`,
-    get: (id) => `${API_BASE_URL}/products/${id}`,
-    duplicate: (id) => `${API_BASE_URL}/products/${id}/duplicate`,
-    bulk: `${API_BASE_URL}/products/bulk`,
-    export: `${API_BASE_URL}/products/export`,
-    import: `${API_BASE_URL}/products/import`,
-    search: `${API_BASE_URL}/products/search`,
-    categories: `${API_BASE_URL}/products/categories`,
+    base: `${API_BASE_URL}/products`,
   },
-
-  // 🎯 SEO & Content Generation
-  seo: {
-    generateKeyword: `${API_BASE_URL}/seo/generate-keyword`,
-    generateTitle: `${API_BASE_URL}/seo/generate-title`,
-    generateDescription: `${API_BASE_URL}/seo/generate-description`,
-    generateMetaTitle: `${API_BASE_URL}/seo/generate-meta-title`,
-    generateMetaDescription: `${API_BASE_URL}/seo/generate-meta-description`,
-    generateUrlPath: `${API_BASE_URL}/seo/generate-url-path`,
-    generateImageAlt: `${API_BASE_URL}/seo/generate-image-alt`,
-    generateAll: `${API_BASE_URL}/seo/generate-all`,
-    analyzeProduct: `${API_BASE_URL}/seo/analyze-product`,
-    scoreProduct: `${API_BASE_URL}/seo/score-product`,
-    checkKeyword: `${API_BASE_URL}/seo/check-keyword`,
-    suggestions: `${API_BASE_URL}/seo/suggestions`,
-  },
-
-  // 💳 Subscription & Billing
-  subscription: {
-    plans: `${API_BASE_URL}/subscription/plans`,
-    current: `${API_BASE_URL}/subscription/current`,
-    subscribe: `${API_BASE_URL}/subscription/subscribe`,
-    cancel: `${API_BASE_URL}/subscription/cancel`,
-    upgrade: `${API_BASE_URL}/subscription/upgrade`,
-    downgrade: `${API_BASE_URL}/subscription/downgrade`,
-    invoices: `${API_BASE_URL}/subscription/invoices`,
-    usage: `${API_BASE_URL}/subscription/usage`,
-    trial: `${API_BASE_URL}/subscription/trial`,
-  },
-
-  // 💰 Payment Processing
-  payment: {
-    createIntent: `${API_BASE_URL}/payment/create-intent`,
-    confirm: `${API_BASE_URL}/payment/confirm`,
-    webhook: `${API_BASE_URL}/payment/webhook`,
-    methods: `${API_BASE_URL}/payment/methods`,
-    addMethod: `${API_BASE_URL}/payment/add-method`,
-    removeMethod: (id) => `${API_BASE_URL}/payment/methods/${id}`,
-    refund: `${API_BASE_URL}/payment/refund`,
-  },
-
-  // 📁 File Management
-  files: {
-    upload: `${API_BASE_URL}/files/upload`,
-    uploadImage: `${API_BASE_URL}/files/upload-image`,
-    uploadAvatar: `${API_BASE_URL}/files/upload-avatar`,
-    delete: (id) => `${API_BASE_URL}/files/${id}`,
-    get: (id) => `${API_BASE_URL}/files/${id}`,
-    list: `${API_BASE_URL}/files`,
-  },
-
-  // 📊 Analytics & Reports
-  analytics: {
-    dashboard: `${API_BASE_URL}/analytics/dashboard`,
-    products: `${API_BASE_URL}/analytics/products`,
-    seo: `${API_BASE_URL}/analytics/seo`,
-    usage: `${API_BASE_URL}/analytics/usage`,
-    performance: `${API_BASE_URL}/analytics/performance`,
-    export: `${API_BASE_URL}/analytics/export`,
-  },
-
-  // 🎯 AI & Generation Services
   ai: {
-    generateText: `${API_BASE_URL}/ai/generate-text`,
-    generateImage: `${API_BASE_URL}/ai/generate-image`,
-    translate: `${API_BASE_URL}/ai/translate`,
-    summarize: `${API_BASE_URL}/ai/summarize`,
-    optimize: `${API_BASE_URL}/ai/optimize`,
-    check: `${API_BASE_URL}/ai/check`,
-    usage: `${API_BASE_URL}/ai/usage`,
-  },
-
-  // 🛠️ Admin & Management
-  admin: {
-    users: `${API_BASE_URL}/admin/users`,
-    getUser: (id) => `${API_BASE_URL}/admin/users/${id}`,
-    updateUser: (id) => `${API_BASE_URL}/admin/users/${id}`,
-    deleteUser: (id) => `${API_BASE_URL}/admin/users/${id}`,
-    stats: `${API_BASE_URL}/admin/stats`,
-    logs: `${API_BASE_URL}/admin/logs`,
-    settings: `${API_BASE_URL}/admin/settings`,
-    backup: `${API_BASE_URL}/admin/backup`,
-    maintenance: `${API_BASE_URL}/admin/maintenance`,
-  },
-
-  // 📧 Notifications & Communication
-  notifications: {
-    list: `${API_BASE_URL}/notifications`,
-    markRead: (id) => `${API_BASE_URL}/notifications/${id}/read`,
-    markAllRead: `${API_BASE_URL}/notifications/read-all`,
-    delete: (id) => `${API_BASE_URL}/notifications/${id}`,
-    preferences: `${API_BASE_URL}/notifications/preferences`,
-    send: `${API_BASE_URL}/notifications/send`,
-  },
-
-  // 🎫 Support & Tickets
-  support: {
-    tickets: `${API_BASE_URL}/support/tickets`,
-    createTicket: `${API_BASE_URL}/support/tickets/create`,
-    getTicket: (id) => `${API_BASE_URL}/support/tickets/${id}`,
-    updateTicket: (id) => `${API_BASE_URL}/support/tickets/${id}`,
-    closeTicket: (id) => `${API_BASE_URL}/support/tickets/${id}/close`,
-    faq: `${API_BASE_URL}/support/faq`,
-    contact: `${API_BASE_URL}/support/contact`,
-  },
-
-  // 🔧 System & Health
-  system: {
-    health: `${API_BASE_URL}/system/health`,
-    status: `${API_BASE_URL}/system/status`,
-    version: `${API_BASE_URL}/system/version`,
-    config: `${API_BASE_URL}/system/config`,
-    maintenance: `${API_BASE_URL}/system/maintenance`,
-  },
+    base: `${API_BASE_URL}/ai`,
+  }
 };
 
-// ✅ HTTP Methods
-export const HTTP_METHODS = {
-  GET: 'GET',
-  POST: 'POST',
-  PUT: 'PUT',
-  PATCH: 'PATCH',
-  DELETE: 'DELETE',
-};
-
-// ✅ Request Headers Configuration
-export const getAuthHeaders = (token) => ({
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer ${token}`,
-});
-
-export const getFileUploadHeaders = (token) => ({
-  'Authorization': `Bearer ${token}`,
-  // Don't set Content-Type for file uploads - let browser set it
-});
-
-export const getBasicHeaders = () => ({
-  'Content-Type': 'application/json',
-});
-
-// ✅ API Request Timeout Configuration
-export const API_CONFIG = {
-  timeout: {
-    default: 30000,      // 30 seconds
-    upload: 120000,      // 2 minutes for file uploads
-    generation: 60000,   // 1 minute for AI generation
-    short: 10000,        // 10 seconds for quick requests
-  },
-  retry: {
-    attempts: 3,
-    delay: 1000,         // 1 second between retries
-  },
-  cache: {
-    enabled: true,
-    duration: 300000,    // 5 minutes
-  },
-};
-
-// ✅ Error Status Codes
-export const ERROR_CODES = {
-  UNAUTHORIZED: 401,
-  FORBIDDEN: 403,
-  NOT_FOUND: 404,
-  VALIDATION_ERROR: 422,
-  SERVER_ERROR: 500,
-  SERVICE_UNAVAILABLE: 503,
-  RATE_LIMITED: 429,
-};
-
-// ✅ Success Status Codes
-export const SUCCESS_CODES = {
-  OK: 200,
-  CREATED: 201,
-  ACCEPTED: 202,
-  NO_CONTENT: 204,
-};
-
-// ✅ Helper Functions
-export const buildUrl = (endpoint, params = {}) => {
-  const url = new URL(endpoint);
-  Object.keys(params).forEach(key => {
-    if (params[key] !== null && params[key] !== undefined) {
-      url.searchParams.append(key, params[key]);
-    }
-  });
-  return url.toString();
-};
-
-export const buildFormData = (data) => {
-  const formData = new FormData();
-  Object.keys(data).forEach(key => {
-    if (data[key] !== null && data[key] !== undefined) {
-      if (data[key] instanceof File) {
-        formData.append(key, data[key]);
-      } else if (typeof data[key] === 'object') {
-        formData.append(key, JSON.stringify(data[key]));
-      } else {
-        formData.append(key, data[key]);
-      }
-    }
-  });
-  return formData;
-};
-
-// ✅ Environment-specific configurations
-export const getEnvironmentConfig = () => {
-  const env = process.env.NODE_ENV || 'development';
-  
-  const configs = {
-    development: {
-      apiUrl: API_URLS.development,
-      debug: true,
-      timeout: API_CONFIG.timeout.default,
-      enableLogging: true,
-    },
-    staging: {
-      apiUrl: API_URLS.staging,
-      debug: true,
-      timeout: API_CONFIG.timeout.default,
-      enableLogging: true,
-    },
-    production: {
-      apiUrl: API_URLS.production,
-      debug: false,
-      timeout: API_CONFIG.timeout.default,
-      enableLogging: false,
-    },
-  };
-
-  return configs[env] || configs.development;
-};
-
-// ✅ Main API Call Function
+// Helper function for API calls
 export const apiCall = async (endpoint, options = {}) => {
-  const {
-    method = 'GET',
-    body = null,
-    headers = {},
-    timeout = API_CONFIG.timeout.default,
-    ...restOptions
-  } = options;
-
-  // Get auth token from localStorage if available
-  const token = localStorage.getItem('token') || localStorage.getItem('authToken');
-  
-  // Prepare headers
-  const defaultHeaders = token ? getAuthHeaders(token) : getBasicHeaders();
-  const requestHeaders = { ...defaultHeaders, ...headers };
-
-  // Prepare request config
-  const requestConfig = {
-    method,
-    headers: requestHeaders,
-    ...restOptions,
+  const defaultOptions = {
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   };
 
-  // Add body if present (and not GET request)
-  if (body && method !== 'GET') {
-    if (body instanceof FormData) {
-      // Remove Content-Type for FormData - let browser set it
-      delete requestConfig.headers['Content-Type'];
-      requestConfig.body = body;
-    } else if (typeof body === 'object') {
-      requestConfig.body = JSON.stringify(body);
-    } else {
-      requestConfig.body = body;
-    }
+  // Add auth token if available
+  const token = localStorage.getItem('token');
+  if (token) {
+    defaultOptions.headers.Authorization = `Bearer ${token}`;
   }
 
-  try {
-    // Create abort controller for timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), timeout);
-    requestConfig.signal = controller.signal;
-
-    // Make the request
-    const response = await fetch(endpoint, requestConfig);
-    clearTimeout(timeoutId);
-
-    // Handle response
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ 
-        message: `HTTP Error ${response.status}` 
-      }));
-      throw new Error(errorData.message || `Request failed with status ${response.status}`);
-    }
-
-    // Return JSON if possible, otherwise return text
-    const contentType = response.headers.get('content-type');
-    if (contentType && contentType.includes('application/json')) {
-      return await response.json();
-    } else {
-      return await response.text();
-    }
-
-  } catch (error) {
-    // Handle different types of errors
-    if (error.name === 'AbortError') {
-      throw new Error('Request timeout');
-    } else if (error.message.includes('Failed to fetch')) {
-      throw new Error('Network error - please check your connection');
-    } else {
-      throw error;
-    }
-  }
-};
-
-// ✅ Convenience functions for common HTTP methods
-export const apiGet = (endpoint, options = {}) => 
-  apiCall(endpoint, { ...options, method: 'GET' });
-
-export const apiPost = (endpoint, body, options = {}) => 
-  apiCall(endpoint, { ...options, method: 'POST', body });
-
-export const apiPut = (endpoint, body, options = {}) => 
-  apiCall(endpoint, { ...options, method: 'PUT', body });
-
-export const apiPatch = (endpoint, body, options = {}) => 
-  apiCall(endpoint, { ...options, method: 'PATCH', body });
-
-export const apiDelete = (endpoint, options = {}) => 
-  apiCall(endpoint, { ...options, method: 'DELETE' });
-
-// ✅ File upload helper
-export const apiUpload = (endpoint, file, additionalData = {}, options = {}) => {
-  const formData = buildFormData({ file, ...additionalData });
-  return apiCall(endpoint, { 
-    ...options, 
-    method: 'POST', 
-    body: formData 
+  const response = await fetch(endpoint, {
+    ...defaultOptions,
+    ...options,
   });
+
+  return response;
 };
 
-// ✅ Default export
-export default API_ENDPOINTS;
-
-// ✅ Named exports for convenience
-export {
-  API_BASE_URL,
-  API_URLS,
-};
+export default API_BASE_URL;
