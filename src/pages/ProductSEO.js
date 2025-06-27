@@ -151,7 +151,7 @@ const checkCoreCriteria = (product) => {
   criteria.push({
     id: 'description_length',
     text: `طول الوصف لا يقل عن 100 كلمة (حالياً: ${descriptionWords.length} كلمة)`,
-    status: descriptionWords.length >= 120 ? 'pass' : 'fail'
+    status: descriptionWords.length >= 100 ? 'pass' : 'fail'
   });
 
   // 7. Using internal backlinks (check for any links in description)
@@ -691,22 +691,19 @@ export default function ProductSEO() {
 
 معايير SEO الإلزامية:
 ✅ الوصف يبدأ بالكلمة المفتاحية في أول 25 كلمة
-✅ طول الوصف 120+ كلمة (ليس أقل)
+✅ طول الوصف 100+ كلمة (ليس أقل)
 ✅ استخدام HTML منظم ومنسق مع روابط داخلية
 ✅ توزيع طبيعي للكلمة المفتاحية
 ✅ دعوة واضحة لاتخاذ إجراء في النهاية
-✅ ذكر مواصفات المنتج (الحجم، الكمية، الأبعاد)
 ✅ استخدام كلمات تحفيزية للشراء
 
 هيكل الوصف المطلوب (مهم جداً):
 1. فقرة افتتاحية قوية تبدأ بالكلمة المفتاحية <p>
 2. قسم "المميزات الرئيسية" <h3>
 3. قائمة 4-6 مميزات <ul><li>
-4. قسم "المواصفات" <h3> (حجم، كمية، أبعاد)
-5. قسم "كيفية الاستخدام" <h3>  
-6. شرح بسيط للاستخدام <p>
-7. فقرة ختامية تحفيزية مع CTA <p>
-8. تضمين رابط داخلي واحد على الأقل
+4. قسم "كيفية الاستخدام" <h3>  
+5. شرح بسيط للاستخدام <p>
+6. فقرة ختامية تحفيزية مع CTA <p>
 
 تنبيه مهم: يجب أن يكون المحتوى متناسب تماماً مع طبيعة المنتج "${product.name}".
 
@@ -716,7 +713,7 @@ export default function ProductSEO() {
   "description": "وصف HTML منسق حسب المعايير أعلاه مع مواصفات ودعوة للشراء",
   "keyword": "${keyword}",
   "meta_title": "Page Title عنوان السيو جذاب (50-60 حرف)",
-  "meta_description": "Page Description وصف الميتا مقنع يحتوي الكلمة المفتاحية (150-160 حرف)",
+  "meta_description": "Page Description وصف الميتا مقنع يحتوي الكلمة المفتاحية (145-150 حرف)",
   "url_path": "مسار-url-صديق-لمحركات-البحث",
   "imageAlt": "وصف بديل للصورة يحتوي الكلمة المفتاحية"
 }`;
@@ -1540,7 +1537,7 @@ Provide only the Arabic ALT text.`
                       {[
                         { key: 'keyword', label: 'الكلمة المفتاحية' },
                         { key: 'name', label: 'عنوان يحتوي الكلمة المفتاحية' },
-                        { key: 'description', label: 'وصف 120+ كلمة' },
+                        { key: 'description', label: 'وصف 100+ كلمة' },
                         { key: 'meta_title', label: 'Page Title' },
                         { key: 'meta_description', label: 'Page Description' },
                         { key: 'imageAlt', label: 'Image Alt' },
