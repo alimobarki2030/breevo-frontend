@@ -150,7 +150,7 @@ const checkCoreCriteria = (product) => {
   // 6. Description length at least 120 words
   criteria.push({
     id: 'description_length',
-    text: `طول الوصف لا يقل عن 120 كلمة (حالياً: ${descriptionWords.length} كلمة)`,
+    text: `طول الوصف لا يقل عن 100 كلمة (حالياً: ${descriptionWords.length} كلمة)`,
     status: descriptionWords.length >= 120 ? 'pass' : 'fail'
   });
 
@@ -771,90 +771,90 @@ export default function ProductSEO() {
       console.log(`🔄 Generating field: ${fieldType}`);
       
       const prompts = {
-        keyword: `أنت خبير SEO محترف. اختر أفضل كلمة مفتاحية لهذا المنتج:
+  keyword: `You are a professional Arabic SEO expert. Choose the most relevant Arabic target keyword for this product in the Saudi market.
 
-المنتج: ${product.name}
-الوصف: ${product.description || 'غير متوفر'}
-الفئة: ${product.category || 'عام'}
+Product: ${product.name}
+Description: ${product.description || 'غير متوفر'}
+Category: ${product.category || 'عام'}
 
-معايير الاختيار:
-- حجم بحث عالي في السعودية
-- منافسة معقولة
-- صلة قوية بالمنتج
-- احتمالية تحويل عالية
+Selection criteria:
+- High search volume in Saudi Arabia
+- Reasonable competition
+- Strong product relevance
+- High conversion potential
 
-أعطني الكلمة المفتاحية فقط بدون علامات اقتباس:`,
-        
-        description: `أنت كاتب محتوى متخصص في SEO. اكتب وصفاً HTML منسقاً لهذا المنتج:
+Provide only the keyword in Arabic without quotation marks.`,
 
-المنتج: ${product.name}
-الكلمة المفتاحية: ${cleanText(product.keyword) || 'منتج'}
-النغمة: ${product.tone || 'محايدة'}
+  description: `You are a professional Arabic marketing copywriter specialized in SEO. Write an HTML formatted product description in Arabic.
 
-متطلبات الوصف:
-- 120+ كلمة
-- يبدأ بالكلمة المفتاحية
-- HTML منسق (<p>, <ul>, <li>, <h3>)
-- رابط داخلي واحد على الأقل
-- ذكر مواصفات المنتج (حجم، كمية)
-- دعوة واضحة لاتخاذ إجراء
-- مناسب للسوق السعودي
+Product: ${product.name}
+Target keyword: ${cleanText(product.keyword) || 'منتج'}
+Tone: ${product.tone || 'محايدة'}
 
-أعد الوصف HTML فقط:`,
-        
-        meta_title: `أنشئ Page Title عنوان السيو مثالي لهذا المنتج:
+Description requirements:
+- At least 100 words
+- Start the first paragraph with the target keyword
+- Use proper HTML tags (<p>, <ul>, <li>, <h3>)
+- Include at least one internal link
+- Mention product specifications (size, quantity)
+- Add a clear call to action
+- Suitable for the Saudi market
 
-المنتج: ${product.name}
-الكلمة المفتاحية: ${cleanText(product.keyword) || 'منتج'}
+Provide only the HTML content in Arabic.`,
 
-معايير العنوان:
-- 50-60 حرف فقط
-- يحتوي الكلمة المفتاحية
-- جذاب ومقنع
-- يناسب نتائج Google
+  meta_title: `Create a compelling Arabic SEO page title for this product targeting the Saudi market.
 
-أعطني العنوان فقط:`,
-        
-        meta_description: `اكتب Page Description وصف الميتا مثالي لهذا المنتج:
+Product: ${product.name}
+Target keyword: ${cleanText(product.keyword) || 'منتج'}
 
-المنتج: ${product.name}
-الكلمة المفتاحية: ${cleanText(product.keyword) || 'منتج'}
-الفئة: ${product.category || 'عام'}
+Title requirements:
+- Between 50 and 60 characters
+- Include the target keyword naturally
+- Attractive and persuasive for Google search results
 
-معايير الوصف:
-- 150-160 حرف بالضبط
-- يحتوي الكلمة المفتاحية
-- يحفز على النقر
-- يوضح الفائدة الأساسية
+Provide only the title text in Arabic.`,
 
-أعطني الوصف فقط:`,
-        
-        url_path: `أنشئ مسار URL محسن لهذا المنتج:
+  meta_description: `Write an Arabic meta description for this product optimized for the Saudi market.
 
-المنتج: ${product.name}
-الكلمة المفتاحية: ${cleanText(product.keyword) || 'منتج'}
+Product: ${product.name}
+Target keyword: ${cleanText(product.keyword) || 'منتج'}
+Category: ${product.category || 'عام'}
 
-معايير المسار:
-- صديق لمحركات البحث
-- باللغة الإنجليزية
-- كلمات مفصولة بشرطات
-- موجز وواضح
+Description requirements:
+- Exactly 150 characters
+- Naturally include the target keyword
+- Clearly communicate the main customer benefit
+- Encourage clicks
 
-أعطني المسار فقط (بدون http):`,
-        
-        imageAlt: `أنشئ نص ALT مثالي لصورة هذا المنتج:
+Provide only the description text in Arabic.`,
 
-المنتج: ${product.name}
-الكلمة المفتاحية: ${cleanText(product.keyword) || 'منتج'}
+  url_path: `Generate an SEO-friendly English URL path for this product.
 
-معايير النص:
-- وصف دقيق للصورة
-- يحتوي الكلمة المفتاحية
-- 10-15 كلمة
-- مفيد للمكفوفين
+Product: ${product.name}
+Target keyword: ${cleanText(product.keyword) || 'product'}
 
-أعطني النص فقط:`
-      };
+URL requirements:
+- All lowercase
+- Words separated by hyphens
+- Short and clear
+- No special characters
+
+Provide only the URL path without http.`,
+
+  imageAlt: `Create a descriptive Arabic ALT text for this product image.
+
+Product: ${product.name}
+Target keyword: ${cleanText(product.keyword) || 'منتج'}
+
+ALT text requirements:
+- Accurately describe the image
+- Include the target keyword naturally
+- Between 10 and 15 words
+- Help visually impaired users understand the image
+
+Provide only the Arabic ALT text.`
+};
+
 
       const prompt = prompts[fieldType];
       if (!prompt) {
@@ -1473,7 +1473,7 @@ export default function ProductSEO() {
                   <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
                     <div className="text-purple-500 mt-0.5">📝</div>
                     <div>
-                      <strong>الوصف:</strong> ابدأ بالكلمة المفتاحية واجعل المحتوى 120+ كلمة مع روابط داخلية
+                      <strong>الوصف:</strong> ابدأ بالكلمة المفتاحية واجعل المحتوى 100+ كلمة مع روابط داخلية
                     </div>
                   </div>
                   
