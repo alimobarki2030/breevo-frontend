@@ -35,7 +35,7 @@ const sharedSEOAnalysis = {
 // 2. CONSISTENT USER ACCESS LOGIC
 const sharedUserAccess = {
   checkUserPlan: () => {
-    const user = safeLocalStorageGet("user", {});
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
     const subscription = JSON.parse(localStorage.getItem("subscription") || "{}");
     const plan = subscription.plan || user.plan || "free";
     

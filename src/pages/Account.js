@@ -152,7 +152,7 @@ export default function Account() {
       localStorage.setItem("subscription", JSON.stringify(updatedSubscription));
       
       // تحديث بيانات المستخدم
-      const user = safeLocalStorageGet("user", {});
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
       user.plan = "free";
       localStorage.setItem("user", JSON.stringify(user));
       

@@ -69,7 +69,7 @@ const AdminVideoUpload = () => {
 
   useEffect(() => {
     // Check admin access
-    const user = safeLocalStorageGet("user", {});
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
     const isOwner = user.email === "alimobarki.ad@gmail.com" || 
                    user.email === "owner@breevo.com" || 
                    user.role === "owner" || 

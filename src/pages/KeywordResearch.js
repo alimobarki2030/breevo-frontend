@@ -17,7 +17,7 @@ const KeywordResearch = () => {
 
   // ✅ التحقق من صلاحية الوصول
   useEffect(() => {
-    const user = safeLocalStorageGet("user", {});
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
     const subscription = JSON.parse(localStorage.getItem("subscription") || "{}");
     const plan = subscription.plan || user.plan || "free";
     
