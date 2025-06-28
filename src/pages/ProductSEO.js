@@ -34,7 +34,7 @@ import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { generateProductSEO } from "../utils/generateProductSEO";
 import analyzeSEO from "../analyzeSEO"; // الملف الجديد الشامل
-import CKEditorProfessional from "../components/CKEditorProfessional";
+import TiptapEditor from "../components/TiptapEditor";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 
 // Constants
@@ -1024,12 +1024,11 @@ export default function ProductSEO() {
               </div>
             </div>
           ) : (
-            <CKEditorProfessional
-             value={fieldValue}
-             onChange={(val) => handleProductChange(key, val)}
-             placeholder={placeholder}
-             minWords={120}
-         />
+            <TiptapEditor
+              value={fieldValue}
+              onChange={(val) => handleProductChange(key, val)}
+              placeholder={placeholder}
+            />
           )}
           
           {hasError && (
