@@ -33,7 +33,7 @@ import {
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { generateProductSEO } from "../utils/generateProductSEO";
-import analyzeSEO from "../analyzeSEO";
+import analyzeSEO from "../analyzeSEO"; // الملف الجديد الشامل
 import TiptapEditor from "../components/TiptapEditor";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 
@@ -92,98 +92,9 @@ const getScoreColor = (score) => {
   return "text-red-600";
 };
 
-// Core SEO Criteria Checker
-const checkCoreCriteria = (product) => {
-  const criteria = [];
-  const keyword = product.keyword?.trim().toLowerCase() || "";
-  const title = product.name?.trim().toLowerCase() || "";
-  const description = product.description?.trim() || "";
-  const metaTitle = product.meta_title?.trim().toLowerCase() || "";
-  const metaDescription = product.meta_description?.trim() || "";
-  const imageAlt = product.imageAlt?.trim().toLowerCase() || "";
-  
-  // Remove HTML tags for word counting
-  const cleanDescription = description.replace(/<[^>]*>/g, ' ').trim();
-  const descriptionWords = cleanDescription.split(/\s+/).filter(word => word.length > 0);
-  const first25Words = descriptionWords.slice(0, 25).join(' ').toLowerCase();
-
-  // 1. Using the ideal focus keyword
-  criteria.push({
-    id: 'focus_keyword',
-    text: 'استخدام الكلمة المفتاحية المثالية',
-    status: keyword ? 'pass' : 'fail'
-  });
-
-  // 2. Including focus keyword in product title
-  criteria.push({
-    id: 'keyword_in_title',
-    text: 'تضمين الكلمة المفتاحية في عنوان المنتج',
-    status: keyword && title.includes(keyword) ? 'pass' : 'fail'
-  });
-
-  // 3. Including focus keyword in first 25 words of description
-  criteria.push({
-    id: 'keyword_in_first_25',
-    text: 'تضمين الكلمة المفتاحية في أول 25 كلمة من الوصف',
-    status: keyword && first25Words.includes(keyword) ? 'pass' : 'fail'
-  });
-
-  // 4. Including focus keyword in SEO title (Page Title)
-  criteria.push({
-    id: 'keyword_in_meta_title',
-    text: 'تضمين الكلمة المفتاحية في Page Title عنوان السيو',
-    status: keyword && metaTitle.includes(keyword) ? 'pass' : 'fail'
-  });
-
-  // 5. Using meta description (Page Description)
-  criteria.push({
-    id: 'has_meta_description',
-    text: 'استخدام Page Description وصف الميتا',
-    status: metaDescription.length > 0 ? 'pass' : 'fail'
-  });
-
-  // 6. Description length at least 120 words
-  criteria.push({
-    id: 'description_length',
-    text: `طول الوصف لا يقل عن 120 كلمة (حالياً: ${descriptionWords.length} كلمة)`,
-    status: descriptionWords.length >= 120 ? 'pass' : 'fail'
-  });
-
-  // 7. Using internal backlinks (check for any links in description)
-  const hasLinks = /<a\s+[^>]*href=[^>]*>/i.test(description);
-  criteria.push({
-    id: 'internal_links',
-    text: 'استخدام روابط داخلية',
-    status: hasLinks ? 'pass' : 'fail'
-  });
-
-  // 8. Image ALT text includes focus keyword or product title
-  const altIncludesKeyword = keyword && imageAlt.includes(keyword);
-  const altIncludesTitle = product.name && imageAlt.includes(product.name.toLowerCase());
-  criteria.push({
-    id: 'image_alt_keyword',
-    text: 'نص ALT للصورة يحتوي على الكلمة المفتاحية أو عنوان المنتج',
-    status: altIncludesKeyword || altIncludesTitle ? 'pass' : 'fail'
-  });
-
-  const passedCount = criteria.filter(c => c.status === 'pass').length;
-  const totalCount = criteria.length;
-  const score = Math.round((passedCount / totalCount) * 100);
-
-  return {
-    criteria,
-    score,
-    passedCount,
-    totalCount
-  };
-};
-
-// Enhanced SEO Display Component - مع إصلاح المعايير الإضافية
+// Enhanced SEO Display Component - استخدام البيانات من analyzeSEO
 const EnhancedSEODisplay = ({ analysis, product }) => {
   const [showAdditionalCriteria, setShowAdditionalCriteria] = useState(false);
-
-  // Get core criteria results
-  const coreResults = checkCoreCriteria(product);
 
   if (!product || Object.keys(product).length === 0) {
     return (
@@ -206,6 +117,23 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
     );
   }
 
+  // استخدام البيانات من analyzeSEO
+  const coreResults = analysis?.coreResults || { criteria: [], score: 0, passedCount: 0, totalCount: 0 };
+  const additionalCategories = analysis?.categories || {};
+  
+  // تحويل المعايير الإضافية لتنسيق مناسب للعرض
+  const additionalCriteria = [];
+  Object.entries(additionalCategories).forEach(([categoryName, checks]) => {
+    if (checks && Array.isArray(checks)) {
+      checks.forEach(check => {
+        additionalCriteria.push({
+          ...check,
+          category: categoryName
+        });
+      });
+    }
+  });
+
   const getStatusIcon = (status) => {
     switch (status) {
       case 'pass': return <CheckCircle className="w-4 h-4 text-green-600" />;
@@ -223,115 +151,6 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
       default: return 'text-gray-600 bg-gray-50 border-gray-200';
     }
   };
-
-  // إصلاح المعايير الإضافية - إضافة معايير حقيقية
-  const additionalCriteria = [];
-  
-  // معايير إضافية للـ URL Structure
-  const urlChecks = [];
-  if (product.url_path) {
-    urlChecks.push({
-      id: 'url_length',
-      text: `طول الرابط مناسب (${product.url_path.length} حرف)`,
-      status: product.url_path.length <= 60 ? 'pass' : 'fail'
-    });
-    
-    urlChecks.push({
-      id: 'url_hyphens',
-      text: 'استخدام الشرطات في الرابط بدلاً من المسافات',
-      status: !product.url_path.includes(' ') && !product.url_path.includes('_') ? 'pass' : 'fail'
-    });
-    
-    urlChecks.push({
-      id: 'url_lowercase',
-      text: 'الرابط بأحرف صغيرة',
-      status: product.url_path === product.url_path.toLowerCase() ? 'pass' : 'fail'
-    });
-  }
-  
-  // معايير إضافية للمحتوى
-  const contentChecks = [];
-  if (product.description) {
-    const cleanDescription = product.description.replace(/<[^>]*>/g, ' ').trim();
-    const words = cleanDescription.split(/\s+/).filter(word => word.length > 0);
-    
-    contentChecks.push({
-      id: 'readability',
-      text: `قابلية القراءة - متوسط طول الكلمة (${words.length > 0 ? Math.round(cleanDescription.length / words.length) : 0} حرف)`,
-      status: words.length > 0 && (cleanDescription.length / words.length) <= 6 ? 'pass' : 'warning'
-    });
-    
-    contentChecks.push({
-      id: 'paragraph_structure',
-      text: 'تنظيم الفقرات - استخدام عدة فقرات',
-      status: (product.description.match(/<p>/g) || []).length >= 2 ? 'pass' : 'fail'
-    });
-    
-    contentChecks.push({
-      id: 'heading_structure',
-      text: 'استخدام العناوين الفرعية (H2, H3)',
-      status: /<h[2-6]>/i.test(product.description) ? 'pass' : 'fail'
-    });
-  }
-  
-  // معايير إضافية تقنية
-  const technicalChecks = [];
-  
-  technicalChecks.push({
-    id: 'meta_title_length',
-    text: `طول Page Title مثالي (${(product.meta_title || '').length}/60 حرف)`,
-    status: product.meta_title && product.meta_title.length >= 30 && product.meta_title.length <= 60 ? 'pass' : 'warning'
-  });
-  
-  technicalChecks.push({
-    id: 'meta_description_length',
-    text: `طول Page Description مثالي (${(product.meta_description || '').length}/160 حرف)`,
-    status: product.meta_description && product.meta_description.length >= 120 && product.meta_description.length <= 160 ? 'pass' : 'warning'
-  });
-  
-  technicalChecks.push({
-    id: 'keyword_density',
-    text: 'كثافة الكلمة المفتاحية مناسبة في الوصف',
-    status: (() => {
-      if (!product.keyword || !product.description) return 'fail';
-      const cleanDescription = product.description.replace(/<[^>]*>/g, ' ').toLowerCase();
-      const keywordCount = (cleanDescription.match(new RegExp(product.keyword.toLowerCase(), 'g')) || []).length;
-      const totalWords = cleanDescription.split(/\s+/).filter(word => word.length > 0).length;
-      const density = totalWords > 0 ? (keywordCount / totalWords) * 100 : 0;
-      return density >= 1 && density <= 3 ? 'pass' : density > 3 ? 'warning' : 'fail';
-    })()
-  });
-  
-  // تجميع المعايير الإضافية
-  if (urlChecks.length > 0) {
-    urlChecks.forEach(check => additionalCriteria.push({...check, category: 'هيكل الروابط'}));
-  }
-  if (contentChecks.length > 0) {
-    contentChecks.forEach(check => additionalCriteria.push({...check, category: 'جودة المحتوى'}));
-  }
-  if (technicalChecks.length > 0) {
-    technicalChecks.forEach(check => additionalCriteria.push({...check, category: 'السيو التقني'}));
-  }
-  
-  // إضافة المعايير من analyzeSEO إذا كانت موجودة
-  if (analysis && analysis.categories) {
-    Object.entries(analysis.categories).forEach(([categoryName, checks]) => {
-      if (checks && Array.isArray(checks)) {
-        checks.forEach(check => {
-          // Skip core criteria that we handle separately
-          const coreIds = ['focus_keyword', 'keyword_in_title', 'keyword_in_first_25', 
-                          'keyword_in_meta_title', 'has_meta_description', 'description_length',
-                          'internal_links', 'image_alt_keyword'];
-          if (!coreIds.some(coreId => check.id?.includes(coreId))) {
-            additionalCriteria.push({
-              ...check,
-              category: categoryName
-            });
-          }
-        });
-      }
-    });
-  }
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
@@ -540,7 +359,7 @@ export default function ProductSEO() {
     loadProduct();
   }, [id, passedProduct]); // العودة للطريقة الأصلية البسيطة
 
-  // Analyze SEO when product changes
+  // Analyze SEO when product changes - استخدام الملف الجديد
   useEffect(() => {
     if (Object.keys(product).length > 0) {
       const result = analyzeSEO(product);
@@ -779,18 +598,18 @@ export default function ProductSEO() {
       // 1. توليد الكلمة المفتاحية
       const keyword = (await generateProductSEO(`استخرج أفضل كلمة مفتاحية لهذا المنتج للسوق السعودي: "${product.name}"`)).trim();
 
-      // 2. تحليل فئة المنتج (خلف الكواليس)
-      const categoryPrompt = `حدد فئة هذا المنتج في كلمة أو كلمتين: "${product.name}"`;
+      // 2. تحليل فئة المنتج (خلف الكواليس) - استخدام analyzeSEO
+      const seoAnalysis = analyzeSEO(product);
+      const categoryPrompt = await seoAnalysis.categorizeProduct(product);
       const category = (await generateProductSEO(categoryPrompt)).trim();
 
-      // 3. تحليل الجمهور المستهدف (خلف الكواليس) 
-      const audiencePrompt = `حدد الجمهور المستهدف لهذا المنتج: "${product.name}" من فئة "${category}"`;
+      // 3. تحليل الجمهور المستهدف (خلف الكواليس) - استخدام analyzeSEO
+      const audiencePrompt = await seoAnalysis.analyzeTargetAudience(product, category);
       const targetAudience = (await generateProductSEO(audiencePrompt)).trim();
 
-      // 4. اختيار النغمة والحبكة تلقائياً
-      const { selectTone, selectStoryArc } = analyzeSEO(product);
-      const tone = selectTone(category, targetAudience);
-      const bestStoryArc = selectStoryArc(category);
+      // 4. اختيار النغمة والحبكة تلقائياً - استخدام functions من analyzeSEO
+      const tone = seoAnalysis.selectTone(category, targetAudience);
+      const bestStoryArc = seoAnalysis.selectStoryArc(category);
 
       // حفظ بيانات التحليل في الخلفية (بدون إظهارها)
       const backgroundAnalysis = {
@@ -814,7 +633,7 @@ export default function ProductSEO() {
 
 معايير SEO الإلزامية:
 ✅ الوصف يبدأ بالكلمة المفتاحية في أول 25 كلمة
-✅ طول الوصف 120+ كلمة
+✅ طول الوصف 100+ كلمة
 ✅ استخدام HTML منظم مع روابط داخلية
 ✅ توزيع طبيعي للكلمة المفتاحية
 ✅ دعوة واضحة لاتخاذ إجراء
@@ -907,7 +726,7 @@ export default function ProductSEO() {
 النغمة: ${product.tone || 'محايدة'}
 
 متطلبات الوصف:
-- 120+ كلمة
+- 100+ كلمة
 - يبدأ بالكلمة المفتاحية
 - HTML منسق (<p>, <ul>, <li>, <h3>)
 - رابط داخلي واحد على الأقل
@@ -1081,11 +900,14 @@ export default function ProductSEO() {
     </div>
   );
 
-  // دالة رسائل التحفيز - بدون useMemo لتجنب infinite loop
+  // دالة رسائل التحفيز - استخدام analyzeSEO
   const renderMotivationalBanner = () => {
-    // حساب التقدم مباشرة بدون useMemo
-    const coreResults = checkCoreCriteria(product);
-    const progress = coreResults.score;
+    // حساب التقدم باستخدام analyzeSEO
+    let progress = 0;
+    if (Object.keys(product).length > 0) {
+      const analysisResult = analyzeSEO(product);
+      progress = analysisResult.coreScore || 0;
+    }
 
     if (!product.name) {
       return (
@@ -1339,10 +1161,11 @@ export default function ProductSEO() {
     );
   }; // إزالة useCallback dependency array
 
-  // Progress calculation using core criteria - إصلاح dependency array
+  // Progress calculation using core criteria - استخدام analyzeSEO
   const progress = useMemo(() => {
-    const coreResults = checkCoreCriteria(product);
-    return coreResults.score;
+    if (Object.keys(product).length === 0) return 0;
+    const analysisResult = analyzeSEO(product);
+    return analysisResult.coreScore || 0;
   }, [
     product.name, 
     product.keyword, 
@@ -1350,7 +1173,7 @@ export default function ProductSEO() {
     product.meta_title, 
     product.meta_description, 
     product.imageAlt
-  ]); // استخدام قيم محددة بدلاً من product object كامل
+  ]);
 
   // Loading state
   if (loading) {
@@ -1460,7 +1283,7 @@ export default function ProductSEO() {
                         ) : (
                           <>
                             <Sparkles className="w-5 h-5" />
-                            🚀 توليد شامل بالذكاء الاصطناعي
+                            🚀 التوليد الذكي
                           </>
                         )}
                       </button>
@@ -1680,7 +1503,7 @@ export default function ProductSEO() {
                   <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
                     <div className="text-purple-500 mt-0.5">📝</div>
                     <div>
-                      <strong>الوصف:</strong> ابدأ بالكلمة المفتاحية واجعل المحتوى 120+ كلمة مع روابط داخلية
+                      <strong>الوصف:</strong> ابدأ بالكلمة المفتاحية واجعل المحتوى 100+ كلمة مع روابط داخلية
                     </div>
                   </div>
                   
