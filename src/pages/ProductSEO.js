@@ -27,17 +27,15 @@ import {
   Download,
   Package,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Brain
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { generateProductSEO } from "../utils/generateProductSEO";
-import analyzeSEO from "../analyzeSEO";
+import analyzeSEO from "../analyzeSEO"; // الملف الجديد الشامل
 import TiptapEditor from "../components/TiptapEditor";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-
-
-
 
 // Constants
 const FIELD_LIMITS = {
@@ -94,98 +92,9 @@ const getScoreColor = (score) => {
   return "text-red-600";
 };
 
-// Core SEO Criteria Checker
-const checkCoreCriteria = (product) => {
-  const criteria = [];
-  const keyword = product.keyword?.trim().toLowerCase() || "";
-  const title = product.name?.trim().toLowerCase() || "";
-  const description = product.description?.trim() || "";
-  const metaTitle = product.meta_title?.trim().toLowerCase() || "";
-  const metaDescription = product.meta_description?.trim() || "";
-  const imageAlt = product.imageAlt?.trim().toLowerCase() || "";
-  
-  // Remove HTML tags for word counting
-  const cleanDescription = description.replace(/<[^>]*>/g, ' ').trim();
-  const descriptionWords = cleanDescription.split(/\s+/).filter(word => word.length > 0);
-  const first25Words = descriptionWords.slice(0, 25).join(' ').toLowerCase();
-
-  // 1. Using the ideal focus keyword
-  criteria.push({
-    id: 'focus_keyword',
-    text: 'استخدام الكلمة المفتاحية المثالية',
-    status: keyword ? 'pass' : 'fail'
-  });
-
-  // 2. Including focus keyword in product title
-  criteria.push({
-    id: 'keyword_in_title',
-    text: 'تضمين الكلمة المفتاحية في عنوان المنتج',
-    status: keyword && title.includes(keyword) ? 'pass' : 'fail'
-  });
-
-  // 3. Including focus keyword in first 25 words of description
-  criteria.push({
-    id: 'keyword_in_first_25',
-    text: 'تضمين الكلمة المفتاحية في أول 25 كلمة من الوصف',
-    status: keyword && first25Words.includes(keyword) ? 'pass' : 'fail'
-  });
-
-  // 4. Including focus keyword in SEO title (Page Title)
-  criteria.push({
-    id: 'keyword_in_meta_title',
-    text: 'تضمين الكلمة المفتاحية في Page Title عنوان السيو',
-    status: keyword && metaTitle.includes(keyword) ? 'pass' : 'fail'
-  });
-
-  // 5. Using meta description (Page Description)
-  criteria.push({
-    id: 'has_meta_description',
-    text: 'استخدام Page Description وصف الميتا',
-    status: metaDescription.length > 0 ? 'pass' : 'fail'
-  });
-
-  // 6. Description length at least 120 words
-  criteria.push({
-    id: 'description_length',
-    text: `طول الوصف لا يقل عن 120 كلمة (حالياً: ${descriptionWords.length} كلمة)`,
-    status: descriptionWords.length >= 120 ? 'pass' : 'fail'
-  });
-
-  // 7. Using internal backlinks (check for any links in description)
-  const hasLinks = /<a\s+[^>]*href=[^>]*>/i.test(description);
-  criteria.push({
-    id: 'internal_links',
-    text: 'استخدام روابط داخلية',
-    status: hasLinks ? 'pass' : 'fail'
-  });
-
-  // 8. Image ALT text includes focus keyword or product title
-  const altIncludesKeyword = keyword && imageAlt.includes(keyword);
-  const altIncludesTitle = product.name && imageAlt.includes(product.name.toLowerCase());
-  criteria.push({
-    id: 'image_alt_keyword',
-    text: 'نص ALT للصورة يحتوي على الكلمة المفتاحية أو عنوان المنتج',
-    status: altIncludesKeyword || altIncludesTitle ? 'pass' : 'fail'
-  });
-
-  const passedCount = criteria.filter(c => c.status === 'pass').length;
-  const totalCount = criteria.length;
-  const score = Math.round((passedCount / totalCount) * 100);
-
-  return {
-    criteria,
-    score,
-    passedCount,
-    totalCount
-  };
-};
-
-// Enhanced SEO Display Component - Completely Revised
+// Enhanced SEO Display Component - استخدام البيانات من analyzeSEO
 const EnhancedSEODisplay = ({ analysis, product }) => {
   const [showAdditionalCriteria, setShowAdditionalCriteria] = useState(false);
-
-  // Get core criteria results
-  const coreResults = checkCoreCriteria(product);
 
   if (!product || Object.keys(product).length === 0) {
     return (
@@ -208,6 +117,23 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
     );
   }
 
+  // استخدام البيانات من analyzeSEO
+  const coreResults = analysis?.coreResults || { criteria: [], score: 0, passedCount: 0, totalCount: 0 };
+  const additionalCategories = analysis?.categories || {};
+  
+  // تحويل المعايير الإضافية لتنسيق مناسب للعرض
+  const additionalCriteria = [];
+  Object.entries(additionalCategories).forEach(([categoryName, checks]) => {
+    if (checks && Array.isArray(checks)) {
+      checks.forEach(check => {
+        additionalCriteria.push({
+          ...check,
+          category: categoryName
+        });
+      });
+    }
+  });
+
   const getStatusIcon = (status) => {
     switch (status) {
       case 'pass': return <CheckCircle className="w-4 h-4 text-green-600" />;
@@ -225,27 +151,6 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
       default: return 'text-gray-600 bg-gray-50 border-gray-200';
     }
   };
-
-  // Additional criteria from original analysis
-  const additionalCriteria = [];
-  if (analysis && analysis.categories) {
-    Object.entries(analysis.categories).forEach(([categoryName, checks]) => {
-      if (checks && Array.isArray(checks)) {
-        checks.forEach(check => {
-          // Skip core criteria that we handle separately
-          const coreIds = ['focus_keyword', 'keyword_in_title', 'keyword_in_first_25', 
-                          'keyword_in_meta_title', 'has_meta_description', 'description_length',
-                          'internal_links', 'image_alt_keyword'];
-          if (!coreIds.includes(check.id)) {
-            additionalCriteria.push({
-              ...check,
-              category: categoryName
-            });
-          }
-        });
-      }
-    });
-  }
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
@@ -301,19 +206,19 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
         </div>
       </div>
 
-      {/* Additional Criteria - Collapsible */}
+      {/* Additional Criteria - Collapsible - مع إصلاح */}
       {additionalCriteria.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              معايير إضافية
+              معايير إضافية ({additionalCriteria.length})
             </h3>
             <button
               onClick={() => setShowAdditionalCriteria(!showAdditionalCriteria)}
               className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-blue-50 transition-colors"
             >
-              {showAdditionalCriteria ? 'إخفاء' : `عرض (${additionalCriteria.length})`}
+              {showAdditionalCriteria ? 'إخفاء' : 'عرض'}
               {showAdditionalCriteria ? (
                 <ChevronDown className="w-3 h-3" />
               ) : (
@@ -428,7 +333,7 @@ export default function ProductSEO() {
       setTrialUsage(usage);
       setIsTrialExpired(usage.used >= usage.limit);
     }
-  };
+  }; // إزالة useCallback إذا كان موجود
 
   const incrementTrialUsage = () => {
     const usage = JSON.parse(localStorage.getItem("seo_trial_usage") || "{}");
@@ -436,25 +341,25 @@ export default function ProductSEO() {
     localStorage.setItem("seo_trial_usage", JSON.stringify(usage));
     setTrialUsage(usage);
     setIsTrialExpired(usage.used >= usage.limit);
-  };
+  }; // إزالة useCallback إذا كان موجود
 
   const checkTrialAccess = () => {
     // Site owner always has access
     if (userPlan === "owner") return true;
     if (userPlan !== "free") return true;
     return trialUsage.used < trialUsage.limit;
-  };
+  }; // إزالة useCallback إذا كان موجود
 
   const showUpgradePrompt = () => {
     setShowUpgradeModal(true);
-  };
+  }; // إزالة useCallback إذا كان موجود
 
   // Load product data
   useEffect(() => {
     loadProduct();
-  }, [id, passedProduct]);
+  }, [id, passedProduct]); // العودة للطريقة الأصلية البسيطة
 
-  // Analyze SEO when product changes
+  // Analyze SEO when product changes - استخدام الملف الجديد
   useEffect(() => {
     if (Object.keys(product).length > 0) {
       const result = analyzeSEO(product);
@@ -539,7 +444,7 @@ export default function ProductSEO() {
     } finally {
       setLoading(false);
     }
-  }, [id, passedProduct]);
+  }, [id, passedProduct]); // العودة للطريقة الأصلية
 
   const handleProductChange = useCallback((field, value) => {
     // Site owner always has full access
@@ -557,12 +462,6 @@ export default function ProductSEO() {
       return;
     }
 
-    // Regular user restrictions (for future customers)
-    // if (userPlan === "free" && isTrialExpired) {
-    //   showUpgradePrompt();
-    //   return;
-    // }
-
     setProduct(prev => ({
       ...prev,
       [field]: value,
@@ -573,7 +472,7 @@ export default function ProductSEO() {
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: null }));
     }
-  }, [errors, userPlan]);
+  }, [userPlan]); // تبسيط dependency array
 
   const validateProduct = useCallback(() => {
     const newErrors = {};
@@ -594,7 +493,7 @@ export default function ProductSEO() {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [product]);
+  }, [product.name, product.meta_title, product.meta_description]); // تبسيط dependency array
 
   const handleSave = useCallback(async () => {
     if (!validateProduct()) {
@@ -667,92 +566,9 @@ export default function ProductSEO() {
     } finally {
       setSaving(false);
     }
-  }, [product, validateProduct]);
+  }, [validateProduct, product.id]); // تبسيط dependency array
 
-  const handleAnalyzeProduct = useCallback(async () => {
-    
-
-
-    if (!product.name?.trim()) {
-      setErrors(prev => ({ ...prev, analyze: "اسم المنتج مطلوب للتحليل" }));
-      return;
-    }
-
-    const {
-  categorizeProduct,
-  analyzeTargetAudience,
-  selectTone,
-  selectStoryArc
-} = analyzeSEO(product);
-
-    setGenerating(true);
-    setErrors(prev => ({ ...prev, analyze: null }));
-
-    try {
-      // Removed trial usage increment for testing
-      // if (userPlan === "free") {
-      //   incrementTrialUsage();
-      // }
-
-      // Generate keyword
-
-
-  
-      const keyword = (await generateProductSEO(`استخرج كلمة مفتاحية لهذا المنتج: "${product.name}"`)).trim();
-
-
-      // Enhanced categorization with both title AND description
-      const productName = product.name?.trim() || '';
-      const productDescription = product.description?.replace(/<[^>]*>/g, ' ').trim() || '';
-      
-     const categoryPrompt = await categorizeProduct(product);
-const category = (await generateProductSEO(categoryPrompt)).trim();
-
-
-      // Step 2: Analyze target audience based on category and product details
-      const audiencePrompt = await analyzeTargetAudience(product, category);
-const targetAudience = (await generateProductSEO(audiencePrompt)).trim();
-
-
-      const tone = selectTone(category, targetAudience);
-const bestStoryArc = selectStoryArc(category);
-
-
-      const analysis = {
-        category: category,
-        target_audience: targetAudience,
-        tone: tone,
-        best_story_arc: bestStoryArc
-      };
-      
-      setProduct(prev => ({
-        ...prev,
-        keyword: truncateText(keyword, FIELD_LIMITS.keyword_limit),
-        category: analysis.category || "",
-        target_audience: analysis.target_audience || "",
-        tone: analysis.tone || "",
-        best_story_arc: analysis.best_story_arc || "",
-      }));
-
-      setProductAnalysis(analysis);
-      
-      if (userPlan === "free") {
-        const remaining = trialUsage.limit - trialUsage.used - 1;
-        toast.success(`تم تحليل المنتج بنجاح! 🎯 (${remaining} تحليل متبقي هذا الشهر)`);
-      } else {
-        toast.success("تم تحليل المنتج بنجاح! 🎯");
-      }
-      
-    } catch (error) {
-      console.error("Error analyzing product:", error);
-      const errorMessage = error?.response?.data?.message || error?.message || "فشل في تحليل المنتج";
-      setErrors(prev => ({ ...prev, analyze: errorMessage }));
-      toast.error("❌ " + errorMessage);
-    } finally {
-      setGenerating(false);
-    }
-  }, [product.name, product.description, userPlan, checkTrialAccess, trialUsage]);
-
+  // تحديث دالة handleGenerateAll لتعمل خلف الكواليس
   const handleGenerateAll = useCallback(async () => {
     if (userPlan === "free" && !checkTrialAccess()) {
       showUpgradePrompt();
@@ -760,7 +576,8 @@ const bestStoryArc = selectStoryArc(category);
     }
 
     if (!product.name?.trim()) {
-      setErrors(prev => ({ ...prev, generate: "اسم المنتج مطلوب للتوليد" }));
+      setErrors(prev => ({ ...prev, generate: "اسم المنتج مطلوب للتوليد الذكي" }));
+      toast.error("⚠️ أدخل اسم المنتج أولاً");
       return;
     }
 
@@ -768,62 +585,73 @@ const bestStoryArc = selectStoryArc(category);
     setErrors(prev => ({ ...prev, generate: null }));
 
     try {
+      // إضافة رسالة تقدم للمستخدم
+      toast.loading("🧠 جاري التحليل والتوليد الذكي...", { id: 'generating' });
+
       // Increment trial usage for free users
       if (userPlan === "free") {
         incrementTrialUsage();
       }
 
-      // Ensure we have analysis data
-      let analysisData = productAnalysis;
-      if (!analysisData) {
-        await handleAnalyzeProduct();
-        analysisData = {
-          category: product.category || "عام",
-          target_audience: product.target_audience || "عام",
-          tone: product.tone || "محايدة",
-          best_story_arc: product.best_story_arc || "مشكلة-حل"
-        };
-      }
+      // === التحليل التلقائي خلف الكواليس ===
+      
+      // 1. توليد الكلمة المفتاحية
+      const keyword = (await generateProductSEO(`استخرج أفضل كلمة مفتاحية لهذا المنتج للسوق السعودي: "${product.name}"`)).trim();
 
-      const keyword = product.keyword || "منتج";
+      // 2. تحليل فئة المنتج (خلف الكواليس) - استخدام analyzeSEO
+      const seoAnalysis = analyzeSEO(product);
+      const categoryPrompt = await seoAnalysis.categorizeProduct(product);
+      const category = (await generateProductSEO(categoryPrompt)).trim();
 
+      // 3. تحليل الجمهور المستهدف (خلف الكواليس) - استخدام analyzeSEO
+      const audiencePrompt = await seoAnalysis.analyzeTargetAudience(product, category);
+      const targetAudience = (await generateProductSEO(audiencePrompt)).trim();
+
+      // 4. اختيار النغمة والحبكة تلقائياً - استخدام functions من analyzeSEO
+      const tone = seoAnalysis.selectTone(category, targetAudience);
+      const bestStoryArc = seoAnalysis.selectStoryArc(category);
+
+      // حفظ بيانات التحليل في الخلفية (بدون إظهارها)
+      const backgroundAnalysis = {
+        category,
+        target_audience: targetAudience,
+        tone,
+        best_story_arc: bestStoryArc
+      };
+
+      // === توليد المحتوى الأساسي ===
       const prompt = `أنت مساعد تسويق محترف متخصص في SEO للسوق السعودي.
 
-المنتج المطلوب تحسينه:
-الاسم: "${product.name}"
+المنتج: "${product.name}"
 الكلمة المفتاحية: "${keyword}"
-الفئة: "${analysisData.category}"
-الجمهور: "${analysisData.target_audience}"
-النغمة: "${analysisData.tone}"
-الحبكة: "${analysisData.best_story_arc}"
+الفئة: "${category}"
+الجمهور: "${targetAudience}"
+النغمة: "${tone}"
+الحبكة: "${bestStoryArc}"
 
-مهمتك: توليد محتوى متكامل لصفحة هذا المنتج المحدد يحقق أفضل نتائج SEO.
+مهمتك: توليد محتوى متكامل لصفحة هذا المنتج يحقق أفضل نتائج SEO.
 
 معايير SEO الإلزامية:
 ✅ الوصف يبدأ بالكلمة المفتاحية في أول 25 كلمة
-✅ طول الوصف 120+ كلمة (ليس أقل)
-✅ استخدام HTML منظم ومنسق مع روابط داخلية
+✅ طول الوصف 120+ كلمة
+✅ استخدام HTML منظم مع روابط داخلية
 ✅ توزيع طبيعي للكلمة المفتاحية
-✅ دعوة واضحة لاتخاذ إجراء في النهاية
+✅ دعوة واضحة لاتخاذ إجراء
 
-هيكل الوصف المطلوب (مهم جداً):
-1. فقرة افتتاحية قوية تبدأ بالكلمة المفتاحية <p>
-2. قسم "المميزات الرئيسية" <h3>
-3. قائمة 4-6 مميزات <ul><li>
-4. قسم "كيفية الاستخدام" <h3>  
-5. شرح بسيط للاستخدام <p>
-6. فقرة ختامية تحفيزية مع CTA <p>
-7. تضمين رابط داخلي واحد على الأقل
-
-تنبيه مهم: يجب أن يكون المحتوى متناسب تماماً مع طبيعة المنتج "${product.name}".
+هيكل الوصف المطلوب:
+1. فقرة افتتاحية تبدأ بالكلمة المفتاحية
+2. قسم المميزات الرئيسية مع قائمة
+3. قسم كيفية الاستخدام  
+4. فقرة ختامية مع CTA
+5. رابط داخلي واحد على الأقل
 
 أعد JSON فقط:
 {
   "name": "عنوان محسن يحتوي الكلمة المفتاحية (أقل من 70 حرف)",
-  "description": "وصف HTML منسق حسب المعايير أعلاه مع روابط داخلية",
+  "description": "وصف HTML منسق حسب المعايير أعلاه",
   "keyword": "${keyword}",
-  "meta_title": "Page Title عنوان السيو جذاب (50-60 حرف)",
-  "meta_description": "Page Description وصف الميتا مقنع يحتوي الكلمة المفتاحية (150-160 حرف)",
+  "meta_title": "Page Title جذاب (50-60 حرف)",
+  "meta_description": "Page Description مقنع (150-160 حرف)",
   "url_path": "مسار-url-صديق-لمحركات-البحث",
   "imageAlt": "وصف بديل للصورة يحتوي الكلمة المفتاحية"
 }`;
@@ -832,7 +660,7 @@ const bestStoryArc = selectStoryArc(category);
       const jsonMatch = generated.match(/{[\s\S]*}/);
       
       if (!jsonMatch) {
-        throw new Error("لم يتم العثور على JSON صالح في الإجابة");
+        throw new Error("فشل في توليد المحتوى");
       }
 
       const fields = JSON.parse(jsonMatch[0]);
@@ -844,6 +672,8 @@ const bestStoryArc = selectStoryArc(category);
         meta_title: truncateText(fields.meta_title, FIELD_LIMITS.meta_title),
         meta_description: truncateText(fields.meta_description, FIELD_LIMITS.meta_description),
         keyword: keyword,
+        // حفظ بيانات التحليل في الخلفية
+        ...backgroundAnalysis
       };
 
       setProduct(prev => ({
@@ -851,30 +681,25 @@ const bestStoryArc = selectStoryArc(category);
         ...processedFields,
       }));
 
+      // رسالة نجاح محسنة
+      toast.success("🎉 تم التوليد الذكي بنجاح!", { id: 'generating' });
+      
       if (userPlan === "free") {
         const remaining = trialUsage.limit - trialUsage.used - 1;
-        toast.success(`تم توليد جميع الحقول بنجاح! ✨ (${remaining} تحليل متبقي هذا الشهر)`);
-      } else {
-        toast.success("تم توليد جميع الحقول بنجاح! ✨");
+        toast.success(`✨ ${remaining} توليدة مجانية متبقية هذا الشهر`, { duration: 4000 });
       }
 
     } catch (error) {
       console.error("Error generating fields:", error);
-      const errorMessage = error?.response?.data?.message || error?.message || "فشل في توليد المحتوى";
+      toast.error("❌ فشل في التوليد الذكي", { id: 'generating' });
+      const errorMessage = error?.response?.data?.message || error?.message || "فشل في التوليد الذكي";
       setErrors(prev => ({ ...prev, generate: errorMessage }));
-      toast.error("❌ " + errorMessage);
     } finally {
       setGenerating(false);
     }
-  }, [product, productAnalysis, userPlan, checkTrialAccess, trialUsage, handleAnalyzeProduct]);
+  }, [userPlan, trialUsage.used, trialUsage.limit, product.name, checkTrialAccess]); // تبسيط dependency array
 
   const handleGenerateField = useCallback(async (fieldType) => {
-    // Remove restrictions for testing - allow all AI generation
-    // if (!canUseAI) {
-    //   toast.error("تحتاج لترقية خطتك لاستخدام التوليد التلقائي");
-    //   return;
-    // }
-
     setFieldLoading(fieldType);
     setErrors(prev => ({ ...prev, [fieldType]: null }));
 
@@ -997,28 +822,140 @@ const bestStoryArc = selectStoryArc(category);
         imageAlt: 'النص البديل للصورة'
       };
 
-      toast.success(`تم توليد ${fieldLabels[fieldType]} بنجاح! 🎯`);
+      toast.success(`تم التوليد الذكي لـ${fieldLabels[fieldType]} بنجاح! 🎯`);
 
     } catch (error) {
       console.error(`Error generating ${fieldType}:`, error);
-      const errorMessage = error?.response?.data?.message || error?.message || `فشل في توليد ${fieldType}`;
+      const errorMessage = error?.response?.data?.message || error?.message || `فشل في التوليد الذكي لـ${fieldType}`;
       setErrors(prev => ({ ...prev, [fieldType]: errorMessage }));
       toast.error("❌ " + errorMessage);
     } finally {
       setFieldLoading("");
     }
-  }, [product, canUseAI]);
+  }, [product.name, product.description, product.keyword, product.category, product.tone]); // تبسيط dependency array
 
-  const copyToClipboard = useCallback(async (text, label) => {
+  const copyToClipboard = async (text, label) => {
     try {
       await navigator.clipboard.writeText(text);
       toast.success(`تم نسخ ${label} للحافظة! 📋`);
     } catch (error) {
       toast.error("فشل في النسخ");
     }
-  }, []);
+  }; // إزالة useCallback
 
-  const renderInputField = useCallback((label, key, multiline = false, placeholder = "", icon = null) => {
+  // دالة العنوان الرئيسي المحسن
+  const renderPageHeader = () => (
+    <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center gap-4">
+        <Link 
+          to="/products" 
+          className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          العودة للمنتجات
+        </Link>
+        <div className="h-6 w-px bg-gray-300"></div>
+        <h1 className="text-2xl font-bold text-gray-900">
+          تحسين السيو الذكي
+        </h1>
+        {generating && (
+          <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full flex items-center gap-2">
+            <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent"></div>
+            جاري التوليد...
+          </span>
+        )}
+        {hasUnsavedChanges && !generating && (
+          <span className="px-3 py-1 bg-orange-100 text-orange-800 text-sm rounded-full">
+            • تغييرات غير محفوظة
+          </span>
+        )}
+      </div>
+      
+      <div className="flex items-center gap-3">
+        {/* شارات الخطة */}
+        {userPlan === "owner" && (
+          <div className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium">
+            👑 مالك الموقع
+          </div>
+        )}
+        {userPlan === "free" && userPlan !== "owner" && (
+          <div className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-lg text-sm font-medium">
+            💎 تجربة مجانية: {trialUsage.used}/{trialUsage.limit}
+          </div>
+        )}
+        
+        {/* زر المعاينة محسن */}
+        <button
+          onClick={() => setShowPreview(!showPreview)}
+          className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
+            showPreview 
+              ? "bg-green-100 text-green-700 hover:bg-green-200" 
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+          }`}
+        >
+          <Eye className="w-4 h-4" />
+          {showPreview ? '✅ معاينة Google' : '👁️ معاينة Google'}
+        </button>
+      </div>
+    </div>
+  );
+
+  // دالة رسائل التحفيز - استخدام analyzeSEO
+  const renderMotivationalBanner = () => {
+    // حساب التقدم باستخدام analyzeSEO
+    let progress = 0;
+    if (Object.keys(product).length > 0) {
+      const analysisResult = analyzeSEO(product);
+      progress = analysisResult.coreScore || 0;
+    }
+
+    if (!product.name) {
+      return (
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-6 border border-blue-100">
+          <div className="flex items-center gap-4">
+            <div className="text-4xl">🚀</div>
+            <div>
+              <h3 className="font-bold text-blue-900 text-lg">ابدأ رحلة تحسين السيو!</h3>
+              <p className="text-blue-700">أدخل اسم منتجك وسنقوم بتوليد محتوى محسن تلقائياً</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (progress < 50) {
+      return (
+        <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-6 mb-6 border border-amber-100">
+          <div className="flex items-center gap-4">
+            <div className="text-4xl">⚡</div>
+            <div>
+              <h3 className="font-bold text-amber-900 text-lg">استخدم التوليد الذكي!</h3>
+              <p className="text-amber-700">اضغط "التوليد الذكي" لإنشاء محتوى محسن تلقائياً</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (progress >= 85) {
+      return (
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 mb-6 border border-green-100">
+          <div className="flex items-center gap-4">
+            <div className="text-4xl">🎉</div>
+            <div>
+              <h3 className="font-bold text-green-900 text-lg">ممتاز! منتجك محسن بالكامل</h3>
+              <p className="text-green-700">لا تنس حفظ التغييرات قبل المغادرة</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    return null;
+  };
+
+  // دالة الحقول المبسطة - إزالة useCallback لتجنب مشاكل dependency
+  const renderInputField = (label, key, multiline = false, placeholder = "", icon = null) => {
     const hasError = errors[key];
     const isLoading = fieldLoading === key;
     const fieldValue = product[key] || "";
@@ -1043,70 +980,32 @@ const bestStoryArc = selectStoryArc(category);
               {isLocked && <span className="text-xs text-red-600 bg-red-100 px-2 py-1 rounded">🔒 مؤمن</span>}
             </label>
             <div className="flex items-center gap-2">
-              {userPlan !== "free" && (
+              {/* أيقونة ذكاء اصطناعي بسيطة */}
+              {(userPlan !== "free" || checkTrialAccess()) && !isLocked && (
                 <button
                   onClick={() => handleGenerateField(key)}
-                  className={`px-3 py-1 text-xs rounded-lg font-medium transition-all flex items-center gap-1 ${
+                  className={`p-2 rounded-lg transition-all ${
                     isLoading 
                       ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
-                      : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                      : "bg-blue-100 text-blue-700 hover:bg-blue-200 hover:scale-105"
                   }`}
                   disabled={isLoading}
-                  title="توليد ذكي"
+                  title="التوليد الذكي"
                 >
                   {isLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent"></div>
-                      جاري التوليد...
-                    </>
+                    <div className="animate-spin rounded-full h-4 w-4 border border-yellow-600 border-t-transparent"></div>
                   ) : (
-                    <>
-                      <Wand2 className="w-3 h-3" />
-                      توليد ذكي
-                    </>
+                    <Brain className="w-4 h-4" />
                   )}
-                </button>
-              )}
-              {userPlan === "free" && checkTrialAccess() && (
-                <button
-                  onClick={() => handleGenerateField(key)}
-                  className={`px-3 py-1 text-xs rounded-lg font-medium transition-all flex items-center gap-1 ${
-                    isLoading 
-                      ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
-                      : "bg-green-100 text-green-700 hover:bg-green-200"
-                  }`}
-                  disabled={isLoading}
-                  title={`توليد ذكي (${trialUsage.limit - trialUsage.used} متبقي)`}
-                >
-                  {isLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent"></div>
-                      جاري التوليد...
-                    </>
-                  ) : (
-                    <>
-                      <Wand2 className="w-3 h-3" />
-                      تجربة مجانية ({trialUsage.limit - trialUsage.used})
-                    </>
-                  )}
-                </button>
-              )}
-              {userPlan === "free" && !checkTrialAccess() && (
-                <button
-                  onClick={showUpgradePrompt}
-                  className="px-3 py-1 text-xs rounded-lg font-medium bg-red-100 text-red-700 hover:bg-red-200 transition-all flex items-center gap-1"
-                >
-                  <Crown className="w-3 h-3" />
-                  ترقية مطلوبة
                 </button>
               )}
               {fieldValue && !isLocked && (
                 <button
                   onClick={() => copyToClipboard(fieldValue, label)}
-                  className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors"
+                  className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
                   title="نسخ"
                 >
-                  <Copy className="w-3 h-3" />
+                  <Copy className="w-4 h-4" />
                 </button>
               )}
             </div>
@@ -1142,7 +1041,7 @@ const bestStoryArc = selectStoryArc(category);
           {/* Rich text editor note */}
           {!isLocked && (
             <div className="text-xs text-gray-500 mt-2">
-              💡 استخدم المحرر لإضافة <strong>التنسيق</strong>، <strong>الروابط الداخلية</strong>، والقوائم المنظمة
+              💡 استخدم المحرر لإضافة <strong>التنسيق</strong>، <strong>الروابط الداخلية</strong>، والقوائم المنظمة | أو جرب التوليد الذكي 🧠
             </div>
           )}
         </div>
@@ -1165,70 +1064,32 @@ const bestStoryArc = selectStoryArc(category);
                 {charCount}{charLimit && `/${charLimit}`}
               </span>
             )}
-            {userPlan !== "free" && (
+            {/* أيقونة ذكاء اصطناعي بسيطة */}
+            {(userPlan !== "free" || checkTrialAccess()) && !isLocked && (
               <button
                 onClick={() => handleGenerateField(key)}
-                className={`px-3 py-1 text-xs rounded-lg font-medium transition-all flex items-center gap-1 ${
+                className={`p-2 rounded-lg transition-all ${
                   isLoading 
                     ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
-                    : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                    : "bg-blue-100 text-blue-700 hover:bg-blue-200 hover:scale-105"
                 }`}
                 disabled={isLoading}
-                title="توليد ذكي"
+                                  title="التوليد الذكي"
               >
                 {isLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent"></div>
-                    جاري...
-                  </>
+                  <div className="animate-spin rounded-full h-4 w-4 border border-yellow-600 border-t-transparent"></div>
                 ) : (
-                  <>
-                    <Wand2 className="w-3 h-3" />
-                    توليد
-                  </>
+                  <Brain className="w-4 h-4" />
                 )}
-              </button>
-            )}
-            {userPlan === "free" && checkTrialAccess() && (
-              <button
-                onClick={() => handleGenerateField(key)}
-                className={`px-3 py-1 text-xs rounded-lg font-medium transition-all flex items-center gap-1 ${
-                  isLoading 
-                    ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
-                    : "bg-green-100 text-green-700 hover:bg-green-200"
-                }`}
-                disabled={isLoading}
-                title={`توليد ذكي (${trialUsage.limit - trialUsage.used} متبقي)`}
-              >
-                {isLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent"></div>
-                    جاري...
-                  </>
-                ) : (
-                  <>
-                    <Wand2 className="w-3 h-3" />
-                    تجربة ({trialUsage.limit - trialUsage.used})
-                  </>
-                )}
-              </button>
-            )}
-            {userPlan === "free" && !checkTrialAccess() && (
-              <button
-                onClick={showUpgradePrompt}
-                className="px-3 py-1 text-xs rounded-lg font-medium bg-red-100 text-red-700 hover:bg-red-200 transition-all flex items-center gap-1"
-              >
-                <Crown className="w-3 h-3" />
-                ترقية
               </button>
             )}
             {fieldValue && !isLocked && (
               <button
                 onClick={() => copyToClipboard(fieldValue, label)}
-                className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors"
+                className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
                 title="نسخ"
               >
-                <Copy className="w-3 h-3" />
+                <Copy className="w-4 h-4" />
               </button>
             )}
           </div>
@@ -1288,7 +1149,7 @@ const bestStoryArc = selectStoryArc(category);
         )}
         {key === 'keyword' && !isLocked && (
           <div className="text-xs text-gray-500 mt-2">
-            💡 اختر كلمة مفتاحية بحجم بحث عالي ومنافسة معقولة
+            💡 اختر كلمة مفتاحية بحجم بحث عالي ومنافسة معقولة - أو جرب التوليد الذكي 🧠
           </div>
         )}
         {key === 'url_path' && !isLocked && (
@@ -1298,13 +1159,21 @@ const bestStoryArc = selectStoryArc(category);
         )}
       </div>
     );
-  }, [product, errors, fieldLoading, userPlan, isTrialExpired, trialUsage, checkTrialAccess, handleGenerateField, handleProductChange, copyToClipboard, showUpgradePrompt]);
+  }; // إزالة useCallback dependency array
 
-  // Progress calculation using core criteria
+  // Progress calculation using core criteria - استخدام analyzeSEO
   const progress = useMemo(() => {
-    const coreResults = checkCoreCriteria(product);
-    return coreResults.score;
-  }, [product]);
+    if (Object.keys(product).length === 0) return 0;
+    const analysisResult = analyzeSEO(product);
+    return analysisResult.coreScore || 0;
+  }, [
+    product.name, 
+    product.keyword, 
+    product.description, 
+    product.meta_title, 
+    product.meta_description, 
+    product.imageAlt
+  ]);
 
   // Loading state
   if (loading) {
@@ -1351,52 +1220,8 @@ const bestStoryArc = selectStoryArc(category);
         <Sidebar />
         <main className="flex-1 p-6 max-w-7xl mx-auto">
           
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <Link 
-                to="/products" 
-                className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                العودة للمنتجات
-              </Link>
-              <div className="h-6 w-px bg-gray-300"></div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                تحليل وتحسين السيو
-              </h1>
-              {hasUnsavedChanges && (
-                <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
-                  تغييرات غير محفوظة
-                </span>
-              )}
-            </div>
-            
-            <div className="flex items-center gap-3">
-              {userPlan === "owner" && (
-                <div className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium">
-                  👑 مالك الموقع - وصول كامل
-                </div>
-              )}
-              {userPlan === "free" && userPlan !== "owner" && (
-                <div className="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-4 py-2 rounded-lg text-sm font-medium">
-                  💎 التجربة المجانية: {trialUsage.used}/{trialUsage.limit} تحليل مستخدم
-                </div>
-              )}
-              {userPlan !== "free" && userPlan !== "owner" && (
-                <div className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium">
-                  ✨ عضوية مميزة - استخدام غير محدود
-                </div>
-              )}
-              <button
-                onClick={() => setShowPreview(!showPreview)}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2"
-              >
-                <Eye className="w-4 h-4" />
-                {showPreview ? 'إخفاء المعاينة' : 'معاينة Google'}
-              </button>
-            </div>
-          </div>
+          {/* Header المحسن */}
+          {renderPageHeader()}
 
           {/* Error Display */}
           {(errors.save || errors.generate || errors.analyze) && (
@@ -1409,94 +1234,93 @@ const bestStoryArc = selectStoryArc(category);
             </div>
           )}
 
+          {/* Motivational Banner */}
+          {renderMotivationalBanner()}
+
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
             
             {/* Main Content */}
             <div className="xl:col-span-2 space-y-6">
               
-              {/* Product Header */}
+              {/* Product Header المبسط - بدون تكرار */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                     <Package className="w-5 h-5 text-blue-500" />
                     معلومات المنتج
                   </h2>
-                  <div className="flex gap-2">
-                    {userPlan !== "free" && (
+                  <div className="flex gap-3">
+                    {/* زر التوليد الشامل */}
+                    {(userPlan !== "free" || checkTrialAccess()) && (
                       <button
                         onClick={handleGenerateAll}
-                        disabled={generating}
-                        className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                        disabled={generating || !product.name?.trim()}
+                        className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 shadow-sm ${
                           generating 
                             ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
-                            : "bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600"
+                            : !product.name?.trim()
+                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                              : userPlan === "free"
+                                ? "bg-gradient-to-r from-green-500 to-blue-500 text-white hover:from-green-600 hover:to-blue-600 hover:shadow-md"
+                                : "bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 hover:shadow-md"
                         }`}
                       >
                         {generating ? (
                           <>
-                            <div className="animate-spin rounded-full h-4 w-4 border border-yellow-600 border-t-transparent"></div>
-                            جاري التوليد...
+                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-yellow-600 border-t-transparent"></div>
+                            جاري التوليد الذكي...
+                          </>
+                        ) : !product.name?.trim() ? (
+                          <>
+                            <Sparkles className="w-5 h-5" />
+                            أدخل اسم المنتج أولاً
+                          </>
+                        ) : userPlan === "free" ? (
+                          <>
+                            <Sparkles className="w-5 h-5" />
+                            🎯 التوليد الذكي مجاناً ({trialUsage.limit - trialUsage.used} متبقي)
                           </>
                         ) : (
                           <>
-                            <Sparkles className="w-4 h-4" />
-                            توليد شامل بالذكاء الاصطناعي
+                            <Sparkles className="w-5 h-5" />
+                            🚀 التوليد الذكي
                           </>
                         )}
                       </button>
                     )}
-                    {userPlan === "free" && checkTrialAccess() && (
-                      <button
-                        onClick={handleGenerateAll}
-                        disabled={generating}
-                        className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
-                          generating 
-                            ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
-                            : "bg-gradient-to-r from-green-500 to-blue-500 text-white hover:from-green-600 hover:to-blue-600"
-                        }`}
-                      >
-                        {generating ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border border-yellow-600 border-t-transparent"></div>
-                            جاري التوليد...
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles className="w-4 h-4" />
-                            تجربة مجانية ({trialUsage.limit - trialUsage.used})
-                          </>
-                        )}
-                      </button>
-                    )}
+
+                    {/* زر الترقية للمستخدمين المنتهية تجربتهم */}
                     {userPlan === "free" && !checkTrialAccess() && (
                       <button
                         onClick={showUpgradePrompt}
-                        className="px-4 py-2 rounded-lg font-medium bg-gradient-to-r from-red-500 to-pink-500 text-white hover:from-red-600 hover:to-pink-600 transition-all flex items-center gap-2"
+                        className="px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-red-500 to-pink-500 text-white hover:from-red-600 hover:to-pink-600 transition-all flex items-center gap-2 shadow-sm hover:shadow-md"
                       >
-                        <Crown className="w-4 h-4" />
-                        ترقية للاستمرار
+                        <Crown className="w-5 h-5" />
+                        🔓 ترقية للاستمرار
                       </button>
                     )}
+
+                    {/* زر الحفظ */}
                     <button
                       onClick={handleSave}
                       disabled={saving || !hasUnsavedChanges || (userPlan === "free" && isTrialExpired)}
-                      className={`px-6 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                      className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 shadow-sm ${
                         saving 
                           ? "bg-blue-100 text-blue-700 cursor-not-allowed"
                           : hasUnsavedChanges && !(userPlan === "free" && isTrialExpired)
-                            ? "bg-blue-600 text-white hover:bg-blue-700" 
+                            ? "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md" 
                             : "bg-gray-100 text-gray-400 cursor-not-allowed"
                       }`}
                     >
                       {saving ? (
                         <>
-                          <div className="animate-spin rounded-full h-4 w-4 border border-blue-600 border-t-transparent"></div>
+                          <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent"></div>
                           جاري الحفظ...
                         </>
                       ) : (
                         <>
-                          <Save className="w-4 h-4" />
-                          {userPlan === "free" && isTrialExpired ? "🔒 حفظ مؤمن" : "حفظ التغييرات"}
+                          <Save className="w-5 h-5" />
+                          {userPlan === "free" && isTrialExpired ? "🔒 حفظ مؤمن" : hasUnsavedChanges ? "💾 حفظ التغييرات" : "✅ محفوظ"}
                         </>
                       )}
                     </button>
@@ -1505,126 +1329,34 @@ const bestStoryArc = selectStoryArc(category);
 
                 {/* Last Updated */}
                 {product.lastUpdated && (
-                  <div className="text-xs text-gray-500 mb-4 flex items-center gap-1">
+                  <div className="text-xs text-gray-500 flex items-center gap-1">
                     <RefreshCw className="w-3 h-3" />
                     آخر تحديث: {formatDate(product.lastUpdated)}
                   </div>
                 )}
 
-                {/* Product Analysis Section */}
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 mb-6 border border-blue-100">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-                      <Target className="w-4 h-4 text-blue-500" />
-                      تحليل المنتج والجمهور
-                    </h3>
-                    {userPlan === "free" && checkTrialAccess() && (
-                      <button
-                        onClick={handleAnalyzeProduct}
-                        disabled={generating}
-                        className={`px-3 py-1 text-xs rounded-lg font-medium transition-all flex items-center gap-1 ${
-                          generating 
-                            ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
-                            : "bg-green-600 text-white hover:bg-green-700"
-                        }`}
-                      >
-                        {generating ? (
-                          <>
-                            <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent"></div>
-                            تحليل...
-                          </>
-                        ) : (
-                          <>
-                            <Zap className="w-3 h-3" />
-                            تجربة مجانية ({trialUsage.limit - trialUsage.used})
-                          </>
-                        )}
-                      </button>
-                    )}
-                    {userPlan === "free" && !checkTrialAccess() && (
-                      <button
-                        onClick={showUpgradePrompt}
-                        className="px-3 py-1 text-xs rounded-lg font-medium bg-red-600 text-white hover:bg-red-700 transition-all flex items-center gap-1"
-                      >
-                        <Crown className="w-3 h-3" />
-                        ترقية مطلوبة
-                      </button>
-                    )}
-                    {userPlan !== "free" && (
-                      <button
-                        onClick={handleAnalyzeProduct}
-                        disabled={generating}
-                        className={`px-3 py-1 text-xs rounded-lg font-medium transition-all flex items-center gap-1 ${
-                          generating 
-                            ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
-                            : "bg-blue-600 text-white hover:bg-blue-700"
-                        }`}
-                      >
-                        {generating ? (
-                          <>
-                            <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent"></div>
-                            تحليل...
-                          </>
-                        ) : (
-                          <>
-                            <Zap className="w-3 h-3" />
-                            تحليل ذكي
-                          </>
-                        )}
-                      </button>
-                    )}
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium text-gray-600 mb-1 block">📦 فئة المنتج</label>
-                      <input
-                        type="text"
-                        value={product.category || ""}
-                        onChange={(e) => handleProductChange('category', e.target.value)}
-                        placeholder="مثل: إلكترونيات، ملابس، منزل..."
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="text-sm font-medium text-gray-600 mb-1 block">🎯 الجمهور المستهدف</label>
-                      <input
-                        type="text"
-                        value={product.target_audience || ""}
-                        onChange={(e) => handleProductChange('target_audience', e.target.value)}
-                        placeholder="مثل: الشباب، العائلات، المهنيين..."
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="text-sm font-medium text-gray-600 mb-1 block">🎭 النغمة</label>
-                      <select
-                        value={product.tone || ""}
-                        onChange={(e) => handleProductChange('tone', e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                      >
-                        {TONE_OPTIONS.map(option => (
-                          <option key={option.value} value={option.value}>{option.label}</option>
-                        ))}
-                      </select>
-                    </div>
-                    
-                    <div>
-                      <label className="text-sm font-medium text-gray-600 mb-1 block">📖 الحبكة التسويقية</label>
-                      <select
-                        value={product.best_story_arc || ""}
-                        onChange={(e) => handleProductChange('best_story_arc', e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                      >
-                        {STORY_ARC_OPTIONS.map(option => (
-                          <option key={option.value} value={option.value}>{option.label}</option>
-                        ))}
-                      </select>
+                {/* معلومات سريعة للتجربة المجانية */}
+                {userPlan === "free" && (
+                  <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100">
+                    <div className="flex items-center gap-3">
+                      <div className="text-2xl">🎁</div>
+                      <div>
+                        <div className="font-semibold text-blue-800">التجربة المجانية</div>
+                        <div className="text-sm text-blue-600">
+                          استخدمت {trialUsage.used} من {trialUsage.limit} توليدات ذكية هذا الشهر
+                        </div>
+                      </div>
+                      {!checkTrialAccess() && (
+                        <button
+                          onClick={showUpgradePrompt}
+                          className="mr-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                        >
+                          ترقية الآن
+                        </button>
+                      )}
                     </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Google Preview */}
@@ -1744,7 +1476,7 @@ const bestStoryArc = selectStoryArc(category);
             {/* Sidebar */}
             <div className="space-y-6">
               
-              {/* SEO Score */}
+              {/* SEO Score - مع شريط تقدم واحد فقط */}
               <EnhancedSEODisplay analysis={score} product={product} />
 
               {/* Quick Tips */}
@@ -1757,7 +1489,7 @@ const bestStoryArc = selectStoryArc(category);
                   <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
                     <div className="text-blue-500 mt-0.5">💡</div>
                     <div>
-                      <strong>الكلمة المفتاحية:</strong> اختر كلمة لها حجم بحث جيد ومنافسة معقولة
+                      <strong>الكلمة المفتاحية:</strong> اختر كلمة لها حجم بحث جيد ومنافسة معقولة - أو استخدم التوليد الذكي 🧠
                     </div>
                   </div>
                   
@@ -1771,7 +1503,7 @@ const bestStoryArc = selectStoryArc(category);
                   <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
                     <div className="text-purple-500 mt-0.5">📝</div>
                     <div>
-                      <strong>الوصف:</strong> ابدأ بالكلمة المفتاحية واجعل المحتوى 120+ كلمة مع روابط داخلية
+                      <strong>الوصف:</strong> ابدأ بالكلمة المفتاحية واجعل المحتوى 120+ كلمة مع روابط داخلية - أو دع التوليد الذكي يتولى الأمر! 🚀
                     </div>
                   </div>
                   
@@ -1779,73 +1511,6 @@ const bestStoryArc = selectStoryArc(category);
                     <div className="text-orange-500 mt-0.5">🔗</div>
                     <div>
                       <strong>الروابط الداخلية:</strong> استخدم أداة الرابط 🔗 في شريط أدوات المحرر لإضافة روابط لصفحات أخرى في موقعك
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Progress Summary */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-green-500" />
-                  ملخص التقدم
-                </h3>
-                
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">النقاط الإجمالية</span>
-                    <span className={`font-bold ${getScoreColor(progress)}`}>
-                      {progress}%
-                    </span>
-                  </div>
-                  
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className={`h-2 rounded-full transition-all duration-500 ${
-                        progress >= 85 ? 'bg-green-500' : 
-                        progress >= 70 ? 'bg-blue-500' :
-                        progress >= 50 ? 'bg-amber-500' : 'bg-red-500'
-                      }`}
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                  
-                  <div className="text-xs text-gray-500 text-center">
-                    {progress >= 85 && "ممتاز! 🎉"}
-                    {progress >= 70 && progress < 85 && "جيد جداً! 👍"}
-                    {progress >= 50 && progress < 70 && "يحتاج تحسين 📈"}
-                    {progress < 50 && "ابدأ التحسين 🚀"}
-                  </div>
-                  
-                  {/* Core Field completion status */}
-                  <div className="pt-4 border-t border-gray-100">
-                    <div className="text-sm font-medium text-gray-700 mb-2">المعايير الأساسية:</div>
-                    <div className="grid grid-cols-1 gap-2 text-xs">
-                      {[
-                        { key: 'keyword', label: 'الكلمة المفتاحية' },
-                        { key: 'name', label: 'عنوان يحتوي الكلمة المفتاحية' },
-                        { key: 'description', label: 'وصف 120+ كلمة' },
-                        { key: 'meta_title', label: 'Page Title' },
-                        { key: 'meta_description', label: 'Page Description' },
-                        { key: 'imageAlt', label: 'Image Alt' }
-                      ].map(field => {
-                        const coreResults = checkCoreCriteria(product);
-                        const criterion = coreResults.criteria.find(c => c.id.includes(field.key) || c.text.includes(field.label));
-                        const isComplete = criterion?.status === 'pass';
-                        
-                        return (
-                          <div key={field.key} className="flex items-center gap-2">
-                            {isComplete ? (
-                              <CheckCircle className="w-3 h-3 text-green-500" />
-                            ) : (
-                              <XCircle className="w-3 h-3 text-gray-400" />
-                            )}
-                            <span className={isComplete ? 'text-green-700' : 'text-gray-500'}>
-                              {field.label}
-                            </span>
-                          </div>
-                        );
-                      })}
                     </div>
                   </div>
                 </div>
@@ -1879,4 +1544,3 @@ const bestStoryArc = selectStoryArc(category);
     </>
   );
 }
-  
