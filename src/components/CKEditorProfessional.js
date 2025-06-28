@@ -1,179 +1,135 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import { 
+    ClassicEditor, 
+    Essentials, 
+    Bold, 
+    Italic, 
+    Underline,
+    Paragraph,
+    Heading,
+    Link,
+    List,
+    BlockQuote,
+    Indent,
+    Table,
+    TableToolbar,
+    PasteFromOffice,
+    Undo
+} from 'ckeditor5';
 
 const CKEditorProfessional = ({ 
   value = '', 
   onChange, 
   placeholder = 'اكتب وصف المنتج هنا...'
 }) => {
-  const editorRef = useRef();
-  const [editorInstance, setEditorInstance] = useState(null);
-  const [isReady, setIsReady] = useState(false);
 
-  useEffect(() => {
-    // Load CKEditor 5 from CDN
-    const script = document.createElement('script');
-    script.src = 'https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js';
-    script.async = true;
-    
-    script.onload = () => {
-      if (window.ClassicEditor && editorRef.current) {
-        window.ClassicEditor
-          .create(editorRef.current, {
-            language: 'ar',
-            toolbar: {
-              items: [
-                'heading',
-                '|',
-                'bold',
-                'italic',
-                'underline',
-                '|',
-                'link',
-                'bulletedList',
-                'numberedList',
-                '|',
-                'outdent',
-                'indent',
-                '|',
-                'blockQuote',
-                'insertTable',
-                '|',
-                'undo',
-                'redo'
-              ],
-              shouldNotGroupWhenFull: true
-            },
-            // RTL interface configuration
-            ui: {
-              language: 'ar'
-            },
-            heading: {
-              options: [
-                { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
-                { model: 'heading2', view: 'h2', title: 'عنوان رئيسي', class: 'ck-heading_heading2' },
-                { model: 'heading3', view: 'h3', title: 'عنوان فرعي', class: 'ck-heading_heading3' }
-              ]
-            },
-            table: {
-              contentToolbar: [
-                'tableColumn',
-                'tableRow',
-                'mergeTableCells'
-              ]
-            },
-            placeholder: placeholder,
-            // RTL support
-            content: {
-              styles: [
-                {
-                  name: 'Arabic text',
-                  element: 'p',
-                  classes: ['rtl-content']
-                }
-              ]
-            }
-          })
-          .then(editor => {
-            setEditorInstance(editor);
-            setIsReady(true);
-            
-            // Set initial content
-            if (value) {
-              editor.setData(value);
-            }
-            
-            // Listen for changes
-            editor.model.document.on('change:data', () => {
-              const data = editor.getData();
-              onChange(data);
-            });
+  const editorConfiguration = {
+    plugins: [
+      Essentials,
+      Bold,
+      Italic,
+      Underline,
+      Paragraph,
+      Heading,
+      Link,
+      List,
+      BlockQuote,
+      Indent,
+      Table,
+      TableToolbar,
+      PasteFromOffice,
+      Undo
+    ],
+    toolbar: {
+      items: [
+        'heading',
+        '|',
+        'bold',
+        'italic',
+        'underline',
+        '|',
+        'link',
+        'bulletedList',
+        'numberedList',
+        '|',
+        'outdent',
+        'indent',
+        '|',
+        'blockQuote',
+        'insertTable',
+        '|',
+        'undo',
+        'redo'
+      ],
+      shouldNotGroupWhenFull: true
+    },
+    heading: {
+      options: [
+        { model: 'paragraph', title: 'فقرة', class: 'ck-heading_paragraph' },
+        { model: 'heading2', view: 'h2', title: 'عنوان رئيسي (H2)', class: 'ck-heading_heading2' },
+        { model: 'heading3', view: 'h3', title: 'عنوان فرعي (H3)', class: 'ck-heading_heading3' }
+      ]
+    },
+    link: {
+      addTargetToExternalLinks: true,
+      defaultProtocol: 'https://'
+    },
+    table: {
+      contentToolbar: [
+        'tableColumn',
+        'tableRow',
+        'mergeTableCells'
+      ]
+    },
+    placeholder: placeholder,
+    language: 'ar'
+  };
 
+  return (
+    <div className="ckeditor-simple-container">
+      
+      {/* CKEditor Only */}
+      <div className="editor-wrapper">
+        <CKEditor
+          editor={ClassicEditor}
+          config={editorConfiguration}
+          data={value || ''}
+          onChange={(event, editor) => {
+            const data = editor.getData();
+            onChange(data);
+          }}
+          onReady={(editor) => {
+            console.log('✅ CKEditor جاهز للاستخدام');
+            
             // Set RTL direction
             editor.editing.view.change(writer => {
               writer.setAttribute('dir', 'rtl', editor.editing.view.document.getRoot());
             });
-          })
-          .catch(error => {
-            console.error('CKEditor initialization error:', error);
-          });
-      }
-    };
-
-    document.head.appendChild(script);
-
-    return () => {
-      if (editorInstance) {
-        editorInstance.destroy();
-      }
-      // Clean up script
-      const existingScript = document.querySelector('script[src*="ckeditor"]');
-      if (existingScript) {
-        document.head.removeChild(existingScript);
-      }
-    };
-  }, []);
-
-  // Update editor content when value prop changes
-  useEffect(() => {
-    if (editorInstance && isReady && editorInstance.getData() !== value) {
-      editorInstance.setData(value || '');
-    }
-  }, [value, editorInstance, isReady]);
-
-  return (
-    <div className="ckeditor-professional-container">
-      {/* CKEditor Container Only */}
-      <div className="editor-container">
-        <div ref={editorRef}></div>
+          }}
+          onError={(error, { willEditorRestart }) => {
+            console.error('❌ خطأ في CKEditor:', error);
+          }}
+        />
       </div>
 
-      {/* Loading indicator */}
-      {!isReady && (
-        <div className="loading">
-          <div className="spinner"></div>
-          <span>جاري تحميل المحرر...</span>
-        </div>
-      )}
-
+      {/* Minimal Styles */}
       <style jsx>{`
-        .ckeditor-professional-container {
-          border: 1px solid #ddd;
+        .ckeditor-simple-container {
+          border: 1px solid #e5e7eb;
           border-radius: 8px;
-          background: white;
           overflow: hidden;
+          background: white;
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .editor-container {
+        .editor-wrapper {
           min-height: 300px;
-          position: relative;
-        }
-
-        .loading {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 12px;
-          padding: 40px;
-          color: #6c757d;
-        }
-
-        .spinner {
-          width: 20px;
-          height: 20px;
-          border: 2px solid #f3f3f3;
-          border-top: 2px solid #007bff;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+          background: white;
         }
       `}</style>
 
-      {/* CKEditor 5 Custom Styles */}
+      {/* Global CKEditor Styles */}
       <style jsx global>{`
         .ck.ck-editor {
           border: none !important;
@@ -181,9 +137,16 @@ const CKEditorProfessional = ({
 
         .ck.ck-toolbar {
           border: none !important;
-          border-bottom: 1px solid #dee2e6 !important;
-          background: #f8f9fa !important;
+          border-bottom: 1px solid #e5e7eb !important;
+          background: #f9fafb !important;
           border-radius: 0 !important;
+          direction: rtl !important;
+          text-align: right !important;
+        }
+
+        .ck.ck-toolbar .ck-toolbar__items {
+          direction: rtl !important;
+          justify-content: flex-start !important;
         }
 
         .ck.ck-content {
@@ -229,7 +192,6 @@ const CKEditorProfessional = ({
 
         .ck.ck-content a:hover {
           color: #0056b3 !important;
-          text-decoration: none !important;
         }
 
         .ck.ck-content blockquote {
@@ -259,28 +221,21 @@ const CKEditorProfessional = ({
           font-weight: 600 !important;
         }
 
+        .ck.ck-content p {
+          margin: 1em 0 !important;
+        }
+
+        .ck.ck-content strong {
+          font-weight: 600 !important;
+          color: #212529 !important;
+        }
+
         /* Placeholder styling */
         .ck.ck-content.ck-placeholder::before {
           color: #6c757d !important;
           right: 20px !important;
           left: auto !important;
           font-style: italic !important;
-        }
-
-        /* Toolbar styling - RTL direction */
-        .ck.ck-toolbar .ck-toolbar__items {
-          direction: rtl !important;
-          justify-content: flex-start !important;
-        }
-
-        .ck.ck-toolbar {
-          direction: rtl !important;
-          text-align: right !important;
-        }
-
-        /* Toolbar groups alignment */
-        .ck.ck-toolbar .ck-toolbar__line {
-          direction: rtl !important;
         }
 
         /* Dropdown menus RTL */

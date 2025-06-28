@@ -7,6 +7,7 @@
     "build": "react-scripts build"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-react": "^9.5.0",
     "@headlessui/react": "^2.2.2",
     "@tailwindcss/typography": "^0.5.16",
     "@tiptap/extension-bold": "^2.11.7",
@@ -23,6 +24,7 @@
     "@uiw/react-md-editor": "^4.0.7",
     "apexcharts": "^4.7.0",
     "axios": "^1.8.4",
+    "ckeditor5": "^45.2.1",
     "framer-motion": "^12.9.2",
     "googleapis": "^148.0.0",
     "jwt-decode": "^4.0.0",
