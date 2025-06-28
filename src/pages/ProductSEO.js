@@ -426,7 +426,7 @@ export default function ProductSEO() {
       setTrialUsage(usage);
       setIsTrialExpired(usage.used >= usage.limit);
     }
-  };
+  }; // إزالة useCallback إذا كان موجود
 
   const incrementTrialUsage = () => {
     const usage = JSON.parse(localStorage.getItem("seo_trial_usage") || "{}");
@@ -434,23 +434,23 @@ export default function ProductSEO() {
     localStorage.setItem("seo_trial_usage", JSON.stringify(usage));
     setTrialUsage(usage);
     setIsTrialExpired(usage.used >= usage.limit);
-  };
+  }; // إزالة useCallback إذا كان موجود
 
   const checkTrialAccess = () => {
     // Site owner always has access
     if (userPlan === "owner") return true;
     if (userPlan !== "free") return true;
     return trialUsage.used < trialUsage.limit;
-  };
+  }; // إزالة useCallback إذا كان موجود
 
   const showUpgradePrompt = () => {
     setShowUpgradeModal(true);
-  };
+  }; // إزالة useCallback إذا كان موجود
 
   // Load product data
   useEffect(() => {
     loadProduct();
-  }, [id, passedProduct]);
+  }, [id, passedProduct]); // العودة للطريقة الأصلية البسيطة
 
   // Analyze SEO when product changes
   useEffect(() => {
@@ -537,7 +537,7 @@ export default function ProductSEO() {
     } finally {
       setLoading(false);
     }
-  }, [id, passedProduct]);
+  }, [id, passedProduct]); // العودة للطريقة الأصلية
 
   const handleProductChange = useCallback((field, value) => {
     // Site owner always has full access
@@ -565,7 +565,7 @@ export default function ProductSEO() {
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: null }));
     }
-  }, [errors, userPlan]);
+  }, [userPlan]); // تبسيط dependency array
 
   const validateProduct = useCallback(() => {
     const newErrors = {};
@@ -586,7 +586,7 @@ export default function ProductSEO() {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [product]);
+  }, [product.name, product.meta_title, product.meta_description]); // تبسيط dependency array
 
   const handleSave = useCallback(async () => {
     if (!validateProduct()) {
@@ -659,7 +659,7 @@ export default function ProductSEO() {
     } finally {
       setSaving(false);
     }
-  }, [product, validateProduct]);
+  }, [validateProduct, product.id]); // تبسيط dependency array
 
   // تحديث دالة handleGenerateAll لتعمل خلف الكواليس
   const handleGenerateAll = useCallback(async () => {
@@ -790,7 +790,7 @@ export default function ProductSEO() {
     } finally {
       setGenerating(false);
     }
-  }, [product, userPlan, checkTrialAccess, trialUsage]);
+  }, [userPlan, trialUsage.used, trialUsage.limit, product.name, checkTrialAccess]); // تبسيط dependency array
 
   const handleGenerateField = useCallback(async (fieldType) => {
     setFieldLoading(fieldType);
@@ -925,16 +925,16 @@ export default function ProductSEO() {
     } finally {
       setFieldLoading("");
     }
-  }, [product]);
+  }, [product.name, product.description, product.keyword, product.category, product.tone]); // تبسيط dependency array
 
-  const copyToClipboard = useCallback(async (text, label) => {
+  const copyToClipboard = async (text, label) => {
     try {
       await navigator.clipboard.writeText(text);
       toast.success(`تم نسخ ${label} للحافظة! 📋`);
     } catch (error) {
       toast.error("فشل في النسخ");
     }
-  }, []);
+  }; // إزالة useCallback
 
   // دالة العنوان الرئيسي المحسن
   const renderPageHeader = () => (
@@ -993,12 +993,11 @@ export default function ProductSEO() {
     </div>
   );
 
-  // دالة رسائل التحفيز
+  // دالة رسائل التحفيز - بدون useMemo لتجنب infinite loop
   const renderMotivationalBanner = () => {
-    const progress = useMemo(() => {
-      const coreResults = checkCoreCriteria(product);
-      return coreResults.score;
-    }, [product]);
+    // حساب التقدم مباشرة بدون useMemo
+    const coreResults = checkCoreCriteria(product);
+    const progress = coreResults.score;
 
     if (!product.name) {
       return (
@@ -1045,8 +1044,8 @@ export default function ProductSEO() {
     return null;
   };
 
-  // دالة الحقول المبسطة - أزرار ذكية فقط
-  const renderInputField = useCallback((label, key, multiline = false, placeholder = "", icon = null) => {
+  // دالة الحقول المبسطة - إزالة useCallback لتجنب مشاكل dependency
+  const renderInputField = (label, key, multiline = false, placeholder = "", icon = null) => {
     const hasError = errors[key];
     const isLoading = fieldLoading === key;
     const fieldValue = product[key] || "";
@@ -1250,13 +1249,20 @@ export default function ProductSEO() {
         )}
       </div>
     );
-  }, [product, errors, fieldLoading, userPlan, isTrialExpired, trialUsage, checkTrialAccess, handleGenerateField, handleProductChange, copyToClipboard, showUpgradePrompt]);
+  }; // إزالة useCallback dependency array
 
-  // Progress calculation using core criteria
+  // Progress calculation using core criteria - إصلاح dependency array
   const progress = useMemo(() => {
     const coreResults = checkCoreCriteria(product);
     return coreResults.score;
-  }, [product]);
+  }, [
+    product.name, 
+    product.keyword, 
+    product.description, 
+    product.meta_title, 
+    product.meta_description, 
+    product.imageAlt
+  ]); // استخدام قيم محددة بدلاً من product object كامل
 
   // Loading state
   if (loading) {
