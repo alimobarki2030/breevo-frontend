@@ -27,7 +27,8 @@ import {
   Download,
   Package,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  Brain
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
@@ -177,7 +178,7 @@ const checkCoreCriteria = (product) => {
   };
 };
 
-// Enhanced SEO Display Component - Completely Revised
+// Enhanced SEO Display Component - مع إصلاح المعايير الإضافية
 const EnhancedSEODisplay = ({ analysis, product }) => {
   const [showAdditionalCriteria, setShowAdditionalCriteria] = useState(false);
 
@@ -223,7 +224,7 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
     }
   };
 
-  // Additional criteria from original analysis
+  // إصلاح المعايير الإضافية - استخراج صحيح من التحليل
   const additionalCriteria = [];
   if (analysis && analysis.categories) {
     Object.entries(analysis.categories).forEach(([categoryName, checks]) => {
@@ -233,7 +234,7 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
           const coreIds = ['focus_keyword', 'keyword_in_title', 'keyword_in_first_25', 
                           'keyword_in_meta_title', 'has_meta_description', 'description_length',
                           'internal_links', 'image_alt_keyword'];
-          if (!coreIds.includes(check.id)) {
+          if (!coreIds.some(coreId => check.id?.includes(coreId))) {
             additionalCriteria.push({
               ...check,
               category: categoryName
@@ -298,19 +299,19 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
         </div>
       </div>
 
-      {/* Additional Criteria - Collapsible */}
+      {/* Additional Criteria - Collapsible - مع إصلاح */}
       {additionalCriteria.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              معايير إضافية
+              معايير إضافية ({additionalCriteria.length})
             </h3>
             <button
               onClick={() => setShowAdditionalCriteria(!showAdditionalCriteria)}
               className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-blue-50 transition-colors"
             >
-              {showAdditionalCriteria ? 'إخفاء' : `عرض (${additionalCriteria.length})`}
+              {showAdditionalCriteria ? 'إخفاء' : 'عرض'}
               {showAdditionalCriteria ? (
                 <ChevronDown className="w-3 h-3" />
               ) : (
@@ -994,6 +995,11 @@ export default function ProductSEO() {
 
   // دالة رسائل التحفيز
   const renderMotivationalBanner = () => {
+    const progress = useMemo(() => {
+      const coreResults = checkCoreCriteria(product);
+      return coreResults.score;
+    }, [product]);
+
     if (!product.name) {
       return (
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-6 border border-blue-100">
@@ -1039,6 +1045,7 @@ export default function ProductSEO() {
     return null;
   };
 
+  // دالة الحقول المبسطة - أزرار ذكية فقط
   const renderInputField = useCallback((label, key, multiline = false, placeholder = "", icon = null) => {
     const hasError = errors[key];
     const isLoading = fieldLoading === key;
@@ -1064,70 +1071,32 @@ export default function ProductSEO() {
               {isLocked && <span className="text-xs text-red-600 bg-red-100 px-2 py-1 rounded">🔒 مؤمن</span>}
             </label>
             <div className="flex items-center gap-2">
-              {userPlan !== "free" && (
+              {/* أيقونة ذكاء اصطناعي بسيطة */}
+              {(userPlan !== "free" || checkTrialAccess()) && !isLocked && (
                 <button
                   onClick={() => handleGenerateField(key)}
-                  className={`px-3 py-1 text-xs rounded-lg font-medium transition-all flex items-center gap-1 ${
+                  className={`p-2 rounded-lg transition-all ${
                     isLoading 
                       ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
-                      : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                      : "bg-blue-100 text-blue-700 hover:bg-blue-200 hover:scale-105"
                   }`}
                   disabled={isLoading}
                   title="توليد ذكي"
                 >
                   {isLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent"></div>
-                      جاري التوليد...
-                    </>
+                    <div className="animate-spin rounded-full h-4 w-4 border border-yellow-600 border-t-transparent"></div>
                   ) : (
-                    <>
-                      <Wand2 className="w-3 h-3" />
-                      توليد ذكي
-                    </>
+                    <Brain className="w-4 h-4" />
                   )}
-                </button>
-              )}
-              {userPlan === "free" && checkTrialAccess() && (
-                <button
-                  onClick={() => handleGenerateField(key)}
-                  className={`px-3 py-1 text-xs rounded-lg font-medium transition-all flex items-center gap-1 ${
-                    isLoading 
-                      ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
-                      : "bg-green-100 text-green-700 hover:bg-green-200"
-                  }`}
-                  disabled={isLoading}
-                  title={`توليد ذكي (${trialUsage.limit - trialUsage.used} متبقي)`}
-                >
-                  {isLoading ? (
-                    <>
-                      <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent"></div>
-                      جاري التوليد...
-                    </>
-                  ) : (
-                    <>
-                      <Wand2 className="w-3 h-3" />
-                      تجربة مجانية ({trialUsage.limit - trialUsage.used})
-                    </>
-                  )}
-                </button>
-              )}
-              {userPlan === "free" && !checkTrialAccess() && (
-                <button
-                  onClick={showUpgradePrompt}
-                  className="px-3 py-1 text-xs rounded-lg font-medium bg-red-100 text-red-700 hover:bg-red-200 transition-all flex items-center gap-1"
-                >
-                  <Crown className="w-3 h-3" />
-                  ترقية مطلوبة
                 </button>
               )}
               {fieldValue && !isLocked && (
                 <button
                   onClick={() => copyToClipboard(fieldValue, label)}
-                  className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors"
+                  className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
                   title="نسخ"
                 >
-                  <Copy className="w-3 h-3" />
+                  <Copy className="w-4 h-4" />
                 </button>
               )}
             </div>
@@ -1186,70 +1155,32 @@ export default function ProductSEO() {
                 {charCount}{charLimit && `/${charLimit}`}
               </span>
             )}
-            {userPlan !== "free" && (
+            {/* أيقونة ذكاء اصطناعي بسيطة */}
+            {(userPlan !== "free" || checkTrialAccess()) && !isLocked && (
               <button
                 onClick={() => handleGenerateField(key)}
-                className={`px-3 py-1 text-xs rounded-lg font-medium transition-all flex items-center gap-1 ${
+                className={`p-2 rounded-lg transition-all ${
                   isLoading 
                     ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
-                    : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                    : "bg-blue-100 text-blue-700 hover:bg-blue-200 hover:scale-105"
                 }`}
                 disabled={isLoading}
                 title="توليد ذكي"
               >
                 {isLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent"></div>
-                    جاري...
-                  </>
+                  <div className="animate-spin rounded-full h-4 w-4 border border-yellow-600 border-t-transparent"></div>
                 ) : (
-                  <>
-                    <Wand2 className="w-3 h-3" />
-                    توليد
-                  </>
+                  <Brain className="w-4 h-4" />
                 )}
-              </button>
-            )}
-            {userPlan === "free" && checkTrialAccess() && (
-              <button
-                onClick={() => handleGenerateField(key)}
-                className={`px-3 py-1 text-xs rounded-lg font-medium transition-all flex items-center gap-1 ${
-                  isLoading 
-                    ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
-                    : "bg-green-100 text-green-700 hover:bg-green-200"
-                }`}
-                disabled={isLoading}
-                title={`توليد ذكي (${trialUsage.limit - trialUsage.used} متبقي)`}
-              >
-                {isLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-3 w-3 border border-yellow-600 border-t-transparent"></div>
-                    جاري...
-                  </>
-                ) : (
-                  <>
-                    <Wand2 className="w-3 h-3" />
-                    تجربة ({trialUsage.limit - trialUsage.used})
-                  </>
-                )}
-              </button>
-            )}
-            {userPlan === "free" && !checkTrialAccess() && (
-              <button
-                onClick={showUpgradePrompt}
-                className="px-3 py-1 text-xs rounded-lg font-medium bg-red-100 text-red-700 hover:bg-red-200 transition-all flex items-center gap-1"
-              >
-                <Crown className="w-3 h-3" />
-                ترقية
               </button>
             )}
             {fieldValue && !isLocked && (
               <button
                 onClick={() => copyToClipboard(fieldValue, label)}
-                className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded hover:bg-gray-200 transition-colors"
+                className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
                 title="نسخ"
               >
-                <Copy className="w-3 h-3" />
+                <Copy className="w-4 h-4" />
               </button>
             )}
           </div>
@@ -1394,9 +1325,9 @@ export default function ProductSEO() {
             {/* Main Content */}
             <div className="xl:col-span-2 space-y-6">
               
-              {/* Product Header المحسن - بدون قسم التحليل */}
+              {/* Product Header المبسط - بدون تكرار */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                     <Package className="w-5 h-5 text-blue-500" />
                     معلومات المنتج
@@ -1478,35 +1409,6 @@ export default function ProductSEO() {
                     </button>
                   </div>
                 </div>
-
-                {/* شريط التقدم البصري */}
-                {Object.keys(product).length > 0 && (
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-600">📊 مستوى اكتمال السيو</span>
-                      <span className={`text-sm font-bold ${getScoreColor(progress)}`}>
-                        {progress}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all duration-700 ${
-                          progress >= 85 ? 'bg-gradient-to-r from-green-400 to-green-600' : 
-                          progress >= 70 ? 'bg-gradient-to-r from-blue-400 to-blue-600' :
-                          progress >= 50 ? 'bg-gradient-to-r from-amber-400 to-amber-600' : 
-                          'bg-gradient-to-r from-red-400 to-red-600'
-                        }`}
-                        style={{ width: `${progress}%` }}
-                      />
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1 text-center">
-                      {progress >= 85 && "🎉 ممتاز! مُحسن بالكامل"}
-                      {progress >= 70 && progress < 85 && "👍 جيد جداً! تحسينات طفيفة"}
-                      {progress >= 50 && progress < 70 && "📈 يحتاج تحسين"}
-                      {progress < 50 && "🚀 ابدأ بإدخال البيانات"}
-                    </div>
-                  </div>
-                )}
 
                 {/* Last Updated */}
                 {product.lastUpdated && (
@@ -1657,7 +1559,7 @@ export default function ProductSEO() {
             {/* Sidebar */}
             <div className="space-y-6">
               
-              {/* SEO Score */}
+              {/* SEO Score - مع شريط تقدم واحد فقط */}
               <EnhancedSEODisplay analysis={score} product={product} />
 
               {/* Quick Tips */}
@@ -1692,73 +1594,6 @@ export default function ProductSEO() {
                     <div className="text-orange-500 mt-0.5">🔗</div>
                     <div>
                       <strong>الروابط الداخلية:</strong> استخدم أداة الرابط 🔗 في شريط أدوات المحرر لإضافة روابط لصفحات أخرى في موقعك
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Progress Summary */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-green-500" />
-                  ملخص التقدم
-                </h3>
-                
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">النقاط الإجمالية</span>
-                    <span className={`font-bold ${getScoreColor(progress)}`}>
-                      {progress}%
-                    </span>
-                  </div>
-                  
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className={`h-2 rounded-full transition-all duration-500 ${
-                        progress >= 85 ? 'bg-green-500' : 
-                        progress >= 70 ? 'bg-blue-500' :
-                        progress >= 50 ? 'bg-amber-500' : 'bg-red-500'
-                      }`}
-                      style={{ width: `${progress}%` }}
-                    />
-                  </div>
-                  
-                  <div className="text-xs text-gray-500 text-center">
-                    {progress >= 85 && "ممتاز! 🎉"}
-                    {progress >= 70 && progress < 85 && "جيد جداً! 👍"}
-                    {progress >= 50 && progress < 70 && "يحتاج تحسين 📈"}
-                    {progress < 50 && "ابدأ التحسين 🚀"}
-                  </div>
-                  
-                  {/* Core Field completion status */}
-                  <div className="pt-4 border-t border-gray-100">
-                    <div className="text-sm font-medium text-gray-700 mb-2">المعايير الأساسية:</div>
-                    <div className="grid grid-cols-1 gap-2 text-xs">
-                      {[
-                        { key: 'keyword', label: 'الكلمة المفتاحية' },
-                        { key: 'name', label: 'عنوان يحتوي الكلمة المفتاحية' },
-                        { key: 'description', label: 'وصف 120+ كلمة' },
-                        { key: 'meta_title', label: 'Page Title' },
-                        { key: 'meta_description', label: 'Page Description' },
-                        { key: 'imageAlt', label: 'Image Alt' }
-                      ].map(field => {
-                        const coreResults = checkCoreCriteria(product);
-                        const criterion = coreResults.criteria.find(c => c.id.includes(field.key) || c.text.includes(field.label));
-                        const isComplete = criterion?.status === 'pass';
-                        
-                        return (
-                          <div key={field.key} className="flex items-center gap-2">
-                            {isComplete ? (
-                              <CheckCircle className="w-3 h-3 text-green-500" />
-                            ) : (
-                              <XCircle className="w-3 h-3 text-gray-400" />
-                            )}
-                            <span className={isComplete ? 'text-green-700' : 'text-gray-500'}>
-                              {field.label}
-                            </span>
-                          </div>
-                        );
-                      })}
                     </div>
                   </div>
                 </div>
