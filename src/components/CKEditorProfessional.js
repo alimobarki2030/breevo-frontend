@@ -8,7 +8,7 @@ const CKEditorProfessional = ({
 }) => {
   const textareaRef = useRef(null);
 
-  // دوال التنسيق البسيطة
+  // دوال التنسيق البسيطة - تعطي HTML صحيح
   const insertText = (before, after = '') => {
     const textarea = textareaRef.current;
     const start = textarea.selectionStart;
@@ -51,7 +51,7 @@ const CKEditorProfessional = ({
       <div className="toolbar">
         <button
           type="button"
-          onClick={() => insertText('**', '**')}
+          onClick={() => insertText('<strong>', '</strong>')}
           className="tool-btn"
           title="غامق"
         >
@@ -60,7 +60,7 @@ const CKEditorProfessional = ({
         
         <button
           type="button"
-          onClick={() => insertText('*', '*')}
+          onClick={() => insertText('<em>', '</em>')}
           className="tool-btn"
           title="مائل"
         >
@@ -71,7 +71,7 @@ const CKEditorProfessional = ({
         
         <button
           type="button"
-          onClick={() => insertAtCursor('\n## ')}
+          onClick={() => insertAtCursor('<h2></h2>')}
           className="tool-btn"
           title="عنوان رئيسي"
         >
@@ -80,7 +80,7 @@ const CKEditorProfessional = ({
         
         <button
           type="button"
-          onClick={() => insertAtCursor('\n### ')}
+          onClick={() => insertAtCursor('<h3></h3>')}
           className="tool-btn"
           title="عنوان فرعي"
         >
@@ -91,7 +91,7 @@ const CKEditorProfessional = ({
         
         <button
           type="button"
-          onClick={() => insertAtCursor('\n- ')}
+          onClick={() => insertAtCursor('<ul><li></li><li></li><li></li></ul>')}
           className="tool-btn"
           title="قائمة نقطية"
         >
@@ -100,7 +100,7 @@ const CKEditorProfessional = ({
         
         <button
           type="button"
-          onClick={() => insertText('[', '](https://example.com)')}
+          onClick={() => insertText('<a href="">', '</a>')}
           className="tool-btn"
           title="رابط"
         >
@@ -109,7 +109,7 @@ const CKEditorProfessional = ({
         
         <button
           type="button"
-          onClick={() => insertAtCursor('\n> ')}
+          onClick={() => insertAtCursor('<blockquote><p></p></blockquote>')}
           className="tool-btn"
           title="اقتباس"
         >
@@ -126,33 +126,6 @@ const CKEditorProfessional = ({
         className="editor-textarea"
         dir="rtl"
       />
-      
-      {/* أزرار سريعة */}
-      <div className="quick-buttons">
-        <button
-          type="button"
-          onClick={() => insertAtCursor('\n\n## ✨ مميزات المنتج:\n- ميزة رائعة\n- ميزة مذهلة\n- ميزة استثنائية\n')}
-          className="quick-btn"
-        >
-          ✨ قائمة مميزات
-        </button>
-        
-        <button
-          type="button"
-          onClick={() => insertAtCursor('\n\n## 🛍️ طريقة الاستخدام:\n1. الخطوة الأولى\n2. الخطوة الثانية\n3. الخطوة الثالثة\n')}
-          className="quick-btn"
-        >
-          📋 دليل الاستخدام
-        </button>
-        
-        <button
-          type="button"
-          onClick={() => insertAtCursor('\n\nتصفح [منتجاتنا الأخرى](/products) أو اقرأ [تقييمات العملاء](/reviews).\n')}
-          className="quick-btn"
-        >
-          🔗 روابط داخلية
-        </button>
-      </div>
 
       <style jsx>{`
         .simple-editor {
@@ -218,41 +191,13 @@ const CKEditorProfessional = ({
           font-style: italic;
         }
 
-        .quick-buttons {
-          display: flex;
-          gap: 8px;
-          padding: 8px 12px;
-          background: #f9fafb;
-          border-top: 1px solid #e5e7eb;
-          flex-wrap: wrap;
-        }
-
-        .quick-btn {
-          padding: 6px 12px;
-          border: 1px solid #d1d5db;
-          background: white;
-          border-radius: 6px;
-          font-size: 12px;
-          color: #374151;
-          cursor: pointer;
-          transition: all 0.2s;
-          font-weight: 500;
-        }
-
-        .quick-btn:hover {
-          background: #f3f4f6;
-          border-color: #9ca3af;
-          transform: translateY(-1px);
+        .editor-textarea:focus {
+          box-shadow: inset 0 0 0 2px #3b82f6;
         }
 
         @media (max-width: 768px) {
-          .toolbar, .quick-buttons {
+          .toolbar {
             justify-content: center;
-          }
-          
-          .quick-btn {
-            font-size: 11px;
-            padding: 5px 8px;
           }
         }
       `}</style>
