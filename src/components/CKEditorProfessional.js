@@ -8,15 +8,6 @@ const CKEditorProfessional = ({
   const editorRef = useRef();
   const [editorInstance, setEditorInstance] = useState(null);
   const [isReady, setIsReady] = useState(false);
-  const [wordCount, setWordCount] = useState(0);
-  const [charCount, setCharCount] = useState(0);
-
-  // Calculate word count
-  const calculateWordCount = (text) => {
-    const plainText = text.replace(/<[^>]*>/g, ' ').trim();
-    if (!plainText) return 0;
-    return plainText.split(/\s+/).filter(word => word.length > 0).length;
-  };
 
   useEffect(() => {
     // Load CKEditor 5 from CDN
@@ -94,11 +85,6 @@ const CKEditorProfessional = ({
             // Listen for changes
             editor.model.document.on('change:data', () => {
               const data = editor.getData();
-              const words = calculateWordCount(data);
-              const chars = data.replace(/<[^>]*>/g, '').length;
-              
-              setWordCount(words);
-              setCharCount(chars);
               onChange(data);
             });
 
@@ -134,89 +120,9 @@ const CKEditorProfessional = ({
     }
   }, [value, editorInstance, isReady]);
 
-  // Quick insert functions
-  const insertFeaturesList = () => {
-    if (editorInstance) {
-      const content = `
-        <h3>✨ مميزات المنتج:</h3>
-        <ul>
-          <li>&nbsp;</li>
-          <li>&nbsp;</li>
-          <li>&nbsp;</li>
-        </ul>
-      `;
-      editorInstance.model.change(writer => {
-        const insertPosition = editorInstance.model.document.selection.getFirstPosition();
-        const fragment = editorInstance.data.htmlProcessor.toView(content);
-        const modelFragment = editorInstance.data.toModel(fragment);
-        editorInstance.model.insertContent(modelFragment, insertPosition);
-      });
-    }
-  };
-
-  const insertUsageGuide = () => {
-    if (editorInstance) {
-      const content = `
-        <h3>🛍️ طريقة الاستخدام:</h3>
-        <ol>
-          <li>&nbsp;</li>
-          <li>&nbsp;</li>
-          <li>&nbsp;</li>
-        </ol>
-      `;
-      editorInstance.model.change(writer => {
-        const insertPosition = editorInstance.model.document.selection.getFirstPosition();
-        const fragment = editorInstance.data.htmlProcessor.toView(content);
-        const modelFragment = editorInstance.data.toModel(fragment);
-        editorInstance.model.insertContent(modelFragment, insertPosition);
-      });
-    }
-  };
-
-  const insertInternalLink = () => {
-    if (editorInstance) {
-      const url = prompt('أدخل رابط داخلي (مثل: /products، /about)');
-      if (url) {
-        const linkText = prompt('نص الرابط') || url;
-        editorInstance.model.change(writer => {
-          const insertPosition = editorInstance.model.document.selection.getFirstPosition();
-          const linkElement = writer.createElement('paragraph');
-          const linkContent = writer.createText(linkText, { linkHref: url });
-          writer.append(linkContent, linkElement);
-          editorInstance.model.insertContent(linkElement, insertPosition);
-        });
-      }
-    }
-  };
-
   return (
     <div className="ckeditor-professional-container">
-      {/* Clean Header */}
-      <div className="editor-header">
-        <div className="header-title">
-          <span className="editor-icon">✍️</span>
-          <span>وصف المنتج</span>
-        </div>
-        <div className="stats">
-          <span className="stat">{wordCount} كلمة</span>
-          <span className="stat">{charCount} حرف</span>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="quick-actions">
-        <button onClick={insertFeaturesList} className="action-btn">
-          ➕ قائمة مميزات
-        </button>
-        <button onClick={insertUsageGuide} className="action-btn">
-          📋 طريقة استخدام
-        </button>
-        <button onClick={insertInternalLink} className="action-btn">
-          🔗 رابط داخلي
-        </button>
-      </div>
-
-      {/* CKEditor Container */}
+      {/* CKEditor Container Only */}
       <div className="editor-container">
         <div ref={editorRef}></div>
       </div>
@@ -236,66 +142,6 @@ const CKEditorProfessional = ({
           background: white;
           overflow: hidden;
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        .editor-header {
-          background: #f8f9fa;
-          padding: 12px 16px;
-          border-bottom: 1px solid #e9ecef;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .header-title {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-weight: 600;
-          color: #495057;
-        }
-
-        .editor-icon {
-          font-size: 18px;
-        }
-
-        .stats {
-          display: flex;
-          gap: 16px;
-          font-size: 14px;
-          color: #6c757d;
-        }
-
-        .stat {
-          background: #fff;
-          padding: 4px 8px;
-          border-radius: 4px;
-          border: 1px solid #dee2e6;
-        }
-
-        .quick-actions {
-          background: #f8f9fa;
-          padding: 8px 16px;
-          border-bottom: 1px solid #dee2e6;
-          display: flex;
-          gap: 8px;
-          flex-wrap: wrap;
-        }
-
-        .action-btn {
-          background: white;
-          border: 1px solid #ced4da;
-          border-radius: 4px;
-          padding: 6px 12px;
-          font-size: 13px;
-          color: #495057;
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .action-btn:hover {
-          background: #e9ecef;
-          border-color: #adb5bd;
         }
 
         .editor-container {
@@ -324,23 +170,6 @@ const CKEditorProfessional = ({
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
-        }
-
-        /* Mobile responsive */
-        @media (max-width: 768px) {
-          .editor-header {
-            flex-direction: column;
-            gap: 8px;
-            align-items: stretch;
-          }
-
-          .stats {
-            justify-content: center;
-          }
-
-          .quick-actions {
-            justify-content: center;
-          }
         }
       `}</style>
 
