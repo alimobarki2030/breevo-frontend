@@ -228,9 +228,10 @@ const analyzeSEO = (product) => {
     // 9. Product title or Page Title contains numbers or sizes (helpful for SEO)
     const nameHasNumber = /\d/.test(product.name || '');
     const metaTitleHasNumber = /\d/.test(product.meta_title || '');
+    
     criteria.push({
       id: 'title_has_number',
-      text: 'اسم المنتج و عنوان السيو  يحتوي على حجم المنتج أو رقم',
+      text: 'اسم المنتج أو Page Title يحتوي على حجم أو رقم',
       status: nameHasNumber || metaTitleHasNumber ? 'pass' : 'fail'
     });
 
