@@ -33,7 +33,7 @@ import {
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { generateProductSEO } from "../utils/generateProductSEO";
-import analyzeSEO from "../analyzeSEO"; // الملف الجديد الشامل
+import analyzeSEO from "../analyzeSEO";
 import TiptapEditor from "../components/TiptapEditor";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 
@@ -44,28 +44,6 @@ const FIELD_LIMITS = {
   keyword_limit: 100,
   name_limit: 70
 };
-
-const TONE_OPTIONS = [
-  { value: "", label: "اختر النغمة" },
-  { value: "رسمية", label: "رسمية - للشركات الكبيرة" },
-  { value: "حماسية", label: "حماسية - للمنتجات الرياضية" },
-  { value: "دافئة", label: "دافئة - للمنتجات العائلية" },
-  { value: "محايدة", label: "محايدة - للمنتجات التقنية" },
-  { value: "ناعمة", label: "ناعمة - للمنتجات النسائية" },
-  { value: "لطيفة", label: "لطيفة - لمنتجات الأطفال" },
-  { value: "فاخرة", label: "فاخرة - للمنتجات المميزة" },
-  { value: "عملية", label: "عملية - للأدوات والمعدات" }
-];
-
-const STORY_ARC_OPTIONS = [
-  { value: "", label: "اختر الحبكة" },
-  { value: "مشكلة-حل", label: "مشكلة ← حل" },
-  { value: "قبل-بعد", label: "قبل ← بعد" },
-  { value: "رحلة-التحول", label: "رحلة التحول" },
-  { value: "الاكتشاف", label: "قصة الاكتشاف" },
-  { value: "المقارنة", label: "مقارنة الخيارات" },
-  { value: "التجربة", label: "التجربة الشخصية" }
-];
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
@@ -92,7 +70,7 @@ const getScoreColor = (score) => {
   return "text-red-600";
 };
 
-// Enhanced SEO Display Component - استخدام البيانات من analyzeSEO
+// Enhanced SEO Display Component
 const EnhancedSEODisplay = ({ analysis, product }) => {
   const [showAdditionalCriteria, setShowAdditionalCriteria] = useState(false);
 
@@ -117,11 +95,9 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
     );
   }
 
-  // استخدام البيانات من analyzeSEO
   const coreResults = analysis?.coreResults || { criteria: [], score: 0, passedCount: 0, totalCount: 0 };
   const additionalCategories = analysis?.categories || {};
   
-  // تحويل المعايير الإضافية لتنسيق مناسب للعرض
   const additionalCriteria = [];
   Object.entries(additionalCategories).forEach(([categoryName, checks]) => {
     if (checks && Array.isArray(checks)) {
@@ -154,7 +130,7 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-      {/* Header with Score - Always Visible */}
+      {/* Header with Score */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
           <BarChart3 className="w-5 h-5 text-green-500" />
@@ -170,7 +146,7 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
         </div>
       </div>
 
-      {/* Progress Bar - Always Visible */}
+      {/* Progress Bar */}
       <div className="w-full bg-gray-200 rounded-full h-3 mb-6">
         <div
           className={`h-3 rounded-full transition-all duration-500 ${
@@ -182,7 +158,7 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
         />
       </div>
 
-      {/* Core Criteria - Always Visible */}
+      {/* Core Criteria */}
       <div className="mb-6">
         <h3 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -206,7 +182,7 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
         </div>
       </div>
 
-      {/* Additional Criteria - Collapsible - مع إصلاح */}
+      {/* Additional Criteria - Collapsible */}
       {additionalCriteria.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-3">
@@ -248,7 +224,7 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
         </div>
       )}
 
-      {/* Score Interpretation - Compact */}
+      {/* Score Interpretation */}
       <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl">
         <div className="text-sm font-medium text-blue-900 mb-1">
           {coreResults.score >= 85 && "ممتاز! جميع المعايير الأساسية مكتملة تقريباً"}
@@ -279,7 +255,6 @@ export default function ProductSEO() {
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [fieldLoading, setFieldLoading] = useState("");
-  const [productAnalysis, setProductAnalysis] = useState(null);
   const [errors, setErrors] = useState({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
@@ -297,17 +272,15 @@ export default function ProductSEO() {
     const subscription = JSON.parse(localStorage.getItem("subscription") || "{}");
     const plan = subscription.plan || user.plan || "free";
     
-    // Check if this is the site owner - full access always
     const isOwner = user.email === "alimobarki.ad@gmail.com" || 
                    user.email === "owner@breevo.com" || 
                    user.role === "owner" || 
                    user.id === "1";
     
     setUserPlan(isOwner ? "owner" : plan);
-    setCanUseAI(true); // Always true for owner
-    setIsTrialExpired(false); // Never expired for owner
+    setCanUseAI(true);
+    setIsTrialExpired(false);
 
-    // Load trial usage only for non-owner free users
     if (!isOwner && plan === "free") {
       loadTrialUsage();
     }
@@ -318,7 +291,6 @@ export default function ProductSEO() {
     const now = new Date();
     const currentMonth = `${now.getFullYear()}-${now.getMonth()}`;
     
-    // Reset if new month
     if (!usage.month || usage.month !== currentMonth) {
       const newUsage = {
         used: 0,
@@ -333,7 +305,7 @@ export default function ProductSEO() {
       setTrialUsage(usage);
       setIsTrialExpired(usage.used >= usage.limit);
     }
-  }; // إزالة useCallback إذا كان موجود
+  };
 
   const incrementTrialUsage = () => {
     const usage = JSON.parse(localStorage.getItem("seo_trial_usage") || "{}");
@@ -341,25 +313,24 @@ export default function ProductSEO() {
     localStorage.setItem("seo_trial_usage", JSON.stringify(usage));
     setTrialUsage(usage);
     setIsTrialExpired(usage.used >= usage.limit);
-  }; // إزالة useCallback إذا كان موجود
+  };
 
   const checkTrialAccess = () => {
-    // Site owner always has access
     if (userPlan === "owner") return true;
     if (userPlan !== "free") return true;
     return trialUsage.used < trialUsage.limit;
-  }; // إزالة useCallback إذا كان موجود
+  };
 
   const showUpgradePrompt = () => {
     setShowUpgradeModal(true);
-  }; // إزالة useCallback إذا كان موجود
+  };
 
   // Load product data
   useEffect(() => {
     loadProduct();
-  }, [id, passedProduct]); // العودة للطريقة الأصلية البسيطة
+  }, [id, passedProduct]);
 
-  // Analyze SEO when product changes - استخدام الملف الجديد
+  // Analyze SEO when product changes
   useEffect(() => {
     if (Object.keys(product).length > 0) {
       const result = analyzeSEO(product);
@@ -406,7 +377,6 @@ export default function ProductSEO() {
       if (passedProduct) {
         productData = passedProduct;
       } else if (id) {
-        // Try API first
         const token = localStorage.getItem("token");
         if (token) {
           try {
@@ -424,7 +394,6 @@ export default function ProductSEO() {
           }
         }
 
-        // Fallback to localStorage
         if (!productData) {
           const saved = JSON.parse(localStorage.getItem("saved_products") || "[]");
           productData = saved.find(p => p.id == id);
@@ -444,10 +413,9 @@ export default function ProductSEO() {
     } finally {
       setLoading(false);
     }
-  }, [id, passedProduct]); // العودة للطريقة الأصلية
+  }, [id, passedProduct]);
 
   const handleProductChange = useCallback((field, value) => {
-    // Site owner always has full access
     if (userPlan === "owner") {
       setProduct(prev => ({
         ...prev,
@@ -455,7 +423,6 @@ export default function ProductSEO() {
         lastUpdated: new Date().toISOString()
       }));
       
-      // Clear field error
       if (errors[field]) {
         setErrors(prev => ({ ...prev, [field]: null }));
       }
@@ -468,11 +435,10 @@ export default function ProductSEO() {
       lastUpdated: new Date().toISOString()
     }));
     
-    // Clear field error
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: null }));
     }
-  }, [userPlan]); // تبسيط dependency array
+  }, [userPlan]);
 
   const validateProduct = useCallback(() => {
     const newErrors = {};
@@ -493,7 +459,7 @@ export default function ProductSEO() {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [product.name, product.meta_title, product.meta_description]); // تبسيط dependency array
+  }, [product.name, product.meta_title, product.meta_description]);
 
   const handleSave = useCallback(async () => {
     if (!validateProduct()) {
@@ -512,15 +478,10 @@ export default function ProductSEO() {
         meta_description: product.meta_description || "",
         url_path: product.url_path || "",
         keyword: product.keyword || "",
-        category: product.category || "",
-        target_audience: product.target_audience || "",
-        tone: product.tone || "",
-        best_story_arc: product.best_story_arc || "",
         imageAlt: product.imageAlt || "",
         lastUpdated: new Date().toISOString()
       };
 
-      // Try API first
       const token = localStorage.getItem("token");
       if (token && product.id) {
         try {
@@ -542,7 +503,6 @@ export default function ProductSEO() {
         }
       }
 
-      // Update localStorage
       const saved = JSON.parse(localStorage.getItem("saved_products") || "[]");
       const index = saved.findIndex(p => p.id === product.id);
       const updatedProduct = { ...product, ...payload };
@@ -566,9 +526,9 @@ export default function ProductSEO() {
     } finally {
       setSaving(false);
     }
-  }, [validateProduct, product.id]); // تبسيط dependency array
+  }, [validateProduct, product]);
 
-  // تحديث دالة handleGenerateAll لتعمل خلف الكواليس
+  // التوليد الذكي الشامل - مبسط وعملي
   const handleGenerateAll = useCallback(async () => {
     if (userPlan === "free" && !checkTrialAccess()) {
       showUpgradePrompt();
@@ -585,75 +545,46 @@ export default function ProductSEO() {
     setErrors(prev => ({ ...prev, generate: null }));
 
     try {
-      // إضافة رسالة تقدم للمستخدم
-      toast.loading("🧠 جاري التحليل والتوليد الذكي...", { id: 'generating' });
+      toast.loading("🧠 جاري التوليد الذكي...", { id: 'generating' });
 
-      // Increment trial usage for free users
       if (userPlan === "free") {
         incrementTrialUsage();
       }
 
-      // === التحليل التلقائي خلف الكواليس ===
-      
-      // 1. توليد الكلمة المفتاحية
-      const keyword = (await generateProductSEO(`استخرج أفضل كلمة مفتاحية لهذا المنتج للسوق السعودي: "${product.name}"`)).trim();
-
-      // 2. تحليل فئة المنتج (خلف الكواليس) - استخدام analyzeSEO
-      const seoAnalysis = analyzeSEO(product);
-      const categoryPrompt = await seoAnalysis.categorizeProduct(product);
-      const category = (await generateProductSEO(categoryPrompt)).trim();
-
-      // 3. تحليل الجمهور المستهدف (خلف الكواليس) - استخدام analyzeSEO
-      const audiencePrompt = await seoAnalysis.analyzeTargetAudience(product, category);
-      const targetAudience = (await generateProductSEO(audiencePrompt)).trim();
-
-      // 4. اختيار النغمة والحبكة تلقائياً - استخدام functions من analyzeSEO
-      const tone = seoAnalysis.selectTone(category, targetAudience);
-      const bestStoryArc = seoAnalysis.selectStoryArc(category);
-
-      // حفظ بيانات التحليل في الخلفية (بدون إظهارها)
-      const backgroundAnalysis = {
-        category,
-        target_audience: targetAudience,
-        tone,
-        best_story_arc: bestStoryArc
-      };
-
-      // === توليد المحتوى الأساسي ===
-      const prompt = `أنت مساعد تسويق محترف متخصص في SEO للسوق السعودي.
+      // البرومبت المبسط والعملي
+      const prompt = `أنت خبير SEO محترف. أنشئ محتوى محسن لهذا المنتج:
 
 المنتج: "${product.name}"
-الكلمة المفتاحية: "${keyword}"
-الفئة: "${category}"
-الجمهور: "${targetAudience}"
-النغمة: "${tone}"
-الحبكة: "${bestStoryArc}"
 
-مهمتك: توليد محتوى متكامل لصفحة هذا المنتج يحقق أفضل نتائج SEO.
+التعليمات:
+1. اختر كلمة مفتاحية مناسبة للسوق السعودي (2-3 كلمات)
+2. اكتب عنوان منتج جذاب يحتوي الكلمة المفتاحية (أقل من 70 حرف)
+3. اكتب وصف HTML يحتوي على:
+   - فقرة افتتاحية تبدأ بالكلمة المفتاحية
+   - قائمة بالمميزات الرئيسية (<ul><li>)
+   - فقرة عن طريقة الاستخدام
+   - دعوة واضحة للشراء
+   - رابط داخلي مثل: <a href="/products">منتجاتنا الأخرى</a>
+4. Page Title محسن (50-60 حرف)
+5. Page Description مقنع (150-160 حرف)
+6. مسار URL باللغة الإنجليزية
+7. وصف ALT للصورة
 
-معايير SEO الإلزامية:
-✅ الوصف يبدأ بالكلمة المفتاحية في أول 25 كلمة
-✅ طول الوصف 120+ كلمة
-✅ استخدام HTML منظم مع روابط داخلية
-✅ توزيع طبيعي للكلمة المفتاحية
-✅ دعوة واضحة لاتخاذ إجراء
-
-هيكل الوصف المطلوب:
-1. فقرة افتتاحية تبدأ بالكلمة المفتاحية
-2. قسم المميزات الرئيسية مع قائمة
-3. قسم كيفية الاستخدام  
-4. فقرة ختامية مع CTA
-5. رابط داخلي واحد على الأقل
+متطلبات مهمة:
+- الوصف 120+ كلمة
+- HTML بسيط: <p>, <ul>, <li>, <h3>, <strong>
+- توزيع طبيعي للكلمة المفتاحية (لا تكررها كثيراً)
+- محتوى يبيع المنتج وليس مجرد SEO
 
 أعد JSON فقط:
 {
-  "name": "عنوان محسن يحتوي الكلمة المفتاحية (أقل من 70 حرف)",
-  "description": "وصف HTML منسق حسب المعايير أعلاه",
-  "keyword": "${keyword}",
-  "meta_title": "Page Title جذاب (50-60 حرف)",
-  "meta_description": "Page Description مقنع (150-160 حرف)",
-  "url_path": "مسار-url-صديق-لمحركات-البحث",
-  "imageAlt": "وصف بديل للصورة يحتوي الكلمة المفتاحية"
+  "keyword": "الكلمة المفتاحية",
+  "name": "عنوان المنتج", 
+  "description": "الوصف HTML المفصل",
+  "meta_title": "Page Title",
+  "meta_description": "Page Description", 
+  "url_path": "product-url",
+  "imageAlt": "وصف الصورة"
 }`;
 
       const generated = await generateProductSEO(prompt);
@@ -665,15 +596,14 @@ export default function ProductSEO() {
 
       const fields = JSON.parse(jsonMatch[0]);
 
-      // Apply field limits and validation
       const processedFields = {
-        ...fields,
+        keyword: fields.keyword?.trim() || "",
         name: truncateText(fields.name, FIELD_LIMITS.name_limit),
+        description: fields.description || "",
         meta_title: truncateText(fields.meta_title, FIELD_LIMITS.meta_title),
         meta_description: truncateText(fields.meta_description, FIELD_LIMITS.meta_description),
-        keyword: keyword,
-        // حفظ بيانات التحليل في الخلفية
-        ...backgroundAnalysis
+        url_path: fields.url_path?.trim() || "",
+        imageAlt: fields.imageAlt?.trim() || ""
       };
 
       setProduct(prev => ({
@@ -681,7 +611,6 @@ export default function ProductSEO() {
         ...processedFields,
       }));
 
-      // رسالة نجاح محسنة
       toast.success("🎉 تم التوليد الذكي بنجاح!", { id: 'generating' });
       
       if (userPlan === "free") {
@@ -692,69 +621,65 @@ export default function ProductSEO() {
     } catch (error) {
       console.error("Error generating fields:", error);
       toast.error("❌ فشل في التوليد الذكي", { id: 'generating' });
-      const errorMessage = error?.response?.data?.message || error?.message || "فشل في التوليد الذكي";
-      setErrors(prev => ({ ...prev, generate: errorMessage }));
+      setErrors(prev => ({ ...prev, generate: "فشل في التوليد الذكي. حاول مرة أخرى." }));
     } finally {
       setGenerating(false);
     }
-  }, [userPlan, trialUsage.used, trialUsage.limit, product.name, checkTrialAccess]); // تبسيط dependency array
+  }, [userPlan, trialUsage.used, trialUsage.limit, product.name, checkTrialAccess]);
 
+  // التوليد لحقل واحد - مبسط
   const handleGenerateField = useCallback(async (fieldType) => {
     setFieldLoading(fieldType);
     setErrors(prev => ({ ...prev, [fieldType]: null }));
 
     try {
       const prompts = {
-        keyword: `أنت خبير SEO محترف. اختر أفضل كلمة مفتاحية لهذا المنتج:
+        keyword: `اختر أفضل كلمة مفتاحية لهذا المنتج للسوق السعودي:
 
 المنتج: ${product.name}
-الوصف: ${product.description || 'غير متوفر'}
-الفئة: ${product.category || 'عام'}
 
-معايير الاختيار:
-- حجم بحث عالي في السعودية
-- منافسة معقولة
-- صلة قوية بالمنتج
-- احتمالية تحويل عالية
+الشروط:
+- 2-3 كلمات
+- حجم بحث جيد
+- منافسة معقولة  
+- مرتبطة مباشرة بالمنتج
 
 أعطني الكلمة المفتاحية فقط:`,
         
-        description: `أنت كاتب محتوى متخصص في SEO. اكتب وصفاً HTML منسقاً لهذا المنتج:
+        description: `اكتب وصف منتج محسن لـ SEO:
 
 المنتج: ${product.name}
 الكلمة المفتاحية: ${product.keyword || 'منتج'}
-النغمة: ${product.tone || 'محايدة'}
 
-متطلبات الوصف:
-- 120+ كلمة
-- يبدأ بالكلمة المفتاحية
-- HTML منسق (<p>, <ul>, <li>, <h3>)
-- رابط داخلي واحد على الأقل
-- دعوة واضحة لاتخاذ إجراء
-- مناسب للسوق السعودي
+المطلوب:
+- ابدأ بالكلمة المفتاحية في الجملة الأولى
+- 120-200 كلمة
+- قائمة بالمميزات (<ul><li>)
+- دعوة للشراء
+- رابط داخلي واحد <a href="/products">منتجاتنا</a>
+- HTML بسيط: <p>, <ul>, <li>, <strong>
 
 أعد الوصف HTML فقط:`,
         
-        meta_title: `أنشئ Page Title عنوان السيو مثالي لهذا المنتج:
+        meta_title: `اكتب Page Title مثالي:
 
 المنتج: ${product.name}
-الكلمة المفتاحية: ${product.keyword || 'منتج'}
+الكلمة المفتاحية: ${product.keyword || ''}
 
-معايير العنوان:
-- 50-60 حرف فقط
+الشروط:
+- 50-60 حرف بالضبط
 - يحتوي الكلمة المفتاحية
-- جذاب ومقنع
-- يناسب نتائج Google
+- جذاب للنقر
+- واضح ومباشر
 
 أعطني العنوان فقط:`,
         
-        meta_description: `اكتب Page Description وصف الميتا مثالي لهذا المنتج:
+        meta_description: `اكتب Page Description مقنع:
 
 المنتج: ${product.name}
-الكلمة المفتاحية: ${product.keyword || 'منتج'}
-الفئة: ${product.category || 'عام'}
+الكلمة المفتاحية: ${product.keyword || ''}
 
-معايير الوصف:
+الشروط:
 - 150-160 حرف بالضبط
 - يحتوي الكلمة المفتاحية
 - يحفز على النقر
@@ -762,25 +687,25 @@ export default function ProductSEO() {
 
 أعطني الوصف فقط:`,
         
-        url_path: `أنشئ مسار URL محسن لهذا المنتج:
+        url_path: `أنشئ مسار URL محسن:
 
 المنتج: ${product.name}
-الكلمة المفتاحية: ${product.keyword || 'منتج'}
+الكلمة المفتاحية: ${product.keyword || ''}
 
-معايير المسار:
-- صديق لمحركات البحث
+الشروط:
 - باللغة الإنجليزية
 - كلمات مفصولة بشرطات
-- موجز وواضح
+- قصير وواضح
+- بدون أرقام عشوائية
 
 أعطني المسار فقط (بدون http):`,
         
-        imageAlt: `أنشئ نص ALT مثالي لصورة هذا المنتج:
+        imageAlt: `اكتب وصف ALT للصورة:
 
 المنتج: ${product.name}
-الكلمة المفتاحية: ${product.keyword || 'منتج'}
+الكلمة المفتاحية: ${product.keyword || ''}
 
-معايير النص:
+الشروط:
 - وصف دقيق للصورة
 - يحتوي الكلمة المفتاحية
 - 10-15 كلمة
@@ -797,11 +722,9 @@ export default function ProductSEO() {
       const response = await generateProductSEO(prompt);
       let value = response.trim();
 
-      // Clean up response
-      value = value.replace(/^["']|["']$/g, ''); // Remove quotes
-      value = value.replace(/^`+|`+$/g, ''); // Remove backticks
+      value = value.replace(/^["']|["']$/g, '');
+      value = value.replace(/^`+|`+$/g, '');
 
-      // Apply field-specific processing
       if (fieldType === "meta_title") {
         value = truncateText(value, FIELD_LIMITS.meta_title);
       } else if (fieldType === "meta_description") {
@@ -816,8 +739,8 @@ export default function ProductSEO() {
       const fieldLabels = {
         keyword: 'الكلمة المفتاحية',
         description: 'الوصف',
-        meta_title: 'Page Title عنوان السيو',
-        meta_description: 'Page Description وصف الميتا',
+        meta_title: 'Page Title',
+        meta_description: 'Page Description',
         url_path: 'مسار الرابط',
         imageAlt: 'النص البديل للصورة'
       };
@@ -832,7 +755,7 @@ export default function ProductSEO() {
     } finally {
       setFieldLoading("");
     }
-  }, [product.name, product.description, product.keyword, product.category, product.tone]); // تبسيط dependency array
+  }, [product.name, product.keyword]);
 
   const copyToClipboard = async (text, label) => {
     try {
@@ -841,9 +764,8 @@ export default function ProductSEO() {
     } catch (error) {
       toast.error("فشل في النسخ");
     }
-  }; // إزالة useCallback
+  };
 
-  // دالة العنوان الرئيسي المحسن
   const renderPageHeader = () => (
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center gap-4">
@@ -872,7 +794,6 @@ export default function ProductSEO() {
       </div>
       
       <div className="flex items-center gap-3">
-        {/* شارات الخطة */}
         {userPlan === "owner" && (
           <div className="bg-gradient-to-r from-purple-500 to-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium">
             👑 مالك الموقع
@@ -884,7 +805,6 @@ export default function ProductSEO() {
           </div>
         )}
         
-        {/* زر المعاينة محسن */}
         <button
           onClick={() => setShowPreview(!showPreview)}
           className={`px-4 py-2 rounded-lg transition-colors flex items-center gap-2 ${
@@ -900,9 +820,7 @@ export default function ProductSEO() {
     </div>
   );
 
-  // دالة رسائل التحفيز - استخدام analyzeSEO
   const renderMotivationalBanner = () => {
-    // حساب التقدم باستخدام analyzeSEO
     let progress = 0;
     if (Object.keys(product).length > 0) {
       const analysisResult = analyzeSEO(product);
@@ -954,14 +872,12 @@ export default function ProductSEO() {
     return null;
   };
 
-  // دالة الحقول المبسطة - إزالة useCallback لتجنب مشاكل dependency
   const renderInputField = (label, key, multiline = false, placeholder = "", icon = null) => {
     const hasError = errors[key];
     const isLoading = fieldLoading === key;
     const fieldValue = product[key] || "";
     const isLocked = userPlan === "free" && isTrialExpired;
     
-    // Character count for limited fields
     const showCharCount = ['meta_title', 'meta_description', 'name'].includes(key);
     const charLimit = FIELD_LIMITS[key + '_limit'] || FIELD_LIMITS[key];
     const charCount = fieldValue.length;
@@ -980,7 +896,6 @@ export default function ProductSEO() {
               {isLocked && <span className="text-xs text-red-600 bg-red-100 px-2 py-1 rounded">🔒 مؤمن</span>}
             </label>
             <div className="flex items-center gap-2">
-              {/* أيقونة ذكاء اصطناعي بسيطة */}
               {(userPlan !== "free" || checkTrialAccess()) && !isLocked && (
                 <button
                   onClick={() => handleGenerateField(key)}
@@ -1038,7 +953,6 @@ export default function ProductSEO() {
             </div>
           )}
           
-          {/* Rich text editor note */}
           {!isLocked && (
             <div className="text-xs text-gray-500 mt-2">
               💡 استخدم المحرر لإضافة <strong>التنسيق</strong>، <strong>الروابط الداخلية</strong>، والقوائم المنظمة | أو جرب التوليد الذكي 🧠
@@ -1064,7 +978,6 @@ export default function ProductSEO() {
                 {charCount}{charLimit && `/${charLimit}`}
               </span>
             )}
-            {/* أيقونة ذكاء اصطناعي بسيطة */}
             {(userPlan !== "free" || checkTrialAccess()) && !isLocked && (
               <button
                 onClick={() => handleGenerateField(key)}
@@ -1074,7 +987,7 @@ export default function ProductSEO() {
                     : "bg-blue-100 text-blue-700 hover:bg-blue-200 hover:scale-105"
                 }`}
                 disabled={isLoading}
-                                  title="التوليد الذكي"
+                title="التوليد الذكي"
               >
                 {isLoading ? (
                   <div className="animate-spin rounded-full h-4 w-4 border border-yellow-600 border-t-transparent"></div>
@@ -1136,7 +1049,6 @@ export default function ProductSEO() {
           </div>
         )}
 
-        {/* Field-specific hints */}
         {key === 'meta_title' && !isLocked && (
           <div className="text-xs text-gray-500 mt-2">
             💡 Page Title المثالي: 50-60 حرف، يحتوي الكلمة المفتاحية، جذاب للنقر
@@ -1159,9 +1071,8 @@ export default function ProductSEO() {
         )}
       </div>
     );
-  }; // إزالة useCallback dependency array
+  };
 
-  // Progress calculation using core criteria - استخدام analyzeSEO
   const progress = useMemo(() => {
     if (Object.keys(product).length === 0) return 0;
     const analysisResult = analyzeSEO(product);
@@ -1220,10 +1131,8 @@ export default function ProductSEO() {
         <Sidebar />
         <main className="flex-1 p-6 max-w-7xl mx-auto">
           
-          {/* Header المحسن */}
           {renderPageHeader()}
 
-          {/* Error Display */}
           {(errors.save || errors.generate || errors.analyze) && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
               <div className="flex items-center gap-2 text-red-800">
@@ -1234,15 +1143,12 @@ export default function ProductSEO() {
             </div>
           )}
 
-          {/* Motivational Banner */}
           {renderMotivationalBanner()}
 
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
             
-            {/* Main Content */}
             <div className="xl:col-span-2 space-y-6">
               
-              {/* Product Header المبسط - بدون تكرار */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
@@ -1250,7 +1156,6 @@ export default function ProductSEO() {
                     معلومات المنتج
                   </h2>
                   <div className="flex gap-3">
-                    {/* زر التوليد الشامل */}
                     {(userPlan !== "free" || checkTrialAccess()) && (
                       <button
                         onClick={handleGenerateAll}
@@ -1289,7 +1194,6 @@ export default function ProductSEO() {
                       </button>
                     )}
 
-                    {/* زر الترقية للمستخدمين المنتهية تجربتهم */}
                     {userPlan === "free" && !checkTrialAccess() && (
                       <button
                         onClick={showUpgradePrompt}
@@ -1300,7 +1204,6 @@ export default function ProductSEO() {
                       </button>
                     )}
 
-                    {/* زر الحفظ */}
                     <button
                       onClick={handleSave}
                       disabled={saving || !hasUnsavedChanges || (userPlan === "free" && isTrialExpired)}
@@ -1327,7 +1230,6 @@ export default function ProductSEO() {
                   </div>
                 </div>
 
-                {/* Last Updated */}
                 {product.lastUpdated && (
                   <div className="text-xs text-gray-500 flex items-center gap-1">
                     <RefreshCw className="w-3 h-3" />
@@ -1335,7 +1237,6 @@ export default function ProductSEO() {
                   </div>
                 )}
 
-                {/* معلومات سريعة للتجربة المجانية */}
                 {userPlan === "free" && (
                   <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100">
                     <div className="flex items-center gap-3">
@@ -1359,7 +1260,6 @@ export default function ProductSEO() {
                 )}
               </div>
 
-              {/* Google Preview */}
               {showPreview && (
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -1380,10 +1280,8 @@ export default function ProductSEO() {
                 </div>
               )}
 
-              {/* SEO Fields */}
               <div className="space-y-6">
                 
-                {/* Basic Info */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
                     <Type className="w-5 h-5 text-blue-500" />
@@ -1407,7 +1305,6 @@ export default function ProductSEO() {
                   )}
                 </div>
 
-                {/* Description */}
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
                     <FileText className="w-5 h-5 text-green-500" />
@@ -1423,7 +1320,6 @@ export default function ProductSEO() {
                   )}
                 </div>
 
-                {/* Page Title & Description */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
                     <Globe className="w-5 h-5 text-purple-500" />
@@ -1447,7 +1343,6 @@ export default function ProductSEO() {
                   )}
                 </div>
 
-                {/* Technical SEO */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-4">
                     <TrendingUp className="w-5 h-5 text-orange-500" />
@@ -1473,50 +1368,46 @@ export default function ProductSEO() {
               </div>
             </div>
 
-            {/* Sidebar */}
             <div className="space-y-6">
               
-              {/* SEO Score - مع شريط تقدم واحد فقط */}
               <EnhancedSEODisplay analysis={score} product={product} />
 
-              {/* Quick Tips */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <Lightbulb className="w-5 h-5 text-yellow-500" />
-                  نصائح سريعة
+                  نصائح سريعة للنجاح
                 </h3>
                 <div className="space-y-3 text-sm text-gray-600">
                   <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
-                    <div className="text-blue-500 mt-0.5">💡</div>
+                    <div className="text-blue-500 mt-0.5">🎯</div>
                     <div>
-                      <strong>الكلمة المفتاحية:</strong> اختر كلمة لها حجم بحث جيد ومنافسة معقولة - أو استخدم التوليد الذكي 🧠
+                      <strong>الكلمة المفتاحية:</strong> اختر كلمة بحجم بحث جيد ومنافسة معقولة - التوليد الذكي يختار لك الأفضل!
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
-                    <div className="text-green-500 mt-0.5">🎯</div>
+                    <div className="text-green-500 mt-0.5">📝</div>
                     <div>
-                      <strong>Page Title:</strong> يجب أن يكون بين 50-60 حرف ويحتوي الكلمة المفتاحية
+                      <strong>Page Title:</strong> 50-60 حرف، يحتوي الكلمة المفتاحية، جذاب للنقر
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
-                    <div className="text-purple-500 mt-0.5">📝</div>
+                    <div className="text-purple-500 mt-0.5">📖</div>
                     <div>
-                      <strong>الوصف:</strong> ابدأ بالكلمة المفتاحية واجعل المحتوى 120+ كلمة مع روابط داخلية - أو دع التوليد الذكي يتولى الأمر! 🚀
+                      <strong>الوصف:</strong> ابدأ بالكلمة المفتاحية، 120+ كلمة، روابط داخلية، دعوة للشراء
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3 p-3 bg-orange-50 rounded-lg">
                     <div className="text-orange-500 mt-0.5">🔗</div>
                     <div>
-                      <strong>الروابط الداخلية:</strong> استخدم أداة الرابط 🔗 في شريط أدوات المحرر لإضافة روابط لصفحات أخرى في موقعك
+                      <strong>الروابط الداخلية:</strong> استخدم أداة الرابط 🔗 في المحرر لربط صفحات أخرى في موقعك
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Actions */}
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">إجراءات سريعة</h3>
                 <div className="space-y-3">
