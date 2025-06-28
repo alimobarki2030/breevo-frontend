@@ -224,8 +224,96 @@ const EnhancedSEODisplay = ({ analysis, product }) => {
     }
   };
 
-  // إصلاح المعايير الإضافية - استخراج صحيح من التحليل
+  // إصلاح المعايير الإضافية - إضافة معايير حقيقية
   const additionalCriteria = [];
+  
+  // معايير إضافية للـ URL Structure
+  const urlChecks = [];
+  if (product.url_path) {
+    urlChecks.push({
+      id: 'url_length',
+      text: `طول الرابط مناسب (${product.url_path.length} حرف)`,
+      status: product.url_path.length <= 60 ? 'pass' : 'fail'
+    });
+    
+    urlChecks.push({
+      id: 'url_hyphens',
+      text: 'استخدام الشرطات في الرابط بدلاً من المسافات',
+      status: !product.url_path.includes(' ') && !product.url_path.includes('_') ? 'pass' : 'fail'
+    });
+    
+    urlChecks.push({
+      id: 'url_lowercase',
+      text: 'الرابط بأحرف صغيرة',
+      status: product.url_path === product.url_path.toLowerCase() ? 'pass' : 'fail'
+    });
+  }
+  
+  // معايير إضافية للمحتوى
+  const contentChecks = [];
+  if (product.description) {
+    const cleanDescription = product.description.replace(/<[^>]*>/g, ' ').trim();
+    const words = cleanDescription.split(/\s+/).filter(word => word.length > 0);
+    
+    contentChecks.push({
+      id: 'readability',
+      text: `قابلية القراءة - متوسط طول الكلمة (${words.length > 0 ? Math.round(cleanDescription.length / words.length) : 0} حرف)`,
+      status: words.length > 0 && (cleanDescription.length / words.length) <= 6 ? 'pass' : 'warning'
+    });
+    
+    contentChecks.push({
+      id: 'paragraph_structure',
+      text: 'تنظيم الفقرات - استخدام عدة فقرات',
+      status: (product.description.match(/<p>/g) || []).length >= 2 ? 'pass' : 'fail'
+    });
+    
+    contentChecks.push({
+      id: 'heading_structure',
+      text: 'استخدام العناوين الفرعية (H2, H3)',
+      status: /<h[2-6]>/i.test(product.description) ? 'pass' : 'fail'
+    });
+  }
+  
+  // معايير إضافية تقنية
+  const technicalChecks = [];
+  
+  technicalChecks.push({
+    id: 'meta_title_length',
+    text: `طول Page Title مثالي (${(product.meta_title || '').length}/60 حرف)`,
+    status: product.meta_title && product.meta_title.length >= 30 && product.meta_title.length <= 60 ? 'pass' : 'warning'
+  });
+  
+  technicalChecks.push({
+    id: 'meta_description_length',
+    text: `طول Page Description مثالي (${(product.meta_description || '').length}/160 حرف)`,
+    status: product.meta_description && product.meta_description.length >= 120 && product.meta_description.length <= 160 ? 'pass' : 'warning'
+  });
+  
+  technicalChecks.push({
+    id: 'keyword_density',
+    text: 'كثافة الكلمة المفتاحية مناسبة في الوصف',
+    status: (() => {
+      if (!product.keyword || !product.description) return 'fail';
+      const cleanDescription = product.description.replace(/<[^>]*>/g, ' ').toLowerCase();
+      const keywordCount = (cleanDescription.match(new RegExp(product.keyword.toLowerCase(), 'g')) || []).length;
+      const totalWords = cleanDescription.split(/\s+/).filter(word => word.length > 0).length;
+      const density = totalWords > 0 ? (keywordCount / totalWords) * 100 : 0;
+      return density >= 1 && density <= 3 ? 'pass' : density > 3 ? 'warning' : 'fail';
+    })()
+  });
+  
+  // تجميع المعايير الإضافية
+  if (urlChecks.length > 0) {
+    urlChecks.forEach(check => additionalCriteria.push({...check, category: 'هيكل الروابط'}));
+  }
+  if (contentChecks.length > 0) {
+    contentChecks.forEach(check => additionalCriteria.push({...check, category: 'جودة المحتوى'}));
+  }
+  if (technicalChecks.length > 0) {
+    technicalChecks.forEach(check => additionalCriteria.push({...check, category: 'السيو التقني'}));
+  }
+  
+  // إضافة المعايير من analyzeSEO إذا كانت موجودة
   if (analysis && analysis.categories) {
     Object.entries(analysis.categories).forEach(([categoryName, checks]) => {
       if (checks && Array.isArray(checks)) {
