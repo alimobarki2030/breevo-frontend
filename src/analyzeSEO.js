@@ -225,6 +225,14 @@ const analyzeSEO = (product) => {
       status: altIncludesKeyword || altIncludesTitle ? 'pass' : 'fail'
     });
 
+    // 9. Product title contains numbers or sizes (helpful for SEO)
+    criteria.push({
+      id: 'title_has_number',
+      text: 'العنوان يحتوي على حجم أو رقم',
+      status: /\d/.test(product.name || '') ? 'pass' : 'fail'
+    });
+
+
     const passedCount = criteria.filter(c => c.status === 'pass').length;
     const totalCount = criteria.length;
     const score = Math.round((passedCount / totalCount) * 100);
