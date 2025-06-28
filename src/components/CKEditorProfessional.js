@@ -3,8 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 const CKEditorProfessional = ({ 
   value = '', 
   onChange, 
-  placeholder = 'اكتب وصف المنتج هنا...',
-  minWords = 120 
+  placeholder = 'اكتب وصف المنتج هنا...'
 }) => {
   const editorRef = useRef();
   const [editorInstance, setEditorInstance] = useState(null);
@@ -50,7 +49,12 @@ const CKEditorProfessional = ({
                 '|',
                 'undo',
                 'redo'
-              ]
+              ],
+              shouldNotGroupWhenFull: true
+            },
+            // RTL interface configuration
+            ui: {
+              language: 'ar'
             },
             heading: {
               options: [
@@ -130,9 +134,6 @@ const CKEditorProfessional = ({
     }
   }, [value, editorInstance, isReady]);
 
-  const isMinWordsMet = wordCount >= minWords;
-  const progressPercentage = Math.min((wordCount / minWords) * 100, 100);
-
   // Quick insert functions
   const insertFeaturesList = () => {
     if (editorInstance) {
@@ -200,27 +201,6 @@ const CKEditorProfessional = ({
           <span className="stat">{wordCount} كلمة</span>
           <span className="stat">{charCount} حرف</span>
         </div>
-      </div>
-
-      {/* SEO Progress */}
-      <div className="seo-progress">
-        <div className="progress-info">
-          <span>معيار السيو الأساسي: {minWords}+ كلمة</span>
-          <span className={`status ${isMinWordsMet ? 'complete' : 'pending'}`}>
-            {isMinWordsMet ? '✅ مكتمل' : `${minWords - wordCount} كلمة متبقية`}
-          </span>
-        </div>
-        <div className="progress-bar">
-          <div 
-            className={`progress-fill ${isMinWordsMet ? 'complete' : 'pending'}`}
-            style={{ width: `${progressPercentage}%` }}
-          />
-        </div>
-      </div>
-
-      {/* SEO Tips */}
-      <div className="seo-tips">
-        💡 <strong>نصائح السيو:</strong> استخدم العناوين (H2، H3) والقوائم والروابط الداخلية
       </div>
 
       {/* Quick Actions */}
@@ -291,59 +271,6 @@ const CKEditorProfessional = ({
           padding: 4px 8px;
           border-radius: 4px;
           border: 1px solid #dee2e6;
-        }
-
-        .seo-progress {
-          background: #fff3cd;
-          padding: 12px 16px;
-          border-bottom: 1px solid #ffeaa7;
-        }
-
-        .progress-info {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 8px;
-          font-size: 14px;
-          color: #856404;
-        }
-
-        .status.complete {
-          color: #155724;
-          font-weight: 600;
-        }
-
-        .status.pending {
-          color: #856404;
-        }
-
-        .progress-bar {
-          width: 100%;
-          height: 6px;
-          background: #ffeaa7;
-          border-radius: 3px;
-          overflow: hidden;
-        }
-
-        .progress-fill {
-          height: 100%;
-          transition: all 0.3s ease;
-        }
-
-        .progress-fill.complete {
-          background: #28a745;
-        }
-
-        .progress-fill.pending {
-          background: #ffc107;
-        }
-
-        .seo-tips {
-          background: #e7f3ff;
-          padding: 10px 16px;
-          border-bottom: 1px solid #bee5eb;
-          font-size: 14px;
-          color: #0c5460;
         }
 
         .quick-actions {
@@ -511,9 +438,26 @@ const CKEditorProfessional = ({
           font-style: italic !important;
         }
 
-        /* Toolbar styling */
+        /* Toolbar styling - RTL direction */
         .ck.ck-toolbar .ck-toolbar__items {
-          direction: ltr !important;
+          direction: rtl !important;
+          justify-content: flex-start !important;
+        }
+
+        .ck.ck-toolbar {
+          direction: rtl !important;
+          text-align: right !important;
+        }
+
+        /* Toolbar groups alignment */
+        .ck.ck-toolbar .ck-toolbar__line {
+          direction: rtl !important;
+        }
+
+        /* Dropdown menus RTL */
+        .ck.ck-dropdown__panel {
+          direction: rtl !important;
+          text-align: right !important;
         }
 
         .ck.ck-button {
