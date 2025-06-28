@@ -651,7 +651,7 @@ export default function ProductSEO() {
   "description": "وصف HTML منسق حسب المعايير أعلاه",
   "keyword": "${keyword}",
   "meta_title": "Page Title جذاب (50-60 حرف)",
-  "meta_description": "Page Description مقنع (150-160 حرف)",
+  "meta_description": "Page Description مقنع (140-150 حرف)",
   "url_path": "مسار-url-صديق-لمحركات-البحث",
   "imageAlt": "وصف بديل للصورة يحتوي الكلمة المفتاحية"
 }`;
@@ -930,7 +930,7 @@ export default function ProductSEO() {
             <div className="text-4xl">⚡</div>
             <div>
               <h3 className="font-bold text-amber-900 text-lg">استخدم التوليد الذكي!</h3>
-              <p className="text-amber-700">اضغط "توليد شامل" لإنشاء محتوى محسن تلقائياً</p>
+              <p className="text-amber-700"> " "ابدأ الآن رحلة التحسين </p>
             </div>
           </div>
         </div>
@@ -1013,7 +1013,7 @@ export default function ProductSEO() {
           
           {isLocked ? (
             <div className="w-full p-3 border border-red-300 rounded-lg bg-red-50 text-red-700 text-center">
-              🔒 انتهت التجربة المجانية. ترقية مطلوبة للمتابعة
+              🔒 انتهت التجربة المجانية. قم بالترقية لتواصل ابداعك
               <div className="mt-2">
                 <button
                   onClick={showUpgradePrompt}
@@ -1097,7 +1097,7 @@ export default function ProductSEO() {
         
         {isLocked ? (
           <div className="w-full p-3 border border-red-300 rounded-lg bg-red-50 text-red-700 text-center">
-            🔒 انتهت التجربة المجانية. ترقية مطلوبة للمتابعة
+            🔒 انتهت التجربة المجانية. قم بالترقية لتواصل ابداعك
             <div className="mt-2">
               <button
                 onClick={showUpgradePrompt}
@@ -1144,7 +1144,7 @@ export default function ProductSEO() {
         )}
         {key === 'meta_description' && !isLocked && (
           <div className="text-xs text-gray-500 mt-2">
-            💡 Page Description المثالي: 150-160 حرف، يحتوي الكلمة المفتاحية، يحفز على الزيارة
+            💡 Page Description المثالي: 140-150 حرف، يحتوي الكلمة المفتاحية، يحفز على الزيارة
           </div>
         )}
         {key === 'keyword' && !isLocked && (
@@ -1283,7 +1283,7 @@ export default function ProductSEO() {
                         ) : (
                           <>
                             <Sparkles className="w-5 h-5" />
-                            🚀 التوليد الذكي
+                            التوليد الذكي
                           </>
                         )}
                       </button>
