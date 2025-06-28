@@ -266,6 +266,14 @@ export default function ProductSEO() {
   const [isTrialExpired, setIsTrialExpired] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
+  // Smart Generation Modal State
+  const [showGenerateModal, setShowGenerateModal] = useState(false);
+  const [generateOptions, setGenerateOptions] = useState({
+    productNameAction: "keep", // "keep", "add_keyword", "regenerate"
+    keywordAction: "generate", // "generate", "use_existing"
+    customKeyword: ""
+  });
+
   // Load user plan and trial usage
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -528,7 +536,7 @@ export default function ProductSEO() {
     }
   }, [validateProduct, product]);
 
-  // التوليد الذكي الشامل - مبسط وعملي
+  // التوليد الذكي الشامل - مع نافذة التحكم
   const handleGenerateAll = useCallback(async () => {
     if (userPlan === "free" && !checkTrialAccess()) {
       showUpgradePrompt();
@@ -541,50 +549,97 @@ export default function ProductSEO() {
       return;
     }
 
+    // إظهار نافذة التحكم بدلاً من التوليد المباشر
+    setShowGenerateModal(true);
+  }, [userPlan, trialUsage.used, trialUsage.limit, product.name, checkTrialAccess]);
+
+  // تنفيذ التوليد الذكي مع الخيارات المحددة
+  const executeSmartGeneration = useCallback(async () => {
     setGenerating(true);
+    setShowGenerateModal(false);
     setErrors(prev => ({ ...prev, generate: null }));
 
     try {
-      toast.loading("🧠 جاري التوليد الذكي...", { id: 'generating' });
+      toast.loading("🧠 جاري التوليد الذكي مع خياراتك...", { id: 'generating' });
 
       if (userPlan === "free") {
         incrementTrialUsage();
       }
 
-      // البرومبت المبسط والعملي
+      // تحديد الكلمة المفتاحية حسب اختيار المستخدم
+      let finalKeyword = "";
+      if (generateOptions.keywordAction === "use_existing") {
+        finalKeyword = generateOptions.customKeyword.trim();
+      } else {
+        // توليد كلمة مفتاحية جديدة
+        const keywordPrompt = `اختر أفضل كلمة مفتاحية لهذا المنتج للسوق السعودي:
+
+المنتج: ${product.name}
+
+الشروط:
+- 2-3 كلمات
+- حجم بحث جيد في السعودية
+- منافسة معقولة  
+- مرتبطة مباشرة بالمنتج
+
+أعطني الكلمة المفتاحية فقط:`;
+
+        finalKeyword = (await generateProductSEO(keywordPrompt)).trim();
+      }
+
+      // تحديد اسم المنتج حسب اختيار المستخدم
+      let finalProductName = product.name;
+      if (generateOptions.productNameAction === "add_keyword") {
+        finalProductName = `${product.name} ${finalKeyword}`;
+      } else if (generateOptions.productNameAction === "regenerate") {
+        const namePrompt = `أنشئ اسم منتج محسن لـ SEO بناءً على:
+
+الاسم الحالي: ${product.name}
+الكلمة المفتاحية: ${finalKeyword}
+
+الشروط:
+- احتفظ بالمعنى الأساسي
+- أضف الكلمة المفتاحية بطريقة طبيعية
+- أقل من 70 حرف
+- جذاب للعملاء
+
+أعطني الاسم المحسن فقط:`;
+
+        finalProductName = (await generateProductSEO(namePrompt)).trim();
+      }
+
+      // البرومبت الرئيسي للمحتوى
       const prompt = `أنت خبير SEO محترف. أنشئ محتوى محسن لهذا المنتج:
 
-المنتج: "${product.name}"
+المنتج: "${finalProductName}"
+الكلمة المفتاحية: "${finalKeyword}"
 
 التعليمات:
-1. اختر كلمة مفتاحية مناسبة للسوق السعودي (2-3 كلمات)
-2. اكتب عنوان منتج جذاب يحتوي الكلمة المفتاحية (أقل من 70 حرف)
-3. اكتب وصف HTML يحتوي على:
+1. استخدم الاسم والكلمة المفتاحية كما هما بالضبط
+2. اكتب وصف HTML يحتوي على:
    - فقرة افتتاحية تبدأ بالكلمة المفتاحية
    - قائمة بالمميزات الرئيسية (<ul><li>)
    - فقرة عن طريقة الاستخدام
    - دعوة واضحة للشراء
    - رابط داخلي مثل: <a href="/products">منتجاتنا الأخرى</a>
-4. Page Title محسن (50-60 حرف)
-5. Page Description مقنع (150-160 حرف)
-6. مسار URL باللغة الإنجليزية
-7. وصف ALT للصورة
+3. Page Title محسن (50-60 حرف) - يحتوي اسم المنتج والكلمة المفتاحية
+4. Page Description مقنع (150-160 حرف)
+5. مسار URL باللغة الإنجليزية مبني على اسم المنتج
+6. وصف ALT للصورة يتضمن اسم المنتج
 
 متطلبات مهمة:
 - الوصف 120+ كلمة
 - HTML بسيط: <p>, <ul>, <li>, <h3>, <strong>
-- توزيع طبيعي للكلمة المفتاحية (لا تكررها كثيراً)
-- محتوى يبيع المنتج وليس مجرد SEO
+- توزيع طبيعي للكلمة المفتاحية
+- محتوى يبيع المنتج ويحسن SEO
 
 أعد JSON فقط:
 {
-  "keyword": "الكلمة المفتاحية",
-  "name": "عنوان المنتج", 
   "description": "الوصف HTML المفصل",
-  "meta_title": "Page Title",
-  "meta_description": "Page Description", 
-  "url_path": "product-url",
-  "imageAlt": "وصف الصورة"
+  "meta_title": "Page Title يحتوي اسم المنتج",
+  "meta_description": "Page Description مقنع", 
+  "url_path": "product-url-based-on-name",
+  "imageAlt": "وصف الصورة مع اسم المنتج"
 }`;
 
       const generated = await generateProductSEO(prompt);
@@ -597,8 +652,8 @@ export default function ProductSEO() {
       const fields = JSON.parse(jsonMatch[0]);
 
       const processedFields = {
-        keyword: fields.keyword?.trim() || "",
-        name: truncateText(fields.name, FIELD_LIMITS.name_limit),
+        keyword: finalKeyword,
+        name: finalProductName,
         description: fields.description || "",
         meta_title: truncateText(fields.meta_title, FIELD_LIMITS.meta_title),
         meta_description: truncateText(fields.meta_description, FIELD_LIMITS.meta_description),
@@ -611,7 +666,7 @@ export default function ProductSEO() {
         ...processedFields,
       }));
 
-      toast.success("🎉 تم التوليد الذكي بنجاح!", { id: 'generating' });
+      toast.success("🎉 تم التوليد الذكي وفقاً لخياراتك!", { id: 'generating' });
       
       if (userPlan === "free") {
         const remaining = trialUsage.limit - trialUsage.used - 1;
@@ -625,7 +680,7 @@ export default function ProductSEO() {
     } finally {
       setGenerating(false);
     }
-  }, [userPlan, trialUsage.used, trialUsage.limit, product.name, checkTrialAccess]);
+  }, [userPlan, trialUsage.used, trialUsage.limit, product.name, generateOptions, checkTrialAccess]);
 
   // التوليد لحقل واحد - مبسط
   const handleGenerateField = useCallback(async (fieldType) => {
@@ -1378,6 +1433,13 @@ export default function ProductSEO() {
                   نصائح سريعة للنجاح
                 </h3>
                 <div className="space-y-3 text-sm text-gray-600">
+                  <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                    <div className="text-green-500 mt-0.5">✅</div>
+                    <div>
+                      <strong>التوليد الذكي:</strong> يحافظ على اسم منتجك الأصلي ويحسن الحقول الأخرى فقط (الوصف، Page Title، إلخ)
+                    </div>
+                  </div>
+                  
                   <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
                     <div className="text-blue-500 mt-0.5">🎯</div>
                     <div>
@@ -1385,24 +1447,17 @@ export default function ProductSEO() {
                     </div>
                   </div>
                   
-                  <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
-                    <div className="text-green-500 mt-0.5">📝</div>
+                  <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
+                    <div className="text-purple-500 mt-0.5">📝</div>
                     <div>
                       <strong>Page Title:</strong> 50-60 حرف، يحتوي الكلمة المفتاحية، جذاب للنقر
                     </div>
                   </div>
                   
-                  <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
-                    <div className="text-purple-500 mt-0.5">📖</div>
+                  <div className="flex items-start gap-3 p-3 bg-orange-50 rounded-lg">
+                    <div className="text-orange-500 mt-0.5">📖</div>
                     <div>
                       <strong>الوصف:</strong> ابدأ بالكلمة المفتاحية، 120+ كلمة، روابط داخلية، دعوة للشراء
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start gap-3 p-3 bg-orange-50 rounded-lg">
-                    <div className="text-orange-500 mt-0.5">🔗</div>
-                    <div>
-                      <strong>الروابط الداخلية:</strong> استخدم أداة الرابط 🔗 في المحرر لربط صفحات أخرى في موقعك
                     </div>
                   </div>
                 </div>
@@ -1432,6 +1487,200 @@ export default function ProductSEO() {
           </div>
         </main>
       </div>
+
+      {/* نافذة التوليد الذكي المنبثقة */}
+      {showGenerateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-t-2xl">
+              <div className="flex items-center gap-3">
+                <div className="text-3xl">🧠</div>
+                <div>
+                  <h2 className="text-xl font-bold">التوليد الذكي لمحتوى SEO</h2>
+                  <p className="text-blue-100 text-sm mt-1">خصص خيارات التوليد حسب احتياجاتك</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-6">
+              
+              {/* شرح توضيحي */}
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <div className="text-2xl">💡</div>
+                  <div>
+                    <h3 className="font-semibold text-blue-900 mb-2">كيف يعمل التوليد الذكي؟</h3>
+                    <p className="text-blue-800 text-sm leading-relaxed">
+                      سيساعدك على تعبئة الحقول وتحسين المحتوى لمنتجك بما يتوافق مع معايير السيو بنقرة واحدة. 
+                      <strong className="text-blue-900"> لا تنسى مراجعة المخرجات قبل النسخ أو النشر!</strong>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* خيار اسم المنتج */}
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                  <Package className="w-4 h-4 text-blue-500" />
+                  اسم المنتج الحالي: "{product.name}"
+                </label>
+                
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <label className="flex items-center space-x-3 space-x-reverse cursor-pointer">
+                      <input
+                        type="radio"
+                        name="productNameAction"
+                        value="keep"
+                        checked={generateOptions.productNameAction === "keep"}
+                        onChange={(e) => setGenerateOptions(prev => ({ ...prev, productNameAction: e.target.value }))}
+                        className="text-blue-600"
+                      />
+                      <span className="text-sm font-medium">لا تغير</span>
+                    </label>
+                    
+                    <label className="flex items-center space-x-3 space-x-reverse cursor-pointer">
+                      <input
+                        type="radio"
+                        name="productNameAction"
+                        value="add_keyword"
+                        checked={generateOptions.productNameAction === "add_keyword"}
+                        onChange={(e) => setGenerateOptions(prev => ({ ...prev, productNameAction: e.target.value }))}
+                        className="text-blue-600"
+                      />
+                      <span className="text-sm font-medium">أضف كلمة مفتاحية</span>
+                    </label>
+                    
+                    <label className="flex items-center space-x-3 space-x-reverse cursor-pointer">
+                      <input
+                        type="radio"
+                        name="productNameAction"
+                        value="regenerate"
+                        checked={generateOptions.productNameAction === "regenerate"}
+                        onChange={(e) => setGenerateOptions(prev => ({ ...prev, productNameAction: e.target.value }))}
+                        className="text-blue-600"
+                      />
+                      <span className="text-sm font-medium">أعد توليد</span>
+                    </label>
+                  </div>
+
+                  {generateOptions.productNameAction === "keep" && (
+                    <div className="text-xs text-green-600 bg-green-50 p-2 rounded">
+                      ✅ سيتم الاحتفاظ باسم المنتج كما هو: "{product.name}"
+                    </div>
+                  )}
+                  {generateOptions.productNameAction === "add_keyword" && (
+                    <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
+                      🔧 سيتم إضافة الكلمة المفتاحية لاسم المنتج لتحسين SEO
+                    </div>
+                  )}
+                  {generateOptions.productNameAction === "regenerate" && (
+                    <div className="text-xs text-purple-600 bg-purple-50 p-2 rounded">
+                      🚀 سيتم إنشاء اسم محسن جديد مع الحفاظ على المعنى الأساسي
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* خيار الكلمة المفتاحية */}
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                  <Search className="w-4 h-4 text-green-500" />
+                  الكلمة المفتاحية
+                </label>
+                
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label className="flex items-center space-x-3 space-x-reverse cursor-pointer">
+                      <input
+                        type="radio"
+                        name="keywordAction"
+                        value="generate"
+                        checked={generateOptions.keywordAction === "generate"}
+                        onChange={(e) => setGenerateOptions(prev => ({ ...prev, keywordAction: e.target.value }))}
+                        className="text-green-600"
+                      />
+                      <span className="text-sm font-medium">توليد تلقائي</span>
+                    </label>
+                    
+                    <label className="flex items-center space-x-3 space-x-reverse cursor-pointer">
+                      <input
+                        type="radio"
+                        name="keywordAction"
+                        value="use_existing"
+                        checked={generateOptions.keywordAction === "use_existing"}
+                        onChange={(e) => setGenerateOptions(prev => ({ ...prev, keywordAction: e.target.value }))}
+                        className="text-green-600"
+                      />
+                      <span className="text-sm font-medium">لدي كلمة مفتاحية</span>
+                    </label>
+                  </div>
+
+                  {generateOptions.keywordAction === "use_existing" && (
+                    <div className="space-y-2">
+                      <input
+                        type="text"
+                        value={generateOptions.customKeyword}
+                        onChange={(e) => setGenerateOptions(prev => ({ ...prev, customKeyword: e.target.value }))}
+                        placeholder="أدخل الكلمة المفتاحية هنا..."
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                      />
+                      <div className="text-xs text-gray-600">
+                        💡 مثال: "كريم مرطب" أو "هاتف ذكي" أو "أحذية رياضية"
+                      </div>
+                    </div>
+                  )}
+
+                  {generateOptions.keywordAction === "generate" && (
+                    <div className="text-xs text-green-600 bg-green-50 p-2 rounded">
+                      🎯 سيتم اختيار أفضل كلمة مفتاحية تلقائياً بناءً على اسم المنتج والسوق السعودي
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* ملخص سريع */}
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl p-4">
+                <h4 className="font-semibold text-purple-900 mb-2">📋 ملخص العملية:</h4>
+                <ul className="text-sm text-purple-800 space-y-1">
+                  <li>✅ توليد وصف منتج محسن (120+ كلمة)</li>
+                  <li>✅ إنشاء Page Title جذاب (50-60 حرف)</li>
+                  <li>✅ كتابة Page Description مقنع (150-160 حرف)</li>
+                  <li>✅ تحسين مسار URL</li>
+                  <li>✅ نص ALT للصورة</li>
+                  <li>✅ إضافة روابط داخلية ودعوة للشراء</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Footer with buttons */}
+            <div className="bg-gray-50 p-6 rounded-b-2xl flex items-center justify-between">
+              <button
+                onClick={() => setShowGenerateModal(false)}
+                className="px-6 py-3 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                إلغاء
+              </button>
+              
+              <button
+                onClick={executeSmartGeneration}
+                disabled={generateOptions.keywordAction === "use_existing" && !generateOptions.customKeyword.trim()}
+                className={`px-8 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                  generateOptions.keywordAction === "use_existing" && !generateOptions.customKeyword.trim()
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 shadow-md hover:shadow-lg"
+                }`}
+              >
+                <Sparkles className="w-5 h-5" />
+                🚀 ابدأ التوليد الذكي
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
