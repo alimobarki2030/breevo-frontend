@@ -1,392 +1,400 @@
-import React, { useCallback, useState } from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import Link from '@tiptap/extension-link';
-import { 
-  Bold, 
-  Italic, 
-  List, 
-  ListOrdered, 
-  Heading2, 
-  Heading3, 
-  Link as LinkIcon, 
-  Unlink,
-  Code,
-  Quote
-} from 'lucide-react';
+import React, { useMemo, useRef } from 'react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
-const TiptapEditor = ({ value = '', onChange, placeholder = '' }) => {
-  const [showLinkDialog, setShowLinkDialog] = useState(false);
-  const [linkUrl, setLinkUrl] = useState('');
-  
-  const editor = useEditor({
-    extensions: [
-      StarterKit.configure({
-        heading: {
-          levels: [2, 3],
-        },
-      }),
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: 'text-blue-600 underline hover:text-blue-800',
-          rel: 'noopener noreferrer',
-          target: '_blank',
-        },
-      }),
-    ],
-    content: value,
-    onUpdate: ({ editor }) => {
-      const html = editor.getHTML();
-      onChange?.(html);
+const EnhancedRichTextEditor = ({ 
+  value = '', 
+  onChange, 
+  placeholder = 'اكتب وصف المنتج هنا...',
+  minWords = 120 
+}) => {
+  const quillRef = useRef(null);
+
+  // Custom toolbar configuration
+  const modules = useMemo(() => ({
+    toolbar: {
+      container: [
+        [{ 'font': [] }, { 'size': ['small', false, 'large', 'huge'] }],
+        [{ 'header': [2, 3, false] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ 'color': [] }, { 'background': [] }],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'indent': '-1'}, { 'indent': '+1' }],
+        [{ 'align': [] }],
+        ['blockquote', 'code-block'],
+        ['link', 'image'],
+        ['clean']
+      ],
+      handlers: {
+        'link': function(value) {
+          if (value) {
+            const href = prompt('أدخل الرابط:');
+            if (href) {
+              this.quill.format('link', href);
+            }
+          } else {
+            this.quill.format('link', false);
+          }
+        }
+      }
     },
-    editorProps: {
-      attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[200px] p-4',
-        style: 'direction: rtl; text-align: right;'
-      },
-    },
-  });
-
-  const setLink = useCallback(() => {
-    if (!editor) return;
-
-    const previousUrl = editor.getAttributes('link').href;
-    setLinkUrl(previousUrl || '');
-    setShowLinkDialog(true);
-  }, [editor]);
-
-  const handleLinkSubmit = useCallback(() => {
-    if (!editor) return;
-
-    // Empty
-    if (linkUrl === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
-      setShowLinkDialog(false);
-      return;
+    clipboard: {
+      matchVisual: false,
     }
+  }), []);
 
-    // Update link
-    let finalUrl = linkUrl;
-    if (!linkUrl.startsWith('http://') && !linkUrl.startsWith('https://') && !linkUrl.startsWith('/')) {
-      finalUrl = 'https://' + linkUrl;
-    }
-
-    editor.chain().focus().extendMarkRange('link').setLink({ href: finalUrl }).run();
-    setShowLinkDialog(false);
-    setLinkUrl('');
-  }, [editor, linkUrl]);
-
-  const unsetLink = useCallback(() => {
-    if (!editor) return;
-    editor.chain().focus().unsetLink().run();
-  }, [editor]);
-
-  if (!editor) {
-    return null;
-  }
-
-  const ToolbarButton = ({ onClick, active, disabled, children, title }) => (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      title={title}
-      className={`p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-        active 
-          ? 'bg-blue-100 text-blue-700 border border-blue-300' 
-          : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-300'
-      }`}
-    >
-      {children}
-    </button>
-  );
+  const formats = [
+    'header', 'font', 'size',
+    'bold', 'italic', 'underline', 'strike', 'blockquote',
+    'list', 'bullet', 'indent',
+    'link', 'image', 'color', 'background',
+    'align', 'code-block'
+  ];
 
   // Calculate word count
-  const text = editor.getText();
-  const words = text.trim().split(/\s+/).filter(word => word.length > 0);
-  const wordCount = words.length;
-  const charCount = text.length;
+  const getWordCount = (text) => {
+    const plainText = text.replace(/<[^>]*>/g, ' ').trim();
+    if (!plainText) return 0;
+    return plainText.split(/\s+/).filter(word => word.length > 0).length;
+  };
+
+  const wordCount = getWordCount(value);
+  const charCount = value.replace(/<[^>]*>/g, '').length;
+  const isMinWordsMet = wordCount >= minWords;
 
   return (
-    <div className="border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
-      {/* Toolbar */}
-      <div className="border-b border-gray-200 p-3 bg-gray-50 rounded-t-lg">
-        <div className="flex flex-wrap gap-2 items-center">
-          {/* Text Formatting */}
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            active={editor.isActive('bold')}
-            title="غامق (Ctrl+B)"
-          >
-            <Bold className="w-4 h-4" />
-          </ToolbarButton>
-          
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            active={editor.isActive('italic')}
-            title="مائل (Ctrl+I)"
-          >
-            <Italic className="w-4 h-4" />
-          </ToolbarButton>
-
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleCode().run()}
-            active={editor.isActive('code')}
-            title="كود"
-          >
-            <Code className="w-4 h-4" />
-          </ToolbarButton>
-
-          {/* Separator */}
-          <div className="w-px h-6 bg-gray-300 mx-1"></div>
-
-          {/* Headings */}
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-            active={editor.isActive('heading', { level: 2 })}
-            title="عنوان رئيسي (H2)"
-          >
-            <Heading2 className="w-4 h-4" />
-          </ToolbarButton>
-
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-            active={editor.isActive('heading', { level: 3 })}
-            title="عنوان فرعي (H3)"
-          >
-            <Heading3 className="w-4 h-4" />
-          </ToolbarButton>
-
-          {/* Separator */}
-          <div className="w-px h-6 bg-gray-300 mx-1"></div>
-
-          {/* Lists */}
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            active={editor.isActive('bulletList')}
-            title="قائمة نقطية"
-          >
-            <List className="w-4 h-4" />
-          </ToolbarButton>
-
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            active={editor.isActive('orderedList')}
-            title="قائمة مرقمة"
-          >
-            <ListOrdered className="w-4 h-4" />
-          </ToolbarButton>
-
-          {/* Separator */}
-          <div className="w-px h-6 bg-gray-300 mx-1"></div>
-
-          {/* Quote */}
-          <ToolbarButton
-            onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            active={editor.isActive('blockquote')}
-            title="اقتباس"
-          >
-            <Quote className="w-4 h-4" />
-          </ToolbarButton>
-
-          {/* Separator */}
-          <div className="w-px h-6 bg-gray-300 mx-1"></div>
-
-          {/* Links */}
-          <ToolbarButton
-            onClick={setLink}
-            active={editor.isActive('link')}
-            title="إضافة رابط (Ctrl+K)"
-          >
-            <LinkIcon className="w-4 h-4" />
-          </ToolbarButton>
-
-          <ToolbarButton
-            onClick={unsetLink}
-            disabled={!editor.isActive('link')}
-            title="إزالة الرابط"
-          >
-            <Unlink className="w-4 h-4" />
-          </ToolbarButton>
+    <div className="enhanced-editor-container">
+      {/* Header with stats */}
+      <div className="editor-header">
+        <div className="editor-title">
+          <span className="editor-icon">✍️</span>
+          وصف المنتج التفصيلي
+          <span className="pro-badge">PRO</span>
         </div>
-
-        {/* SEO Tips */}
-        <div className="mt-3 text-xs text-gray-600 bg-blue-50 p-2 rounded border-l-4 border-blue-400">
-          <strong>💡 نصائح السيو:</strong> استخدم <strong>H2</strong> و <strong>H3</strong> لتنظيم المحتوى، 
-          أضف <strong>قوائم نقطية</strong> للمميزات، وأدرج <strong>روابط داخلية 🔗</strong> للصفحات الأخرى
+        <div className="editor-stats">
+          <span className={`stat-item ${isMinWordsMet ? 'stat-success' : 'stat-warning'}`}>
+            📝 {wordCount} كلمة
+          </span>
+          <span className="stat-item">
+            📊 {charCount} حرف
+          </span>
         </div>
       </div>
 
-      {/* Editor Content */}
-      <EditorContent 
-        editor={editor} 
-        placeholder={placeholder}
-        className="min-h-[200px]"
-      />
+      {/* SEO Tips */}
+      <div className="seo-tips">
+        <div className="tip-icon">💡</div>
+        <div className="tip-content">
+          <strong>نصائح السيو:</strong> استخدم <strong>العناوين الفرعية</strong> لتنظيم المحتوى، 
+          أضف <strong>قوائم نقطية</strong> للمميزات، وأدرج <strong>روابط داخلية</strong> للصفحات الأخرى
+        </div>
+      </div>
 
-      {/* Link Dialog */}
-      {showLinkDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96 max-w-[90vw]">
-            <h3 className="text-lg font-semibold mb-4 text-gray-900">إضافة رابط</h3>
-            
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                عنوان الرابط (URL)
-              </label>
-              <input
-                type="url"
-                value={linkUrl}
-                onChange={(e) => setLinkUrl(e.target.value)}
-                placeholder="https://example.com أو /products"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                autoFocus
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleLinkSubmit();
-                  } else if (e.key === 'Escape') {
-                    setShowLinkDialog(false);
-                  }
-                }}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                سيتم فتح الرابط في نافذة جديدة تلقائياً
-              </p>
-            </div>
+      {/* Rich Text Editor */}
+      <div className="editor-wrapper">
+        <ReactQuill
+          ref={quillRef}
+          theme="snow"
+          value={value}
+          onChange={onChange}
+          modules={modules}
+          formats={formats}
+          placeholder={placeholder}
+          style={{
+            direction: 'rtl',
+            textAlign: 'right'
+          }}
+        />
+      </div>
 
-            <div className="mb-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-              <h4 className="text-sm font-semibold text-yellow-800 mb-2">💡 أمثلة على الروابط الداخلية المفيدة:</h4>
-              <div className="text-xs text-yellow-700 space-y-1">
-                <div>• <code>/products</code> - صفحة المنتجات الأخرى</div>
-                <div>• <code>/about</code> - من نحن</div>
-                <div>• <code>/contact</code> - اتصل بنا</div>
-                <div>• <code>/reviews</code> - مراجعات العملاء</div>
-                <div>• <code>/shipping</code> - الشحن والتوصيل</div>
-                <div>• <code>/warranty</code> - ضمان المنتج</div>
-              </div>
-            </div>
-
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={() => setShowLinkDialog(false)}
-                className="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                إلغاء
-              </button>
-              <button
-                onClick={handleLinkSubmit}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                {linkUrl === '' ? 'إزالة الرابط' : 'إضافة الرابط'}
-              </button>
-            </div>
+      {/* Footer with progress */}
+      <div className="editor-footer">
+        <div className="progress-section">
+          <div className="progress-label">
+            معيار السيو الأساسي ({minWords}+ كلمة)
+          </div>
+          <div className="progress-bar">
+            <div 
+              className={`progress-fill ${isMinWordsMet ? 'progress-complete' : 'progress-incomplete'}`}
+              style={{ width: `${Math.min((wordCount / minWords) * 100, 100)}%` }}
+            ></div>
+          </div>
+          <div className={`progress-text ${isMinWordsMet ? 'text-success' : 'text-warning'}`}>
+            {isMinWordsMet 
+              ? '✅ المعيار الأساسي مكتمل!' 
+              : `يحتاج ${minWords - wordCount} كلمة إضافية`
+            }
           </div>
         </div>
-      )}
-
-      {/* Character Count */}
-      <div className="p-3 border-t border-gray-200 bg-gray-50 rounded-b-lg">
-        <div className="flex justify-between items-center text-xs text-gray-500">
-          <div>
-            <span className="font-medium">عدد الكلمات:</span> {wordCount}
-            <span className="mx-2">•</span>
-            <span className="font-medium">الأحرف:</span> {charCount}
-          </div>
-          <div className="flex items-center gap-4">
-            <span className={`font-medium px-3 py-1 rounded-full ${
-              wordCount >= 120 
-                ? 'text-green-600 bg-green-100' 
-                : 'text-amber-600 bg-amber-100'
-            }`}>
-              {wordCount >= 120 
-                ? '✅ المعيار الأساسي مكتمل' 
-                : `يحتاج ${120 - wordCount} كلمة إضافية`
+        
+        <div className="quick-actions">
+          <button 
+            className="action-btn"
+            onClick={() => {
+              const editor = quillRef.current?.getEditor();
+              if (editor) {
+                editor.insertText(editor.getLength(), '\n\n✨ مميزات المنتج:\n• \n• \n• ');
               }
-            </span>
-          </div>
+            }}
+          >
+            ➕ إضافة قائمة مميزات
+          </button>
+          <button 
+            className="action-btn"
+            onClick={() => {
+              const editor = quillRef.current?.getEditor();
+              if (editor) {
+                editor.insertText(editor.getLength(), '\n\n🛍️ طريقة الاستخدام:\n1. \n2. \n3. ');
+              }
+            }}
+          >
+            📋 إضافة طريقة استخدام
+          </button>
         </div>
       </div>
 
-      {/* Custom CSS */}
-      <style jsx global>{`
-        .ProseMirror {
-          direction: rtl !important;
-          text-align: right !important;
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          line-height: 1.6;
-          outline: none;
-          min-height: 200px;
-          padding: 16px;
+      {/* Custom Styles */}
+      <style jsx>{`
+        .enhanced-editor-container {
+          border: 2px solid #e5e7eb;
+          border-radius: 16px;
+          overflow: hidden;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          background: white;
+          transition: all 0.3s ease;
         }
-        
-        .ProseMirror h2 {
-          font-size: 1.5em;
-          font-weight: bold;
-          margin: 1.5em 0 0.75em 0;
-          color: #1f2937;
-          border-bottom: 2px solid #e5e7eb;
-          padding-bottom: 0.25em;
+
+        .enhanced-editor-container:focus-within {
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
-        
-        .ProseMirror h3 {
-          font-size: 1.25em;
-          font-weight: bold;
-          margin: 1.25em 0 0.5em 0;
-          color: #374151;
+
+        .editor-header {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 16px 20px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
         }
-        
-        .ProseMirror ul, .ProseMirror ol {
-          margin: 1em 0;
-          padding-right: 1.5em;
+
+        .editor-title {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-weight: 600;
+          font-size: 16px;
         }
-        
-        .ProseMirror li {
-          margin: 0.5em 0;
-          line-height: 1.6;
+
+        .editor-icon {
+          font-size: 20px;
         }
-        
-        .ProseMirror a {
-          color: #2563eb;
-          text-decoration: underline;
+
+        .pro-badge {
+          background: rgba(255, 255, 255, 0.2);
+          padding: 2px 8px;
+          border-radius: 12px;
+          font-size: 12px;
           font-weight: 500;
         }
-        
-        .ProseMirror a:hover {
-          color: #1d4ed8;
-          background-color: #dbeafe;
-          padding: 2px 4px;
+
+        .editor-stats {
+          display: flex;
+          gap: 16px;
+        }
+
+        .stat-item {
+          background: rgba(255, 255, 255, 0.15);
+          padding: 4px 12px;
+          border-radius: 20px;
+          font-size: 14px;
+          backdrop-filter: blur(10px);
+        }
+
+        .stat-success {
+          background: rgba(34, 197, 94, 0.2);
+        }
+
+        .stat-warning {
+          background: rgba(251, 191, 36, 0.2);
+        }
+
+        .seo-tips {
+          background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+          padding: 12px 20px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          border-bottom: 1px solid #f3f4f6;
+        }
+
+        .tip-icon {
+          font-size: 20px;
+        }
+
+        .tip-content {
+          color: #92400e;
+          font-size: 14px;
+          line-height: 1.5;
+        }
+
+        .editor-wrapper {
+          background: white;
+        }
+
+        .editor-footer {
+          background: #f9fafb;
+          padding: 16px 20px;
+          border-top: 1px solid #e5e7eb;
+        }
+
+        .progress-section {
+          margin-bottom: 16px;
+        }
+
+        .progress-label {
+          font-size: 14px;
+          font-weight: 500;
+          color: #374151;
+          margin-bottom: 8px;
+        }
+
+        .progress-bar {
+          width: 100%;
+          height: 8px;
+          background: #e5e7eb;
+          border-radius: 4px;
+          overflow: hidden;
+          margin-bottom: 8px;
+        }
+
+        .progress-fill {
+          height: 100%;
+          transition: all 0.3s ease;
           border-radius: 4px;
         }
-        
-        .ProseMirror blockquote {
+
+        .progress-complete {
+          background: linear-gradient(90deg, #10b981, #34d399);
+        }
+
+        .progress-incomplete {
+          background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        }
+
+        .progress-text {
+          font-size: 13px;
+          font-weight: 500;
+        }
+
+        .text-success {
+          color: #059669;
+        }
+
+        .text-warning {
+          color: #d97706;
+        }
+
+        .quick-actions {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+
+        .action-btn {
+          background: white;
+          border: 1px solid #d1d5db;
+          border-radius: 8px;
+          padding: 8px 16px;
+          font-size: 13px;
+          color: #374151;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .action-btn:hover {
+          background: #f3f4f6;
+          border-color: #9ca3af;
+          transform: translateY(-1px);
+        }
+
+        /* Quill Editor Custom Styles */
+        .ql-toolbar.ql-snow {
+          border: none;
+          border-bottom: 1px solid #e5e7eb;
+          background: #fafafa;
+        }
+
+        .ql-container.ql-snow {
+          border: none;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          font-size: 16px;
+          line-height: 1.6;
+          min-height: 250px;
+        }
+
+        .ql-editor {
+          direction: rtl !important;
+          text-align: right !important;
+          padding: 20px;
+          min-height: 250px;
+        }
+
+        .ql-editor.ql-blank::before {
+          font-style: normal;
+          color: #9ca3af;
+          right: 20px;
+          left: auto;
+        }
+
+        .ql-snow .ql-tooltip {
+          direction: rtl;
+        }
+
+        .ql-editor h2 {
+          border-bottom: 2px solid #e5e7eb;
+          padding-bottom: 8px;
+          color: #1f2937;
+        }
+
+        .ql-editor h3 {
+          color: #374151;
+        }
+
+        .ql-editor a {
+          color: #2563eb;
+          text-decoration: underline;
+        }
+
+        .ql-editor blockquote {
           border-right: 4px solid #3b82f6;
-          margin: 1em 0;
-          padding: 0.75em 1em;
-          background-color: #f8fafc;
-          font-style: italic;
-          color: #475569;
+          border-left: none;
+          padding: 16px;
+          background: #f8fafc;
+          margin: 16px 0;
           border-radius: 0 8px 8px 0;
         }
-        
-        .ProseMirror code {
-          background-color: #f1f5f9;
-          color: #1e293b;
-          padding: 2px 4px;
-          border-radius: 4px;
-          font-family: 'Monaco', 'Consolas', monospace;
-          font-size: 0.9em;
-        }
-        
-        .ProseMirror p.is-editor-empty:first-child::before {
-          color: #9ca3af;
-          content: attr(data-placeholder);
-          float: right;
-          height: 0;
-          pointer-events: none;
+
+        @media (max-width: 768px) {
+          .editor-header {
+            flex-direction: column;
+            gap: 12px;
+            align-items: stretch;
+          }
+
+          .editor-stats {
+            justify-content: center;
+          }
+
+          .quick-actions {
+            justify-content: center;
+          }
         }
       `}</style>
     </div>
   );
 };
 
-export default TiptapEditor;
+export default EnhancedRichTextEditor;
