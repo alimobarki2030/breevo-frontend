@@ -268,10 +268,14 @@ export default function ProductSEO() {
 
   // Smart Generation Modal State
   const [showGenerateModal, setShowGenerateModal] = useState(false);
-  const [generateOptions, setGenerateOptions] = useState({
-    productNameAction: "keep", // "keep", "add_keyword", "regenerate"
-    keywordAction: "generate", // "generate", "use_existing"
-    customKeyword: ""
+  const [generateOptions, setGenerateOptions] = useState(() => {
+    // تحميل الخيارات المحفوظة من localStorage
+    const saved = localStorage.getItem("seo_generate_options");
+    return saved ? JSON.parse(saved) : {
+      productNameAction: "keep",
+      keywordAction: "generate", 
+      customKeyword: ""
+    };
   });
 
   // Load user plan and trial usage
@@ -331,6 +335,13 @@ export default function ProductSEO() {
 
   const showUpgradePrompt = () => {
     setShowUpgradeModal(true);
+  };
+
+  const updateGenerateOptions = (newOptions) => {
+    const updatedOptions = { ...generateOptions, ...newOptions };
+    setGenerateOptions(updatedOptions);
+    // حفظ الخيارات في localStorage
+    localStorage.setItem("seo_generate_options", JSON.stringify(updatedOptions));
   };
 
   // Load product data
@@ -572,7 +583,8 @@ export default function ProductSEO() {
         finalKeyword = generateOptions.customKeyword.trim();
       } else {
         // توليد كلمة مفتاحية جديدة
-        const keywordPrompt = `اختر أفضل كلمة مفتاحية لهذا المنتج للسوق السعودي:
+        try {
+          const keywordPrompt = `اختر أفضل كلمة مفتاحية لهذا المنتج للسوق السعودي:
 
 المنتج: ${product.name}
 
@@ -584,7 +596,12 @@ export default function ProductSEO() {
 
 أعطني الكلمة المفتاحية فقط:`;
 
-        finalKeyword = (await generateProductSEO(keywordPrompt)).trim();
+          const keywordResponse = await generateProductSEO(keywordPrompt);
+          finalKeyword = keywordResponse.replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim();
+        } catch (error) {
+          console.error("Keyword generation failed:", error);
+          finalKeyword = product.name; // استخدام اسم المنتج كـ fallback
+        }
       }
 
       // تحديد اسم المنتج حسب اختيار المستخدم
@@ -592,7 +609,8 @@ export default function ProductSEO() {
       if (generateOptions.productNameAction === "add_keyword") {
         finalProductName = `${product.name} ${finalKeyword}`;
       } else if (generateOptions.productNameAction === "regenerate") {
-        const namePrompt = `أنشئ اسم منتج محسن لـ SEO بناءً على:
+        try {
+          const namePrompt = `أنشئ اسم منتج محسن لـ SEO بناءً على:
 
 الاسم الحالي: ${product.name}
 الكلمة المفتاحية: ${finalKeyword}
@@ -605,7 +623,12 @@ export default function ProductSEO() {
 
 أعطني الاسم المحسن فقط:`;
 
-        finalProductName = (await generateProductSEO(namePrompt)).trim();
+          const nameResponse = await generateProductSEO(namePrompt);
+          finalProductName = nameResponse.replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim();
+        } catch (error) {
+          console.error("Product name generation failed:", error);
+          finalProductName = `${product.name} ${finalKeyword}`; // fallback
+        }
       }
 
       // البرومبت الرئيسي للمحتوى
@@ -633,7 +656,7 @@ export default function ProductSEO() {
 - توزيع طبيعي للكلمة المفتاحية
 - محتوى يبيع المنتج ويحسن SEO
 
-أعد JSON فقط:
+أعد JSON نظيف فقط بدون أي نص إضافي:
 {
   "description": "الوصف HTML المفصل",
   "meta_title": "Page Title يحتوي اسم المنتج",
@@ -643,13 +666,30 @@ export default function ProductSEO() {
 }`;
 
       const generated = await generateProductSEO(prompt);
-      const jsonMatch = generated.match(/{[\s\S]*}/);
+      
+      // تنظيف النص المُولد قبل تحليل JSON
+      let cleanedGenerated = generated
+        .replace(/[\x00-\x1F\x7F-\x9F]/g, '') // إزالة أحرف التحكم
+        .replace(/\n/g, '\\n') // تحويل أسطر جديدة لصيغة JSON صالحة
+        .replace(/\r/g, '\\r') // تحويل carriage returns
+        .replace(/\t/g, '\\t') // تحويل tabs
+        .trim();
+      
+      const jsonMatch = cleanedGenerated.match(/{[\s\S]*}/);
       
       if (!jsonMatch) {
-        throw new Error("فشل في توليد المحتوى");
+        throw new Error("فشل في توليد المحتوى - لم يتم العثور على JSON صالح");
       }
 
-      const fields = JSON.parse(jsonMatch[0]);
+      let fields;
+      try {
+        fields = JSON.parse(jsonMatch[0]);
+      } catch (parseError) {
+        console.error("JSON Parse Error:", parseError);
+        console.error("Generated content:", generated);
+        console.error("Cleaned content:", cleanedGenerated);
+        throw new Error("فشل في تحليل المحتوى المُولد - يرجى المحاولة مرة أخرى");
+      }
 
       const processedFields = {
         keyword: finalKeyword,
@@ -668,6 +708,11 @@ export default function ProductSEO() {
 
       toast.success("🎉 تم التوليد الذكي وفقاً لخياراتك!", { id: 'generating' });
       
+      // تحذير إذا تم استخدام fallback
+      if (finalKeyword === product.name && generateOptions.keywordAction === "generate") {
+        toast.warning("⚠️ تم استخدام اسم المنتج كلمة مفتاحية. يمكنك تعديلها يدوياً.", { duration: 4000 });
+      }
+      
       if (userPlan === "free") {
         const remaining = trialUsage.limit - trialUsage.used - 1;
         toast.success(`✨ ${remaining} توليدة مجانية متبقية هذا الشهر`, { duration: 4000 });
@@ -675,8 +720,20 @@ export default function ProductSEO() {
 
     } catch (error) {
       console.error("Error generating fields:", error);
-      toast.error("❌ فشل في التوليد الذكي", { id: 'generating' });
-      setErrors(prev => ({ ...prev, generate: "فشل في التوليد الذكي. حاول مرة أخرى." }));
+      
+      // رسائل خطأ محددة حسب نوع المشكلة
+      let errorMessage = "فشل في التوليد الذكي. حاول مرة أخرى.";
+      
+      if (error.message.includes("JSON")) {
+        errorMessage = "خطأ في تحليل المحتوى المُولد. يرجى المحاولة مرة أخرى.";
+      } else if (error.message.includes("فشل في توليد المحتوى")) {
+        errorMessage = "لم يتم توليد محتوى صالح. تأكد من صحة اسم المنتج والمحاولة مرة أخرى.";
+      } else if (error.name === "TypeError" || error.message.includes("fetch")) {
+        errorMessage = "مشكلة في الاتصال. تأكد من الاتصال بالإنترنت وحاول مرة أخرى.";
+      }
+      
+      toast.error("❌ " + errorMessage, { id: 'generating' });
+      setErrors(prev => ({ ...prev, generate: errorMessage }));
     } finally {
       setGenerating(false);
     }
@@ -1490,7 +1547,14 @@ export default function ProductSEO() {
 
       {/* نافذة التوليد الذكي المنبثقة */}
       {showGenerateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          onClick={(e) => {
+            // منع الإغلاق أثناء التوليد أو إذا تم النقر على النافذة نفسها
+            if (generating || e.target !== e.currentTarget) return;
+            setShowGenerateModal(false);
+          }}
+        >
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             
             {/* Header */}
@@ -1536,7 +1600,7 @@ export default function ProductSEO() {
                         name="productNameAction"
                         value="keep"
                         checked={generateOptions.productNameAction === "keep"}
-                        onChange={(e) => setGenerateOptions(prev => ({ ...prev, productNameAction: e.target.value }))}
+                        onChange={(e) => updateGenerateOptions({ productNameAction: e.target.value })}
                         className="text-blue-600"
                       />
                       <span className="text-sm font-medium">لا تغير</span>
@@ -1548,7 +1612,7 @@ export default function ProductSEO() {
                         name="productNameAction"
                         value="add_keyword"
                         checked={generateOptions.productNameAction === "add_keyword"}
-                        onChange={(e) => setGenerateOptions(prev => ({ ...prev, productNameAction: e.target.value }))}
+                        onChange={(e) => updateGenerateOptions({ productNameAction: e.target.value })}
                         className="text-blue-600"
                       />
                       <span className="text-sm font-medium">أضف كلمة مفتاحية</span>
@@ -1560,7 +1624,7 @@ export default function ProductSEO() {
                         name="productNameAction"
                         value="regenerate"
                         checked={generateOptions.productNameAction === "regenerate"}
-                        onChange={(e) => setGenerateOptions(prev => ({ ...prev, productNameAction: e.target.value }))}
+                        onChange={(e) => updateGenerateOptions({ productNameAction: e.target.value })}
                         className="text-blue-600"
                       />
                       <span className="text-sm font-medium">أعد توليد</span>
@@ -1600,7 +1664,7 @@ export default function ProductSEO() {
                         name="keywordAction"
                         value="generate"
                         checked={generateOptions.keywordAction === "generate"}
-                        onChange={(e) => setGenerateOptions(prev => ({ ...prev, keywordAction: e.target.value }))}
+                        onChange={(e) => updateGenerateOptions({ keywordAction: e.target.value })}
                         className="text-green-600"
                       />
                       <span className="text-sm font-medium">توليد تلقائي</span>
@@ -1612,7 +1676,7 @@ export default function ProductSEO() {
                         name="keywordAction"
                         value="use_existing"
                         checked={generateOptions.keywordAction === "use_existing"}
-                        onChange={(e) => setGenerateOptions(prev => ({ ...prev, keywordAction: e.target.value }))}
+                        onChange={(e) => updateGenerateOptions({ keywordAction: e.target.value })}
                         className="text-green-600"
                       />
                       <span className="text-sm font-medium">لدي كلمة مفتاحية</span>
@@ -1624,7 +1688,7 @@ export default function ProductSEO() {
                       <input
                         type="text"
                         value={generateOptions.customKeyword}
-                        onChange={(e) => setGenerateOptions(prev => ({ ...prev, customKeyword: e.target.value }))}
+                        onChange={(e) => updateGenerateOptions({ customKeyword: e.target.value })}
                         placeholder="أدخل الكلمة المفتاحية هنا..."
                         className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
@@ -1653,6 +1717,25 @@ export default function ProductSEO() {
                   <li>✅ نص ALT للصورة</li>
                   <li>✅ إضافة روابط داخلية ودعوة للشراء</li>
                 </ul>
+                
+                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="text-yellow-800 text-sm">
+                    <strong>💡 نصيحة:</strong> ستتذكر خياراتك للمرة القادمة لتوفير الوقت!
+                  </div>
+                </div>
+                
+                {/* معاينة سريعة للنتيجة المتوقعة */}
+                <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="text-green-800 text-sm">
+                    <strong>🎯 المتوقع:</strong> 
+                    {generateOptions.productNameAction === "keep" && " اسم المنتج الحالي"}
+                    {generateOptions.productNameAction === "add_keyword" && " اسم المنتج + كلمة مفتاحية"}
+                    {generateOptions.productNameAction === "regenerate" && " اسم محسن جديد"}
+                    {" + "}
+                    {generateOptions.keywordAction === "generate" && "كلمة مفتاحية مقترحة"}
+                    {generateOptions.keywordAction === "use_existing" && `كلمتك: "${generateOptions.customKeyword}"`}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1660,22 +1743,38 @@ export default function ProductSEO() {
             <div className="bg-gray-50 p-6 rounded-b-2xl flex items-center justify-between">
               <button
                 onClick={() => setShowGenerateModal(false)}
-                className="px-6 py-3 text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                disabled={generating}
+                className={`px-6 py-3 border border-gray-300 rounded-lg transition-colors ${
+                  generating 
+                    ? "text-gray-400 bg-gray-100 cursor-not-allowed"
+                    : "text-gray-600 bg-white hover:bg-gray-50"
+                }`}
               >
-                إلغاء
+                {generating ? "جاري التوليد..." : "إلغاء"}
               </button>
               
               <button
                 onClick={executeSmartGeneration}
-                disabled={generateOptions.keywordAction === "use_existing" && !generateOptions.customKeyword.trim()}
+                disabled={generating || (generateOptions.keywordAction === "use_existing" && !generateOptions.customKeyword.trim())}
                 className={`px-8 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
-                  generateOptions.keywordAction === "use_existing" && !generateOptions.customKeyword.trim()
+                  generating 
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 shadow-md hover:shadow-lg"
+                    : (generateOptions.keywordAction === "use_existing" && !generateOptions.customKeyword.trim())
+                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 shadow-md hover:shadow-lg"
                 }`}
               >
-                <Sparkles className="w-5 h-5" />
-                🚀 ابدأ التوليد الذكي
+                {generating ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-2 border-gray-400 border-t-transparent"></div>
+                    جاري التوليد...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5" />
+                    🚀 ابدأ التوليد الذكي
+                  </>
+                )}
               </button>
             </div>
           </div>
