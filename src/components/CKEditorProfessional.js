@@ -1,260 +1,259 @@
-import React from 'react';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import { 
-    ClassicEditor, 
-    Essentials, 
-    Bold, 
-    Italic, 
-    Underline,
-    Paragraph,
-    Heading,
-    Link,
-    List,
-    BlockQuote,
-    Indent,
-    Table,
-    TableToolbar,
-    PasteFromOffice,
-    Undo
-} from 'ckeditor5';
+import React, { useRef } from 'react';
+import { Bold, Italic, List, Link2, Type, Quote } from 'lucide-react';
 
 const CKEditorProfessional = ({ 
   value = '', 
   onChange, 
   placeholder = 'اكتب وصف المنتج هنا...'
 }) => {
+  const textareaRef = useRef(null);
 
-  const editorConfiguration = {
-    plugins: [
-      Essentials,
-      Bold,
-      Italic,
-      Underline,
-      Paragraph,
-      Heading,
-      Link,
-      List,
-      BlockQuote,
-      Indent,
-      Table,
-      TableToolbar,
-      PasteFromOffice,
-      Undo
-    ],
-    toolbar: {
-      items: [
-        'heading',
-        '|',
-        'bold',
-        'italic',
-        'underline',
-        '|',
-        'link',
-        'bulletedList',
-        'numberedList',
-        '|',
-        'outdent',
-        'indent',
-        '|',
-        'blockQuote',
-        'insertTable',
-        '|',
-        'undo',
-        'redo'
-      ],
-      shouldNotGroupWhenFull: true
-    },
-    heading: {
-      options: [
-        { model: 'paragraph', title: 'فقرة', class: 'ck-heading_paragraph' },
-        { model: 'heading2', view: 'h2', title: 'عنوان رئيسي (H2)', class: 'ck-heading_heading2' },
-        { model: 'heading3', view: 'h3', title: 'عنوان فرعي (H3)', class: 'ck-heading_heading3' }
-      ]
-    },
-    link: {
-      addTargetToExternalLinks: true,
-      defaultProtocol: 'https://'
-    },
-    table: {
-      contentToolbar: [
-        'tableColumn',
-        'tableRow',
-        'mergeTableCells'
-      ]
-    },
-    placeholder: placeholder,
-    language: 'ar'
+  // دوال التنسيق البسيطة
+  const insertText = (before, after = '') => {
+    const textarea = textareaRef.current;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = value.substring(start, end);
+    
+    const newText = value.substring(0, start) + 
+                   before + selectedText + after + 
+                   value.substring(end);
+    
+    onChange(newText);
+    
+    // العودة للتركيز
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(
+        start + before.length, 
+        start + before.length + selectedText.length
+      );
+    }, 0);
+  };
+
+  const insertAtCursor = (text) => {
+    const textarea = textareaRef.current;
+    const start = textarea.selectionStart;
+    
+    const newText = value.substring(0, start) + text + value.substring(start);
+    onChange(newText);
+    
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + text.length, start + text.length);
+    }, 0);
   };
 
   return (
-    <div className="ckeditor-simple-container">
+    <div className="simple-editor">
       
-      {/* CKEditor Only */}
-      <div className="editor-wrapper">
-        <CKEditor
-          editor={ClassicEditor}
-          config={editorConfiguration}
-          data={value || ''}
-          onChange={(event, editor) => {
-            const data = editor.getData();
-            onChange(data);
-          }}
-          onReady={(editor) => {
-            console.log('✅ CKEditor جاهز للاستخدام');
-            
-            // Set RTL direction
-            editor.editing.view.change(writer => {
-              writer.setAttribute('dir', 'rtl', editor.editing.view.document.getRoot());
-            });
-          }}
-          onError={(error, { willEditorRestart }) => {
-            console.error('❌ خطأ في CKEditor:', error);
-          }}
-        />
+      {/* شريط أدوات بسيط */}
+      <div className="toolbar">
+        <button
+          type="button"
+          onClick={() => insertText('**', '**')}
+          className="tool-btn"
+          title="غامق"
+        >
+          <Bold className="w-4 h-4" />
+        </button>
+        
+        <button
+          type="button"
+          onClick={() => insertText('*', '*')}
+          className="tool-btn"
+          title="مائل"
+        >
+          <Italic className="w-4 h-4" />
+        </button>
+        
+        <div className="separator"></div>
+        
+        <button
+          type="button"
+          onClick={() => insertAtCursor('\n## ')}
+          className="tool-btn"
+          title="عنوان رئيسي"
+        >
+          <Type className="w-4 h-4" />
+        </button>
+        
+        <button
+          type="button"
+          onClick={() => insertAtCursor('\n### ')}
+          className="tool-btn"
+          title="عنوان فرعي"
+        >
+          <Type className="w-3 h-3" />
+        </button>
+        
+        <div className="separator"></div>
+        
+        <button
+          type="button"
+          onClick={() => insertAtCursor('\n- ')}
+          className="tool-btn"
+          title="قائمة نقطية"
+        >
+          <List className="w-4 h-4" />
+        </button>
+        
+        <button
+          type="button"
+          onClick={() => insertText('[', '](https://example.com)')}
+          className="tool-btn"
+          title="رابط"
+        >
+          <Link2 className="w-4 h-4" />
+        </button>
+        
+        <button
+          type="button"
+          onClick={() => insertAtCursor('\n> ')}
+          className="tool-btn"
+          title="اقتباس"
+        >
+          <Quote className="w-4 h-4" />
+        </button>
       </div>
 
-      {/* Minimal Styles */}
+      {/* المحرر */}
+      <textarea
+        ref={textareaRef}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="editor-textarea"
+        dir="rtl"
+      />
+      
+      {/* أزرار سريعة */}
+      <div className="quick-buttons">
+        <button
+          type="button"
+          onClick={() => insertAtCursor('\n\n## ✨ مميزات المنتج:\n- ميزة رائعة\n- ميزة مذهلة\n- ميزة استثنائية\n')}
+          className="quick-btn"
+        >
+          ✨ قائمة مميزات
+        </button>
+        
+        <button
+          type="button"
+          onClick={() => insertAtCursor('\n\n## 🛍️ طريقة الاستخدام:\n1. الخطوة الأولى\n2. الخطوة الثانية\n3. الخطوة الثالثة\n')}
+          className="quick-btn"
+        >
+          📋 دليل الاستخدام
+        </button>
+        
+        <button
+          type="button"
+          onClick={() => insertAtCursor('\n\nتصفح [منتجاتنا الأخرى](/products) أو اقرأ [تقييمات العملاء](/reviews).\n')}
+          className="quick-btn"
+        >
+          🔗 روابط داخلية
+        </button>
+      </div>
+
       <style jsx>{`
-        .ckeditor-simple-container {
+        .simple-editor {
           border: 1px solid #e5e7eb;
           border-radius: 8px;
+          background: white;
           overflow: hidden;
-          background: white;
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .editor-wrapper {
+        .toolbar {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          padding: 8px 12px;
+          background: #f9fafb;
+          border-bottom: 1px solid #e5e7eb;
+          flex-wrap: wrap;
+        }
+
+        .tool-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          border: none;
+          background: white;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: all 0.2s;
+          color: #374151;
+        }
+
+        .tool-btn:hover {
+          background: #e5e7eb;
+          color: #1f2937;
+        }
+
+        .separator {
+          width: 1px;
+          height: 20px;
+          background: #d1d5db;
+          margin: 0 4px;
+        }
+
+        .editor-textarea {
+          width: 100%;
           min-height: 300px;
+          padding: 16px;
+          border: none;
+          outline: none;
+          resize: vertical;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          font-size: 16px;
+          line-height: 1.6;
           background: white;
-        }
-      `}</style>
-
-      {/* Global CKEditor Styles */}
-      <style jsx global>{`
-        .ck.ck-editor {
-          border: none !important;
+          direction: rtl;
+          text-align: right;
         }
 
-        .ck.ck-toolbar {
-          border: none !important;
-          border-bottom: 1px solid #e5e7eb !important;
-          background: #f9fafb !important;
-          border-radius: 0 !important;
-          direction: rtl !important;
-          text-align: right !important;
+        .editor-textarea::placeholder {
+          color: #9ca3af;
+          font-style: italic;
         }
 
-        .ck.ck-toolbar .ck-toolbar__items {
-          direction: rtl !important;
-          justify-content: flex-start !important;
+        .quick-buttons {
+          display: flex;
+          gap: 8px;
+          padding: 8px 12px;
+          background: #f9fafb;
+          border-top: 1px solid #e5e7eb;
+          flex-wrap: wrap;
         }
 
-        .ck.ck-content {
-          border: none !important;
-          padding: 20px !important;
-          min-height: 250px !important;
-          font-size: 16px !important;
-          line-height: 1.6 !important;
-          direction: rtl !important;
-          text-align: right !important;
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+        .quick-btn {
+          padding: 6px 12px;
+          border: 1px solid #d1d5db;
+          background: white;
+          border-radius: 6px;
+          font-size: 12px;
+          color: #374151;
+          cursor: pointer;
+          transition: all 0.2s;
+          font-weight: 500;
         }
 
-        .ck.ck-content h2 {
-          font-size: 1.5em !important;
-          font-weight: 600 !important;
-          color: #212529 !important;
-          margin: 1.5em 0 0.5em 0 !important;
-          border-bottom: 2px solid #dee2e6 !important;
-          padding-bottom: 0.3em !important;
+        .quick-btn:hover {
+          background: #f3f4f6;
+          border-color: #9ca3af;
+          transform: translateY(-1px);
         }
 
-        .ck.ck-content h3 {
-          font-size: 1.25em !important;
-          font-weight: 600 !important;
-          color: #495057 !important;
-          margin: 1.25em 0 0.5em 0 !important;
-        }
-
-        .ck.ck-content ul, .ck.ck-content ol {
-          margin: 1em 0 !important;
-          padding-right: 2em !important;
-        }
-
-        .ck.ck-content li {
-          margin: 0.5em 0 !important;
-        }
-
-        .ck.ck-content a {
-          color: #007bff !important;
-          text-decoration: underline !important;
-        }
-
-        .ck.ck-content a:hover {
-          color: #0056b3 !important;
-        }
-
-        .ck.ck-content blockquote {
-          border-right: 4px solid #007bff !important;
-          border-left: none !important;
-          margin: 1em 0 !important;
-          padding: 0.5em 1em !important;
-          background: #f8f9fa !important;
-          font-style: italic !important;
-          border-radius: 0 4px 4px 0 !important;
-        }
-
-        .ck.ck-content table {
-          border-collapse: collapse !important;
-          margin: 1em 0 !important;
-          width: 100% !important;
-        }
-
-        .ck.ck-content table td, .ck.ck-content table th {
-          border: 1px solid #dee2e6 !important;
-          padding: 8px 12px !important;
-          text-align: right !important;
-        }
-
-        .ck.ck-content table th {
-          background: #f8f9fa !important;
-          font-weight: 600 !important;
-        }
-
-        .ck.ck-content p {
-          margin: 1em 0 !important;
-        }
-
-        .ck.ck-content strong {
-          font-weight: 600 !important;
-          color: #212529 !important;
-        }
-
-        /* Placeholder styling */
-        .ck.ck-content.ck-placeholder::before {
-          color: #6c757d !important;
-          right: 20px !important;
-          left: auto !important;
-          font-style: italic !important;
-        }
-
-        /* Dropdown menus RTL */
-        .ck.ck-dropdown__panel {
-          direction: rtl !important;
-          text-align: right !important;
-        }
-
-        .ck.ck-button {
-          border-radius: 4px !important;
-        }
-
-        .ck.ck-button:hover {
-          background: #e9ecef !important;
-        }
-
-        .ck.ck-button.ck-on {
-          background: #007bff !important;
-          color: white !important;
+        @media (max-width: 768px) {
+          .toolbar, .quick-buttons {
+            justify-content: center;
+          }
+          
+          .quick-btn {
+            font-size: 11px;
+            padding: 5px 8px;
+          }
         }
       `}</style>
     </div>
