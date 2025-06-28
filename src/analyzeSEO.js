@@ -225,11 +225,13 @@ const analyzeSEO = (product) => {
       status: altIncludesKeyword || altIncludesTitle ? 'pass' : 'fail'
     });
 
-    // 9. Product title contains numbers or sizes (helpful for SEO)
+    // 9. Product title or Page Title contains numbers or sizes (helpful for SEO)
+    const nameHasNumber = /\d/.test(product.name || '');
+    const metaTitleHasNumber = /\d/.test(product.meta_title || '');
     criteria.push({
       id: 'title_has_number',
-      text: 'العنوان يحتوي على حجم أو رقم',
-      status: /\d/.test(product.name || '') ? 'pass' : 'fail'
+      text: 'اسم المنتج و عنوان السيو  يحتوي على حجم المنتج أو رقم',
+      status: nameHasNumber || metaTitleHasNumber ? 'pass' : 'fail'
     });
 
 
