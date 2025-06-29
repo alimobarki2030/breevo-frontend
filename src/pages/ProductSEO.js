@@ -394,6 +394,7 @@ export default function ProductSEO() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [editorKey, setEditorKey] = useState(Date.now()); // ← جديد: لإجبار تحديث المحرر
+  const [copiedFields, setCopiedFields] = useState({}); // ← جديد: لتتبع الحقول المنسوخة
 
   // User subscription info and trial tracking
   const [userPlan, setUserPlan] = useState("free");
@@ -931,9 +932,18 @@ export default function ProductSEO() {
     }
   }, [product.name, product.keyword, product.description]);
 
-  const copyToClipboard = async (text, label) => {
+  const copyToClipboard = async (text, label, fieldKey) => {
     try {
       await navigator.clipboard.writeText(text);
+      
+      // إظهار علامة صح لهذا الحقل
+      setCopiedFields(prev => ({ ...prev, [fieldKey]: true }));
+      
+      // إخفاء علامة صح بعد 2 ثانية
+      setTimeout(() => {
+        setCopiedFields(prev => ({ ...prev, [fieldKey]: false }));
+      }, 2000);
+      
       toast.success(`تم نسخ ${label} للحافظة! 📋`);
     } catch (error) {
       toast.error("فشل في النسخ");
@@ -1051,6 +1061,7 @@ export default function ProductSEO() {
     const isLoading = fieldLoading === key;
     const fieldValue = product[key] || "";
     const isLocked = userPlan === "free" && isTrialExpired;
+    const isCopied = copiedFields[key];
     
     const showCharCount = ['meta_title', 'meta_description', 'name'].includes(key);
     const charLimit = FIELD_LIMITS[key + '_limit'] || (FIELD_LIMITS[key]?.max || FIELD_LIMITS[key]);
@@ -1090,13 +1101,35 @@ export default function ProductSEO() {
                   )}
                 </button>
               )}
-              {fieldValue && !isLocked && (
+              
+              {/* زر النسخ المحسن */}
+              {!isLocked && (
                 <button
-                  onClick={() => copyToClipboard(fieldValue, label)}
-                  className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
-                  title="نسخ"
+                  onClick={() => {
+                    if (fieldValue.trim()) {
+                      copyToClipboard(fieldValue, label, key);
+                    } else {
+                      toast.warning(`${label} فارغ - لا يوجد محتوى للنسخ`);
+                    }
+                  }}
+                  className={`p-2 rounded-lg transition-all duration-200 ${
+                    isCopied 
+                      ? "bg-green-100 text-green-700 scale-110" 
+                      : fieldValue.trim()
+                        ? "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        : "bg-gray-50 text-gray-400"
+                  }`}
+                  title={
+                    isCopied ? "تم النسخ!" : 
+                    fieldValue.trim() ? "نسخ" : 
+                    "لا يوجد محتوى للنسخ"
+                  }
                 >
-                  <Copy className="w-4 h-4" />
+                  {isCopied ? (
+                    <CheckCircle className="w-4 h-4" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
                 </button>
               )}
             </div>
@@ -1116,6 +1149,7 @@ export default function ProductSEO() {
             </div>
           ) : (
             <TiptapEditor
+              key={editorKey}
               value={fieldValue}
               onChange={(val) => handleProductChange(key, val)}
               placeholder={placeholder}
@@ -1162,6 +1196,7 @@ export default function ProductSEO() {
                 {isOverLimit && ` (كثير)`}
               </span>
             )}
+            
             {(userPlan !== "free" || checkTrialAccess()) && !isLocked && (
               <button
                 onClick={() => handleGenerateField(key)}
@@ -1180,13 +1215,35 @@ export default function ProductSEO() {
                 )}
               </button>
             )}
-            {fieldValue && !isLocked && (
+            
+            {/* زر النسخ المحسن */}
+            {!isLocked && (
               <button
-                onClick={() => copyToClipboard(fieldValue, label)}
-                className="p-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors"
-                title="نسخ"
+                onClick={() => {
+                  if (fieldValue.trim()) {
+                    copyToClipboard(fieldValue, label, key);
+                  } else {
+                    toast.warning(`${label} فارغ - لا يوجد محتوى للنسخ`);
+                  }
+                }}
+                className={`p-2 rounded-lg transition-all duration-200 ${
+                  isCopied 
+                    ? "bg-green-100 text-green-700 scale-110" 
+                    : fieldValue.trim()
+                      ? "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      : "bg-gray-50 text-gray-400"
+                }`}
+                title={
+                  isCopied ? "تم النسخ!" : 
+                  fieldValue.trim() ? "نسخ" : 
+                  "لا يوجد محتوى للنسخ"
+                }
               >
-                <Copy className="w-4 h-4" />
+                {isCopied ? (
+                  <CheckCircle className="w-4 h-4" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
               </button>
             )}
           </div>
@@ -1596,7 +1653,7 @@ export default function ProductSEO() {
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">إجراءات سريعة</h3>
                 <div className="space-y-3">
                   <button
-                    onClick={() => copyToClipboard(JSON.stringify(product, null, 2), "بيانات المنتج")}
+                    onClick={() => copyToClipboard(JSON.stringify(product, null, 2), "بيانات المنتج", "product_json")}
                     className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 justify-center"
                   >
                     <Copy className="w-4 h-4" />
