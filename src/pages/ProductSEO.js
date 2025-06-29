@@ -1081,12 +1081,12 @@ export default function ProductSEO() {
                       : "bg-blue-100 text-blue-700 hover:bg-blue-200 hover:scale-105"
                   }`}
                   disabled={isLoading}
-                  title="التوليد الذكي بالبرومبت المحفوظ"
+                  title="التوليد الفردي "
                 >
                   {isLoading ? (
                     <div className="animate-spin rounded-full h-4 w-4 border border-yellow-600 border-t-transparent"></div>
                   ) : (
-                    <Brain className="w-4 h-4" />
+                    <Sparkles className="w-4 h-4" />
                   )}
                 </button>
               )}
@@ -1176,7 +1176,7 @@ export default function ProductSEO() {
                 {isLoading ? (
                   <div className="animate-spin rounded-full h-4 w-4 border border-yellow-600 border-t-transparent"></div>
                 ) : (
-                  <Brain className="w-4 h-4" />
+                  <Sparkles className="w-4 h-4" />
                 )}
               </button>
             )}
