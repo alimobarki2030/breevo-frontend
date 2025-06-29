@@ -52,7 +52,8 @@ const SAVED_PROMPT_TEMPLATE = `هذا هو انت خبير كتابة المحت
 - الجمهور المستهدف: {{audience}}
 - نبرة الكتابة: {{tone}}
 🔹 التعليمات:
-1. اكتب وصف HTML يتضمن:
+1. إذا لم تحصل على كلمة مفتاحية محددة، اختر الكلمة المفتاحية الأنسب للمنتج والجمهور المستهدف.
+2. اكتب وصف HTML يتضمن:
    - فقرة افتتاحية تبدأ بالكلمة المفتاحية.
    - فقرة تشرح فائدة المنتج بإيجاز.
    - إذا كان المنتج عطرًا، اذكر النوتات العطرية بالتفصيل هكذا:
@@ -65,10 +66,10 @@ const SAVED_PROMPT_TEMPLATE = `هذا هو انت خبير كتابة المحت
    - فقرة عن طريقة الاستخدام إن أمكن.
    - دعوة واضحة للشراء.
    - رابط داخلي في النهاية <a href="/products">تصفح منتجاتنا الأخرى</a>
-2. اكتب Page Title واضح وجذاب (50-60 حرف).
-3. اكتب Meta Description تسويقي (140-150حرف).
-4. اكتب URL path قصير بالإنجليزية.
-5. اكتب ALT نص بديل يحتوي على الكلمة المفتاحية.
+3. اكتب Page Title واضح وجذاب (50-60 حرف).
+4. اكتب Meta Description تسويقي (140-150حرف).
+5. اكتب URL path قصير بالإنجليزية.
+6. اكتب ALT نص بديل يحتوي على الكلمة المفتاحية.
 🔹 قواعد عامة:
 - لا تستخدم لهجة عامية.
 - حافظ على لغة محترفة.
@@ -79,6 +80,7 @@ const SAVED_PROMPT_TEMPLATE = `هذا هو انت خبير كتابة المحت
 🔹 الناتج:
 أعد JSON فقط:
 {
+  "keyword": "الكلمة المفتاحية المثلى",
   "description": "الوصف HTML",
   "meta_title": "عنوان الصفحة",
   "meta_description": "وصف الميتا",
@@ -89,7 +91,7 @@ const SAVED_PROMPT_TEMPLATE = `هذا هو انت خبير كتابة المحت
 // Constants
 const FIELD_LIMITS = {
   meta_title: 60,
-  meta_description: 160,
+  meta_description: 150,
   keyword_limit: 100,
   name_limit: 70
 };
@@ -717,26 +719,13 @@ export default function ProductSEO() {
       if (generateOptions.keywordAction === "use_existing") {
         finalKeyword = generateOptions.customKeyword.trim();
       } else {
-        // استخدام البرومبت المحفوظ لتوليد الكلمة المفتاحية
-        const keywordVariables = {
-          task: "generate_keyword",
-          product_name: product.name,
-          audience: generateOptions.audience,
-          tone: generateOptions.tone
-        };
-
-        try {
-          const keywordResponse = await generateWithCustomPrompt(keywordVariables);
-          finalKeyword = keywordResponse.replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim();
-        } catch (error) {
-          console.error("Keyword generation failed:", error);
-          finalKeyword = product.name; // استخدام اسم المنتج كـ fallback
-        }
+        // سيتم توليدها بواسطة البرومبت الرئيسي
+        finalKeyword = ""; // فارغة عشان البرومبت يولدها
       }
 
       // تحديد اسم المنتج حسب اختيار المستخدم
       let finalProductName = product.name;
-      if (generateOptions.productNameAction === "add_keyword") {
+      if (generateOptions.productNameAction === "add_keyword" && finalKeyword) {
         finalProductName = `${product.name} ${finalKeyword}`;
       } else if (generateOptions.productNameAction === "regenerate") {
         // استخدام البرومبت المحفوظ لتوليد اسم محسن
@@ -753,20 +742,17 @@ export default function ProductSEO() {
           finalProductName = nameResponse.replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim();
         } catch (error) {
           console.error("Product name generation failed:", error);
-          finalProductName = `${product.name} ${finalKeyword}`; // fallback
+          finalProductName = product.name; // fallback
         }
       }
 
       // استخدام البرومبت المحفوظ لتوليد جميع المحتويات
       const variables = {
-        task: "generate_all_seo_content",
         product_name: finalProductName,
-        keyword: finalKeyword,
+        keyword: finalKeyword || "توليد تلقائي", // إشارة للبرومبت لتوليد كلمة مفتاحية
         audience: generateOptions.audience,
         tone: generateOptions.tone,
-        existing_description: product.description || "",
-        product_name_action: generateOptions.productNameAction,
-        keyword_action: generateOptions.keywordAction
+        existing_description: product.description || ""
       };
 
       const generated = await generateWithCustomPrompt(variables);
@@ -796,7 +782,7 @@ export default function ProductSEO() {
       }
 
       const processedFields = {
-        keyword: finalKeyword,
+        keyword: fields.keyword || finalKeyword || "يحتاج كلمة مفتاحية", // إعطاء أولوية لما يولده البرومبت
         name: finalProductName,
         description: fields.description || "",
         meta_title: truncateText(fields.meta_title, FIELD_LIMITS.meta_title),
@@ -805,6 +791,11 @@ export default function ProductSEO() {
         imageAlt: fields.imageAlt?.trim() || ""
       };
 
+      // إذا كان اسم المنتج يحتاج تحديث بناء على الكلمة المفتاحية المولدة
+      if (generateOptions.productNameAction === "add_keyword" && fields.keyword && !finalKeyword) {
+        processedFields.name = `${product.name} ${fields.keyword}`;
+      }
+
       setProduct(prev => ({
         ...prev,
         ...processedFields,
@@ -812,9 +803,9 @@ export default function ProductSEO() {
 
       toast.success("🎉 تم إنشاء محتوى احترافي باستخدام البرومبت المحفوظ!", { id: 'generating' });
       
-      // تحذير إذا تم استخدام fallback
-      if (finalKeyword === product.name && generateOptions.keywordAction === "generate") {
-        toast.warning("⚠️ تم استخدام اسم المنتج كلمة مفتاحية. يمكنك تعديلها يدوياً.", { duration: 4000 });
+      // تحذير إذا لم يتم توليد كلمة مفتاحية
+      if (!processedFields.keyword && generateOptions.keywordAction === "generate") {
+        toast.warning("⚠️ لم يتم توليد كلمة مفتاحية. يمكنك إضافتها يدوياً.", { duration: 4000 });
       }
       
       if (userPlan === "free") {
@@ -851,16 +842,31 @@ export default function ProductSEO() {
     try {
       // استخدام البرومبت المحفوظ لتوليد حقل واحد
       const variables = {
-        task: `generate_${fieldType}`,
         product_name: product.name,
-        keyword: product.keyword || '',
+        keyword: fieldType === "keyword" ? "توليد تلقائي" : (product.keyword || "توليد تلقائي"),
         audience: generateOptions.audience,
         tone: generateOptions.tone,
         existing_description: product.description || ""
       };
 
       const response = await generateWithCustomPrompt(variables);
+      
+      // إذا كان التوليد للكلمة المفتاحية، نحتاج استخراجها من JSON
       let value = response.trim();
+      
+      if (fieldType === "keyword") {
+        // محاولة استخراج الكلمة المفتاحية من JSON
+        const jsonMatch = response.match(/{[\s\S]*}/);
+        if (jsonMatch) {
+          try {
+            const parsed = JSON.parse(jsonMatch[0]);
+            value = parsed.keyword || value;
+          } catch (error) {
+            // إذا فشل، استخدم النص كما هو
+            console.log("فشل في تحليل JSON للكلمة المفتاحية، استخدام النص المباشر");
+          }
+        }
+      }
 
       value = value.replace(/^["']|["']$/g, '');
       value = value.replace(/^`+|`+$/g, '');
@@ -1196,7 +1202,7 @@ export default function ProductSEO() {
         )}
         {key === 'meta_description' && !isLocked && (
           <div className="text-xs text-gray-500 mt-2">
-            💡 Page Description المثالي: 150-160 حرف، يحتوي الكلمة المفتاحية، يحفز على الزيارة
+            💡 Page Description المثالي: 140-150 حرف، يحتوي الكلمة المفتاحية، يحفز على الزيارة
           </div>
         )}
         {key === 'keyword' && !isLocked && (
