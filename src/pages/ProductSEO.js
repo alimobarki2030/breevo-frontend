@@ -36,11 +36,55 @@ import analyzeSEO from "../analyzeSEO";
 import TiptapEditor from "../components/TiptapEditor";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 
-// إعدادات البرومبت المخصص
-const CUSTOM_PROMPT_CONFIG = {
-  promptId: "pmpt_685ffc0009bc81978d0bb122e0917a900a4178e0f8d7cd17",
-  version: "2"
-};
+/*
+🔧 تم تحديث النظام للعمل مع Chat Completions API الرسمي:
+- ✅ استبدال "/v1/prompts/{id}/completions" بـ "/v1/chat/completions"
+- ✅ البرومبت محفوظ في الكود مباشرة كـ system message
+- ✅ استخدام منطق استبدال المتغيرات {{variable}}
+- ✅ طريقة أكثر موثوقية واستقراراً
+*/
+
+// نص البرومبت المحفوظ من Dashboard
+const SAVED_PROMPT_TEMPLATE = `هذا هو انت خبير كتابة المحتوى التسويقي للمتاجر الالكترونية اكتب محتوى تسويقي للمنتجات بما يتلائم مع نية بحث المستخدم .
+🔹 بيانات المنتج:
+- اسم المنتج: {{product_name}}
+- الكلمة المفتاحية: {{keyword}}
+- الجمهور المستهدف: {{audience}}
+- نبرة الكتابة: {{tone}}
+🔹 التعليمات:
+1. اكتب وصف HTML يتضمن:
+   - فقرة افتتاحية تبدأ بالكلمة المفتاحية.
+   - فقرة تشرح فائدة المنتج بإيجاز.
+   - إذا كان المنتج عطرًا، اذكر النوتات العطرية بالتفصيل هكذا:
+     <ul>
+       <li><strong>مقدمة العطر:</strong> (وصف المقدمة)</li>
+       <li><strong>قلب العطر:</strong> (وصف القلب)</li>
+       <li><strong>قاعدة العطر:</strong> (وصف النهاية)</li>
+     </ul>
+   - قائمة مميزات عامة <ul><li>.
+   - فقرة عن طريقة الاستخدام إن أمكن.
+   - دعوة واضحة للشراء.
+   - رابط داخلي في النهاية <a href="/products">تصفح منتجاتنا الأخرى</a>
+2. اكتب Page Title واضح وجذاب (50-60 حرف).
+3. اكتب Meta Description تسويقي (140-150حرف).
+4. اكتب URL path قصير بالإنجليزية.
+5. اكتب ALT نص بديل يحتوي على الكلمة المفتاحية.
+🔹 قواعد عامة:
+- لا تستخدم لهجة عامية.
+- حافظ على لغة محترفة.
+- استخدم أسلوب تسويقي ابداعي يتناسب مع نوع المنتج.
+- إذا لم تتوفر معلومات الاستخدام، تجاهلها.
+- لا تضف أي معلومات غير مؤكدة.
+- لا تكتب أي مقدمة خارج JSON.
+🔹 الناتج:
+أعد JSON فقط:
+{
+  "description": "الوصف HTML",
+  "meta_title": "عنوان الصفحة",
+  "meta_description": "وصف الميتا",
+  "url_path": "short-url-path",
+  "imageAlt": "النص البديل للصورة"
+}`;
 
 // Constants
 const FIELD_LIMITS = {
@@ -73,7 +117,7 @@ const TONE_OPTIONS = [
   { value: "مقنعة", label: "مقنعة - لزيادة المبيعات" }
 ];
 
-// دالة التوليد باستخدام البرومبت المخصص - الوحيدة المسموحة
+// دالة التوليد باستخدام البرومبت المحفوظ - الطريقة الصحيحة
 const generateWithCustomPrompt = async (variables) => {
   const API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
   
@@ -82,16 +126,34 @@ const generateWithCustomPrompt = async (variables) => {
   }
 
   try {
-    // استخدام API الخاص بالبرومبتات المخصصة
-    const response = await fetch(`https://api.openai.com/v1/prompts/${CUSTOM_PROMPT_CONFIG.promptId}/completions`, {
+    // استبدال المتغيرات في البرومبت المحفوظ
+    let processedPrompt = SAVED_PROMPT_TEMPLATE
+      .replace(/{{product_name}}/g, variables.product_name || '')
+      .replace(/{{keyword}}/g, variables.keyword || '')
+      .replace(/{{audience}}/g, variables.audience || 'العملاء العرب')
+      .replace(/{{tone}}/g, variables.tone || 'احترافية');
+
+    // استخدام Chat Completions API الصحيح
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${API_KEY}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        // تمرير المتغيرات فقط - النموذج محدد في البرومبت
-        variables: variables
+        model: "gpt-4", // يمكنك تغيير الموديل حسب الحاجة
+        messages: [
+          {
+            role: "system",
+            content: processedPrompt // البرومبت المحفوظ مع المتغيرات المستبدلة
+          },
+          {
+            role: "user", 
+            content: `المنتج: ${variables.product_name}`
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 2000
       })
     });
 
@@ -102,8 +164,6 @@ const generateWithCustomPrompt = async (variables) => {
         throw new Error("OpenAI API Key غير صحيح أو منتهي الصلاحية");
       } else if (response.status === 429) {
         throw new Error("تم تجاوز حد الاستخدام. يرجى المحاولة لاحقاً");
-      } else if (response.status === 404) {
-        throw new Error("البرومبت المخصص غير موجود. تحقق من معرف البرومبت");
       } else {
         throw new Error(`OpenAI API Error: ${response.status} - ${errorData.error?.message || 'خطأ غير معروف'}`);
       }
@@ -113,7 +173,7 @@ const generateWithCustomPrompt = async (variables) => {
     return data.choices[0].message.content;
 
   } catch (error) {
-    console.error('Error calling OpenAI Custom Prompt:', error);
+    console.error('Error calling OpenAI Chat Completions:', error);
     throw error;
   }
 };
@@ -639,14 +699,14 @@ export default function ProductSEO() {
     setShowGenerateModal(true);
   }, [userPlan, trialUsage.used, trialUsage.limit, product.name, checkTrialAccess]);
 
-  // تنفيذ التوليد الذكي مع الخيارات المحددة - باستخدام البرومبت المخصص فقط
+  // تنفيذ التوليد الذكي مع الخيارات المحددة - باستخدام البرومبت المحفوظ فقط
   const executeSmartGeneration = useCallback(async () => {
     setGenerating(true);
     setShowGenerateModal(false);
     setErrors(prev => ({ ...prev, generate: null }));
 
     try {
-      toast.loading("🧠 جاري التوليد الذكي باستخدام البرومبت المخصص...", { id: 'generating' });
+      toast.loading("🧠 جاري التوليد الذكي باستخدام البرومبت المحفوظ...", { id: 'generating' });
 
       if (userPlan === "free") {
         incrementTrialUsage();
@@ -657,7 +717,7 @@ export default function ProductSEO() {
       if (generateOptions.keywordAction === "use_existing") {
         finalKeyword = generateOptions.customKeyword.trim();
       } else {
-        // استخدام البرومبت المخصص لتوليد الكلمة المفتاحية
+        // استخدام البرومبت المحفوظ لتوليد الكلمة المفتاحية
         const keywordVariables = {
           task: "generate_keyword",
           product_name: product.name,
@@ -679,7 +739,7 @@ export default function ProductSEO() {
       if (generateOptions.productNameAction === "add_keyword") {
         finalProductName = `${product.name} ${finalKeyword}`;
       } else if (generateOptions.productNameAction === "regenerate") {
-        // استخدام البرومبت المخصص لتوليد اسم محسن
+        // استخدام البرومبت المحفوظ لتوليد اسم محسن
         const nameVariables = {
           task: "optimize_product_name",
           original_name: product.name,
@@ -697,7 +757,7 @@ export default function ProductSEO() {
         }
       }
 
-      // استخدام البرومبت المخصص لتوليد جميع المحتويات
+      // استخدام البرومبت المحفوظ لتوليد جميع المحتويات
       const variables = {
         task: "generate_all_seo_content",
         product_name: finalProductName,
@@ -750,7 +810,7 @@ export default function ProductSEO() {
         ...processedFields,
       }));
 
-      toast.success("🎉 تم إنشاء محتوى احترافي باستخدام البرومبت المخصص!", { id: 'generating' });
+      toast.success("🎉 تم إنشاء محتوى احترافي باستخدام البرومبت المحفوظ!", { id: 'generating' });
       
       // تحذير إذا تم استخدام fallback
       if (finalKeyword === product.name && generateOptions.keywordAction === "generate") {
@@ -783,13 +843,13 @@ export default function ProductSEO() {
     }
   }, [userPlan, trialUsage.used, trialUsage.limit, product.name, generateOptions, checkTrialAccess]);
 
-  // التوليد لحقل واحد - باستخدام البرومبت المخصص فقط
+  // التوليد لحقل واحد - باستخدام البرومبت المحفوظ فقط
   const handleGenerateField = useCallback(async (fieldType) => {
     setFieldLoading(fieldType);
     setErrors(prev => ({ ...prev, [fieldType]: null }));
 
     try {
-      // استخدام البرومبت المخصص لتوليد حقل واحد
+      // استخدام البرومبت المحفوظ لتوليد حقل واحد
       const variables = {
         task: `generate_${fieldType}`,
         product_name: product.name,
@@ -914,7 +974,7 @@ export default function ProductSEO() {
             <div className="text-4xl">🚀</div>
             <div>
               <h3 className="font-bold text-blue-900 text-lg">ابدأ رحلة تحسين السيو!</h3>
-              <p className="text-blue-700">أدخل اسم منتجك وسنقوم بتوليد محتوى احترافي باستخدام البرومبت المخصص</p>
+              <p className="text-blue-700">أدخل اسم منتجك وسنقوم بتوليد محتوى احترافي باستخدام البرومبت المحفوظ</p>
             </div>
           </div>
         </div>
@@ -927,8 +987,8 @@ export default function ProductSEO() {
           <div className="flex items-center gap-4">
             <div className="text-4xl">⚡</div>
             <div>
-              <h3 className="font-bold text-amber-900 text-lg">استخدم البرومبت المخصص!</h3>
-              <p className="text-amber-700">اضغط "التوليد الذكي" للحصول على محتوى احترافي باستخدام البرومبت المخصص الخاص بك</p>
+              <h3 className="font-bold text-amber-900 text-lg">استخدم البرومبت المحفوظ!</h3>
+              <p className="text-amber-700">اضغط "التوليد الذكي" للحصول على محتوى احترافي باستخدام البرومبت المحفوظ الخاص بك</p>
             </div>
           </div>
         </div>
@@ -985,7 +1045,7 @@ export default function ProductSEO() {
                       : "bg-blue-100 text-blue-700 hover:bg-blue-200 hover:scale-105"
                   }`}
                   disabled={isLoading}
-                  title="التوليد الذكي بالبرومبت المخصص"
+                  title="التوليد الذكي بالبرومبت المحفوظ"
                 >
                   {isLoading ? (
                     <div className="animate-spin rounded-full h-4 w-4 border border-yellow-600 border-t-transparent"></div>
@@ -1035,7 +1095,7 @@ export default function ProductSEO() {
           
           {!isLocked && (
             <div className="text-xs text-gray-500 mt-2">
-              💡 استخدم المحرر لإضافة <strong>التنسيق</strong>، <strong>الروابط الداخلية</strong>، والقوائم المنظمة | أو جرب التوليد الذكي بالبرومبت المخصص 🧠
+              💡 استخدم المحرر لإضافة <strong>التنسيق</strong>، <strong>الروابط الداخلية</strong>، والقوائم المنظمة | أو جرب التوليد الذكي بالبرومبت المحفوظ 🧠
             </div>
           )}
         </div>
@@ -1067,7 +1127,7 @@ export default function ProductSEO() {
                     : "bg-blue-100 text-blue-700 hover:bg-blue-200 hover:scale-105"
                 }`}
                 disabled={isLoading}
-                title="التوليد الذكي بالبرومبت المخصص"
+                title="التوليد الذكي بالبرومبت المحفوظ"
               >
                 {isLoading ? (
                   <div className="animate-spin rounded-full h-4 w-4 border border-yellow-600 border-t-transparent"></div>
@@ -1141,7 +1201,7 @@ export default function ProductSEO() {
         )}
         {key === 'keyword' && !isLocked && (
           <div className="text-xs text-gray-500 mt-2">
-            💡 اختر كلمة مفتاحية بحجم بحث عالي ومنافسة معقولة - أو جرب التوليد الذكي بالبرومبت المخصص 🧠
+            💡 اختر كلمة مفتاحية بحجم بحث عالي ومنافسة معقولة - أو جرب التوليد الذكي بالبرومبت المحفوظ 🧠
           </div>
         )}
         {key === 'url_path' && !isLocked && (
@@ -1263,12 +1323,12 @@ export default function ProductSEO() {
                         ) : userPlan === "free" ? (
                           <>
                             <Sparkles className="w-5 h-5" />
-                            🚀 البرومبت المخصص ({trialUsage.limit - trialUsage.used} متبقي)
+                            🚀 البرومبت المحفوظ ({trialUsage.limit - trialUsage.used} متبقي)
                           </>
                         ) : (
                           <>
                             <Sparkles className="w-5 h-5" />
-                            🚀 البرومبت المخصص
+                            🚀 البرومبت المحفوظ
                           </>
                         )}
                       </button>
@@ -1322,7 +1382,7 @@ export default function ProductSEO() {
                     <div className="flex items-center gap-3">
                       <div className="text-2xl">🎁</div>
                       <div>
-                        <div className="font-semibold text-blue-800">البرومبت المخصص - التجربة المجانية</div>
+                        <div className="font-semibold text-blue-800">البرومبت المحفوظ - التجربة المجانية</div>
                         <div className="text-sm text-blue-600">
                           استخدمت {trialUsage.used} من {trialUsage.limit} توليدات ذكية هذا الشهر
                         </div>
@@ -1455,34 +1515,34 @@ export default function ProductSEO() {
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <Lightbulb className="w-5 h-5 text-yellow-500" />
-                  البرومبت المخصص
+                  البرومبت المحفوظ
                 </h3>
                 <div className="space-y-3 text-sm text-gray-600">
                   <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
                     <div className="text-green-500 mt-0.5">🎯</div>
                     <div>
-                      <strong>نظام متطور:</strong> يتم توليد جميع المحتويات باستخدام البرومبت المخصص الخاص بك فقط - لا مزيد من البرومبتات المبرمجة!
+                      <strong>نظام محدث:</strong> يتم توليد جميع المحتويات باستخدام البرومبت المحفوظ في الكود مباشرة - طريقة أكثر موثوقية!
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
                     <div className="text-blue-500 mt-0.5">🔧</div>
                     <div>
-                      <strong>تحكم كامل:</strong> البرومبت المخصص يضمن الحصول على نتائج متسقة وعالية الجودة حسب احتياجاتك
+                      <strong>تحكم كامل:</strong> البرومبت محفوظ في الكود مما يضمن الاستقرار والجودة العالية
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
                     <div className="text-purple-500 mt-0.5">⚡</div>
                     <div>
-                      <strong>سرعة وموثوقية:</strong> استجابة أسرع ونتائج أكثر دقة مع البرومبت المخصص
+                      <strong>سرعة وموثوقية:</strong> استجابة أسرع باستخدام Chat Completions API الرسمي
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3 p-3 bg-orange-50 rounded-lg">
                     <div className="text-orange-500 mt-0.5">🎨</div>
                     <div>
-                      <strong>تخصيص كامل:</strong> يمكنك تعديل البرومبت حسب احتياجاتك المحددة
+                      <strong>تحديث سهل:</strong> يمكن تعديل البرومبت مباشرة في الكود حسب الحاجة
                     </div>
                   </div>
                 </div>
@@ -1530,8 +1590,8 @@ export default function ProductSEO() {
               <div className="flex items-center gap-3">
                 <div className="text-3xl">🎯</div>
                 <div>
-                  <h2 className="text-xl font-bold">البرومبت المخصص</h2>
-                  <p className="text-blue-100 text-sm mt-1">خصص خيارات التوليد لاستخدامها مع البرومبت المخصص</p>
+                  <h2 className="text-xl font-bold">البرومبت المحفوظ</h2>
+                  <p className="text-blue-100 text-sm mt-1">خصص خيارات التوليد لاستخدامها مع البرومبت المحفوظ</p>
                 </div>
               </div>
             </div>
@@ -1544,9 +1604,9 @@ export default function ProductSEO() {
                 <div className="flex items-start gap-3">
                   <div className="text-2xl">🎯</div>
                   <div>
-                    <h3 className="font-semibold text-blue-900 mb-2">كيف يعمل البرومبت المخصص؟</h3>
+                    <h3 className="font-semibold text-blue-900 mb-2">كيف يعمل البرومبت المحفوظ؟</h3>
                     <p className="text-blue-800 text-sm leading-relaxed mb-3">
-                      سيتم إرسال جميع البيانات والخيارات التي تحددها هنا إلى البرومبت المخصص الخاص بك في OpenAI مباشرة. هذا يضمن حصولك على نتائج متسقة وعالية الجودة.
+                      سيتم إرسال جميع البيانات والخيارات التي تحددها هنا إلى البرومبت المحفوظ في الكود مباشرة باستخدام OpenAI Chat Completions API. هذا يضمن حصولك على نتائج متسقة وعالية الجودة.
                     </p>
                     <div className="bg-blue-100 border border-blue-300 rounded-lg p-3">
                       <p className="text-blue-900 text-sm font-medium">
@@ -1639,7 +1699,7 @@ export default function ProductSEO() {
                         onChange={(e) => updateGenerateOptions({ keywordAction: e.target.value })}
                         className="text-green-600"
                       />
-                      <span className="text-sm font-medium">توليد بالبرومبت المخصص</span>
+                      <span className="text-sm font-medium">توليد بالبرومبت المحفوظ</span>
                     </label>
                     
                     <label className="flex items-center space-x-3 space-x-reverse cursor-pointer">
@@ -1665,14 +1725,14 @@ export default function ProductSEO() {
                         className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
                       <div className="text-xs text-gray-600">
-                        💡 مثال: "كريم مرطب" أو "هاتف ذكي" أو "أحذية رياضية"
+                        💡 مثال: كريم مرطب أو هاتف ذكي أو أحذية رياضية"
                       </div>
                     </div>
                   )}
 
                   {generateOptions.keywordAction === "generate" && (
                     <div className="text-xs text-green-600 bg-green-50 p-2 rounded">
-                      🎯 سيتم اختيار أفضل كلمة مفتاحية باستخدام البرومبت المخصص
+                      🎯 سيتم اختيار أفضل كلمة مفتاحية باستخدام البرومبت المحفوظ
                     </div>
                   )}
                 </div>
@@ -1698,7 +1758,7 @@ export default function ProductSEO() {
                     ))}
                   </select>
                   <div className="text-xs text-gray-600 mt-2">
-                    💡 سيتم إرسال هذا الجمهور للبرومبت المخصص لتحسين أسلوب الكتابة
+                    💡 سيتم إرسال هذا الجمهور للبرومبت المحفوظ لتحسين أسلوب الكتابة
                   </div>
                 </div>
               </div>
@@ -1723,14 +1783,14 @@ export default function ProductSEO() {
                     ))}
                   </select>
                   <div className="text-xs text-gray-600 mt-2">
-                    💡 سيتم إرسال هذه النبرة للبرومبت المخصص
+                    💡 سيتم إرسال هذه النبرة للبرومبت المحفوظ
                   </div>
                 </div>
               </div>
 
               {/* ملخص سريع */}
               <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl p-4">
-                <h4 className="font-semibold text-purple-900 mb-2">📋 البيانات التي سيتم إرسالها للبرومبت المخصص:</h4>
+                <h4 className="font-semibold text-purple-900 mb-2">📋 البيانات التي سيتم إرسالها للبرومبت المحفوظ:</h4>
                 <ul className="text-sm text-purple-800 space-y-1">
                   <li>✅ اسم المنتج: {product.name}</li>
                   <li>✅ إجراء الاسم: {generateOptions.productNameAction}</li>
@@ -1744,7 +1804,7 @@ export default function ProductSEO() {
                 
                 <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
                   <div className="text-green-800 text-sm">
-                    <strong>🎯 النتيجة:</strong> سيقوم البرومبت المخصص بمعالجة هذه البيانات وإنتاج محتوى متسق وعالي الجودة
+                    <strong>🎯 النتيجة:</strong> سيقوم البرومبت المحفوظ بمعالجة هذه البيانات وإنتاج محتوى متسق وعالي الجودة
                   </div>
                 </div>
               </div>
@@ -1783,7 +1843,7 @@ export default function ProductSEO() {
                 ) : (
                   <>
                     <Sparkles className="w-5 h-5" />
-                    🎯 إرسال للبرومبت المخصص
+                    🎯 إرسال للبرومبت المحفوظ
                   </>
                 )}
               </button>
