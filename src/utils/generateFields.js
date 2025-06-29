@@ -5,7 +5,6 @@ import {
   seoAltPrompt
 } from "./generationPrompts";
 
-import { generateProductSEO } from "./generateProductSEO";
 
 export const generateAllFields = async (product) => {
   const description = await generateProductSEO(descriptionPrompt(product));

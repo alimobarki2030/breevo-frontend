@@ -1,6 +1,5 @@
 // src/utils/sharedSEOLogic.js
 import analyzeSEO from '../analyzeSEO';
-import { generateProductSEO } from './generateProductSEO';
 
 // 1. SHARED SEO ANALYSIS LOGIC
 const sharedSEOAnalysis = {
@@ -11,10 +10,8 @@ const sharedSEOAnalysis = {
     try {
       // Same prompts and logic as ProductSEO.js
       const categoryPrompt = await categorizeProduct(product);
-      const category = (await generateProductSEO(categoryPrompt)).trim();
       
       const audiencePrompt = await analyzeTargetAudience(product, category);
-      const targetAudience = (await generateProductSEO(audiencePrompt)).trim();
       
       const tone = selectTone(category, targetAudience);
       const storyArc = selectStoryArc(category);

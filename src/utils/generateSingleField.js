@@ -5,7 +5,6 @@ import {
   seoAltPrompt,
 } from "./generationPrompts";
 
-import { generateProductSEO } from "./generateProductSEO";
 
 export const generateSingleField = async (fieldType, product) => {
   const fieldPromptMap = {
@@ -20,6 +19,5 @@ export const generateSingleField = async (fieldType, product) => {
   if (!promptGenerator) throw new Error("لا يوجد برومبت لهذا الحقل");
 
   const prompt = promptGenerator(product);
-  const result = await generateProductSEO(prompt);
   return result;
 };

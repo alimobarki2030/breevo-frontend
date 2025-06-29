@@ -32,7 +32,6 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
-import { generateProductSEO } from "../utils/generateProductSEO";
 import analyzeSEO from "../analyzeSEO";
 import TiptapEditor from "../components/TiptapEditor";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
@@ -74,7 +73,7 @@ const TONE_OPTIONS = [
   { value: "مقنعة", label: "مقنعة - لزيادة المبيعات" }
 ];
 
-// دالة للتوليد باستخدام البرومبت المخصص - API فقط
+// دالة التوليد باستخدام البرومبت المخصص - الوحيدة المسموحة
 const generateWithCustomPrompt = async (variables) => {
   const API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
   
@@ -115,7 +114,7 @@ const generateWithCustomPrompt = async (variables) => {
 
   } catch (error) {
     console.error('Error calling OpenAI Custom Prompt:', error);
-    throw error; // رمي الخطأ مباشرة بدون fallback
+    throw error;
   }
 };
 
@@ -349,8 +348,8 @@ export default function ProductSEO() {
       productNameAction: "keep",
       keywordAction: "generate", 
       customKeyword: "",
-      audience: "العملاء العرب", // جديد
-      tone: "احترافية" // جديد
+      audience: "العملاء العرب",
+      tone: "احترافية"
     };
   });
 
@@ -640,14 +639,14 @@ export default function ProductSEO() {
     setShowGenerateModal(true);
   }, [userPlan, trialUsage.used, trialUsage.limit, product.name, checkTrialAccess]);
 
-  // تنفيذ التوليد الذكي مع الخيارات المحددة
+  // تنفيذ التوليد الذكي مع الخيارات المحددة - باستخدام البرومبت المخصص فقط
   const executeSmartGeneration = useCallback(async () => {
     setGenerating(true);
     setShowGenerateModal(false);
     setErrors(prev => ({ ...prev, generate: null }));
 
     try {
-      toast.loading("🧠 جاري التوليد الذكي مع خياراتك...", { id: 'generating' });
+      toast.loading("🧠 جاري التوليد الذكي باستخدام البرومبت المخصص...", { id: 'generating' });
 
       if (userPlan === "free") {
         incrementTrialUsage();
@@ -658,21 +657,16 @@ export default function ProductSEO() {
       if (generateOptions.keywordAction === "use_existing") {
         finalKeyword = generateOptions.customKeyword.trim();
       } else {
-        // توليد كلمة مفتاحية جديدة
+        // استخدام البرومبت المخصص لتوليد الكلمة المفتاحية
+        const keywordVariables = {
+          task: "generate_keyword",
+          product_name: product.name,
+          audience: generateOptions.audience,
+          tone: generateOptions.tone
+        };
+
         try {
-          const keywordPrompt = `اختر أفضل كلمة مفتاحية لهذا المنتج للسوق السعودي:
-
-المنتج: ${product.name}
-
-الشروط:
-- 2-3 كلمات
-- حجم بحث جيد في السعودية
-- منافسة معقولة  
-- مرتبطة مباشرة بالمنتج
-
-أعطني الكلمة المفتاحية فقط:`;
-
-          const keywordResponse = await generateProductSEO(keywordPrompt);
+          const keywordResponse = await generateWithCustomPrompt(keywordVariables);
           finalKeyword = keywordResponse.replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim();
         } catch (error) {
           console.error("Keyword generation failed:", error);
@@ -685,21 +679,17 @@ export default function ProductSEO() {
       if (generateOptions.productNameAction === "add_keyword") {
         finalProductName = `${product.name} ${finalKeyword}`;
       } else if (generateOptions.productNameAction === "regenerate") {
+        // استخدام البرومبت المخصص لتوليد اسم محسن
+        const nameVariables = {
+          task: "optimize_product_name",
+          original_name: product.name,
+          keyword: finalKeyword,
+          audience: generateOptions.audience,
+          tone: generateOptions.tone
+        };
+
         try {
-          const namePrompt = `أنشئ اسم منتج محسن لـ SEO بناءً على:
-
-الاسم الحالي: ${product.name}
-الكلمة المفتاحية: ${finalKeyword}
-
-الشروط:
-- احتفظ بالمعنى الأساسي
-- أضف الكلمة المفتاحية بطريقة طبيعية
-- أقل من 70 حرف
-- جذاب للعملاء
-
-أعطني الاسم المحسن فقط:`;
-
-          const nameResponse = await generateProductSEO(namePrompt);
+          const nameResponse = await generateWithCustomPrompt(nameVariables);
           finalProductName = nameResponse.replace(/[\x00-\x1F\x7F-\x9F]/g, '').trim();
         } catch (error) {
           console.error("Product name generation failed:", error);
@@ -707,60 +697,19 @@ export default function ProductSEO() {
         }
       }
 
-      // البرومبت الاحترافي الجديد - جودة عالية
-      const prompt = `أنت كاتب محتوى محترف متخصص في التجارة الإلكترونية والسيو. مهمتك كتابة محتوى تسويقي عالي الجودة.
+      // استخدام البرومبت المخصص لتوليد جميع المحتويات
+      const variables = {
+        task: "generate_all_seo_content",
+        product_name: finalProductName,
+        keyword: finalKeyword,
+        audience: generateOptions.audience,
+        tone: generateOptions.tone,
+        existing_description: product.description || "",
+        product_name_action: generateOptions.productNameAction,
+        keyword_action: generateOptions.keywordAction
+      };
 
-المنتج: "${finalProductName}"
-الكلمة المفتاحية: "${finalKeyword}"
-
-معايير الكتابة الاحترافية:
-1. اكتب محتوى يبيع المنتج ويقنع العميل (ليس مجرد SEO)
-2. استخدم الكلمة المفتاحية بطريقة طبيعية تماماً (مرة أو مرتين فقط)
-3. ركز على فوائد المنتج وليس على الوصف التقني
-4. اكتب بأسلوب يناسب العملاء السعوديين
-
-المطلوب:
-
-**الوصف HTML:**
-- فقرة افتتاحية جذابة (25-30 كلمة) تذكر الكلمة المفتاحية مرة واحدة
-- قسم "المميزات الرئيسية" مع 3-4 نقاط قوية
-- قسم "لماذا تختارنا؟" 
-- دعوة واضحة للشراء
-- رابط واحد: <a href="/products">تصفح منتجاتنا</a>
-- المجموع: 120-150 كلمة
-
-**Page Title:** (50-60 حرف)
-- يحتوي اسم المنتج والكلمة المفتاحية
-- جذاب للنقر في نتائج Google
-
-**Page Description:** (150-160 حرف)
-- يحفز على الزيارة والشراء
-- يوضح الفائدة الأساسية
-- يحتوي الكلمة المفتاحية مرة واحدة
-
-**URL Path:** 
-- باللغة الإنجليزية
-- مبني على اسم المنتج
-- قصير وواضح
-
-**Image Alt:**
-- وصف بصري دقيق للصورة
-- يحتوي اسم المنتج
-
-مثال على الأسلوب المطلوب:
-❌ خطأ: "عطر كوكو شانيل عطر فاخر عطر نسائي عطر مميز..."
-✅ صحيح: "اكتشفي عالم الأناقة مع عطر كوكو شانيل الأصلي..."
-
-أعد JSON نظيف فقط:
-{
-  "description": "وصف HTML احترافي",
-  "meta_title": "عنوان جذاب للسيو",
-  "meta_description": "وصف مقنع",
-  "url_path": "english-url-path",
-  "imageAlt": "وصف الصورة"
-}`;
-
-      const generated = await generateProductSEO(prompt);
+      const generated = await generateWithCustomPrompt(variables);
       
       // تنظيف النص المُولد قبل تحليل JSON
       let cleanedGenerated = generated
@@ -801,7 +750,7 @@ export default function ProductSEO() {
         ...processedFields,
       }));
 
-      toast.success("🎉 تم إنشاء محتوى احترافي بالتوليد الذكي المحسّن!", { id: 'generating' });
+      toast.success("🎉 تم إنشاء محتوى احترافي باستخدام البرومبت المخصص!", { id: 'generating' });
       
       // تحذير إذا تم استخدام fallback
       if (finalKeyword === product.name && generateOptions.keywordAction === "generate") {
@@ -834,110 +783,23 @@ export default function ProductSEO() {
     }
   }, [userPlan, trialUsage.used, trialUsage.limit, product.name, generateOptions, checkTrialAccess]);
 
-  // التوليد لحقل واحد - مبسط
+  // التوليد لحقل واحد - باستخدام البرومبت المخصص فقط
   const handleGenerateField = useCallback(async (fieldType) => {
     setFieldLoading(fieldType);
     setErrors(prev => ({ ...prev, [fieldType]: null }));
 
     try {
-      const prompts = {
-        keyword: `أنت خبير تسويق رقمي. اختر أفضل كلمة مفتاحية لهذا المنتج:
-
-المنتج: ${product.name}
-
-معايير الاختيار:
-- مناسبة للسوق السعودي
-- يبحث عنها العملاء فعلاً
-- منافسة معقولة
-- تجلب مبيعات حقيقية
-
-أعطني كلمة مفتاحية واحدة فقط (2-3 كلمات):`,
-        
-        description: `أنت كاتب محتوى محترف للتجارة الإلكترونية. اكتب وصف منتج عالي الجودة:
-
-المنتج: ${product.name}
-الكلمة المفتاحية: ${product.keyword || 'منتج'}
-
-معايير الكتابة:
-- أسلوب احترافي يناسب العملاء السعوديين
-- يركز على الفوائد وليس الوصف التقني
-- يحتوي الكلمة المفتاحية مرة أو مرتين فقط
-- 120-150 كلمة
-- HTML منظم: <p>, <ul>, <li>, <h3>
-- رابط واحد: <a href="/products">تصفح منتجاتنا</a>
-- دعوة واضحة للشراء
-
-الهيكل المطلوب:
-1. فقرة افتتاحية جذابة
-2. قسم المميزات (3-4 نقاط)
-3. قسم "لماذا تختارنا؟"
-4. دعوة للشراء مع الرابط
-
-أعد الوصف HTML فقط:`,
-        
-        meta_title: `أنت خبير تحسين محركات البحث. اكتب Page Title مثالي:
-
-المنتج: ${product.name}
-الكلمة المفتاحية: ${product.keyword || ''}
-
-معايير العنوان:
-- 50-60 حرف بالضبط
-- يحتوي اسم المنتج والكلمة المفتاحية
-- جذاب للنقر في Google
-- يوضح الفائدة الأساسية
-- مناسب للسوق السعودي
-
-أعطني العنوان فقط:`,
-        
-        meta_description: `اكتب Page Description احترافي لهذا المنتج:
-
-المنتج: ${product.name}
-الكلمة المفتاحية: ${product.keyword || ''}
-
-معايير الوصف:
-- 150-160 حرف بالضبط
-- يحفز على النقر والزيارة
-- يوضح الفائدة الأساسية للعميل
-- يحتوي الكلمة المفتاحية مرة واحدة
-- أسلوب مقنع وجذاب
-
-أعطني الوصف فقط:`,
-        
-        url_path: `أنشئ مسار URL محسن:
-
-المنتج: ${product.name}
-الكلمة المفتاحية: ${product.keyword || ''}
-
-المعايير:
-- باللغة الإنجليزية فقط
-- مبني على اسم المنتج
-- كلمات مفصولة بشرطات
-- قصير وواضح (أقل من 60 حرف)
-- صديق لمحركات البحث
-
-أعطني المسار فقط (بدون http):`,
-        
-        imageAlt: `اكتب وصف ALT احترافي للصورة:
-
-المنتج: ${product.name}
-الكلمة المفتاحية: ${product.keyword || ''}
-
-المعايير:
-- وصف بصري دقيق لما في الصورة
-- يحتوي اسم المنتج
-- 8-12 كلمة
-- مفيد للمكفوفين
-- طبيعي وغير محشو
-
-أعطني وصف الصورة فقط:`
+      // استخدام البرومبت المخصص لتوليد حقل واحد
+      const variables = {
+        task: `generate_${fieldType}`,
+        product_name: product.name,
+        keyword: product.keyword || '',
+        audience: generateOptions.audience,
+        tone: generateOptions.tone,
+        existing_description: product.description || ""
       };
 
-      const prompt = prompts[fieldType];
-      if (!prompt) {
-        throw new Error(`لا يوجد برومبت للحقل: ${fieldType}`);
-      }
-
-      const response = await generateProductSEO(prompt);
+      const response = await generateWithCustomPrompt(variables);
       let value = response.trim();
 
       value = value.replace(/^["']|["']$/g, '');
@@ -973,7 +835,7 @@ export default function ProductSEO() {
     } finally {
       setFieldLoading("");
     }
-  }, [product.name, product.keyword]);
+  }, [product.name, product.keyword, generateOptions.audience, generateOptions.tone, product.description]);
 
   const copyToClipboard = async (text, label) => {
     try {
@@ -1045,9 +907,6 @@ export default function ProductSEO() {
       progress = analysisResult.coreScore || 0;
     }
 
-    // إزالة Banner التحسينات - لا نحتاجه بعد الآن
-    // if (showUpdateBanner && product.name) { ... }
-
     if (!product.name) {
       return (
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-6 border border-blue-100">
@@ -1055,7 +914,7 @@ export default function ProductSEO() {
             <div className="text-4xl">🚀</div>
             <div>
               <h3 className="font-bold text-blue-900 text-lg">ابدأ رحلة تحسين السيو!</h3>
-              <p className="text-blue-700">أدخل اسم منتجك وسنقوم بتوليد محتوى احترافي محسن تلقائياً</p>
+              <p className="text-blue-700">أدخل اسم منتجك وسنقوم بتوليد محتوى احترافي باستخدام البرومبت المخصص</p>
             </div>
           </div>
         </div>
@@ -1068,8 +927,8 @@ export default function ProductSEO() {
           <div className="flex items-center gap-4">
             <div className="text-4xl">⚡</div>
             <div>
-              <h3 className="font-bold text-amber-900 text-lg">استخدم التوليد الذكي المحسّن!</h3>
-              <p className="text-amber-700">اضغط "التوليد الذكي" للحصول على محتوى احترافي يبيع منتجك فعلاً</p>
+              <h3 className="font-bold text-amber-900 text-lg">استخدم البرومبت المخصص!</h3>
+              <p className="text-amber-700">اضغط "التوليد الذكي" للحصول على محتوى احترافي باستخدام البرومبت المخصص الخاص بك</p>
             </div>
           </div>
         </div>
@@ -1126,7 +985,7 @@ export default function ProductSEO() {
                       : "bg-blue-100 text-blue-700 hover:bg-blue-200 hover:scale-105"
                   }`}
                   disabled={isLoading}
-                  title="التوليد الذكي"
+                  title="التوليد الذكي بالبرومبت المخصص"
                 >
                   {isLoading ? (
                     <div className="animate-spin rounded-full h-4 w-4 border border-yellow-600 border-t-transparent"></div>
@@ -1176,7 +1035,7 @@ export default function ProductSEO() {
           
           {!isLocked && (
             <div className="text-xs text-gray-500 mt-2">
-              💡 استخدم المحرر لإضافة <strong>التنسيق</strong>، <strong>الروابط الداخلية</strong>، والقوائم المنظمة | أو جرب التوليد الذكي 🧠
+              💡 استخدم المحرر لإضافة <strong>التنسيق</strong>، <strong>الروابط الداخلية</strong>، والقوائم المنظمة | أو جرب التوليد الذكي بالبرومبت المخصص 🧠
             </div>
           )}
         </div>
@@ -1208,7 +1067,7 @@ export default function ProductSEO() {
                     : "bg-blue-100 text-blue-700 hover:bg-blue-200 hover:scale-105"
                 }`}
                 disabled={isLoading}
-                title="التوليد الذكي"
+                title="التوليد الذكي بالبرومبت المخصص"
               >
                 {isLoading ? (
                   <div className="animate-spin rounded-full h-4 w-4 border border-yellow-600 border-t-transparent"></div>
@@ -1282,7 +1141,7 @@ export default function ProductSEO() {
         )}
         {key === 'keyword' && !isLocked && (
           <div className="text-xs text-gray-500 mt-2">
-            💡 اختر كلمة مفتاحية بحجم بحث عالي ومنافسة معقولة - أو جرب التوليد الذكي 🧠
+            💡 اختر كلمة مفتاحية بحجم بحث عالي ومنافسة معقولة - أو جرب التوليد الذكي بالبرومبت المخصص 🧠
           </div>
         )}
         {key === 'url_path' && !isLocked && (
@@ -1404,12 +1263,12 @@ export default function ProductSEO() {
                         ) : userPlan === "free" ? (
                           <>
                             <Sparkles className="w-5 h-5" />
-                            🚀 التوليد الذكي المحسّن ({trialUsage.limit - trialUsage.used} متبقي)
+                            🚀 البرومبت المخصص ({trialUsage.limit - trialUsage.used} متبقي)
                           </>
                         ) : (
                           <>
                             <Sparkles className="w-5 h-5" />
-                            🚀 التوليد الذكي المحسّن
+                            🚀 البرومبت المخصص
                           </>
                         )}
                       </button>
@@ -1463,7 +1322,7 @@ export default function ProductSEO() {
                     <div className="flex items-center gap-3">
                       <div className="text-2xl">🎁</div>
                       <div>
-                        <div className="font-semibold text-blue-800">التجربة المجانية</div>
+                        <div className="font-semibold text-blue-800">البرومبت المخصص - التجربة المجانية</div>
                         <div className="text-sm text-blue-600">
                           استخدمت {trialUsage.used} من {trialUsage.limit} توليدات ذكية هذا الشهر
                         </div>
@@ -1596,34 +1455,34 @@ export default function ProductSEO() {
               <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <Lightbulb className="w-5 h-5 text-yellow-500" />
-                  نصائح سريعة للنجاح
+                  البرومبت المخصص
                 </h3>
                 <div className="space-y-3 text-sm text-gray-600">
                   <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
-                    <div className="text-green-500 mt-0.5">🚀</div>
+                    <div className="text-green-500 mt-0.5">🎯</div>
                     <div>
-                      <strong>التوليد الذكي المحسّن:</strong> تم تطوير البرومبت ليعطي محتوى احترافي عالي الجودة مناسب للمتاجر المحترفة - لا مزيد من المحتوى المحشو!
+                      <strong>نظام متطور:</strong> يتم توليد جميع المحتويات باستخدام البرومبت المخصص الخاص بك فقط - لا مزيد من البرومبتات المبرمجة!
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
-                    <div className="text-blue-500 mt-0.5">🎯</div>
+                    <div className="text-blue-500 mt-0.5">🔧</div>
                     <div>
-                      <strong>الكلمة المفتاحية:</strong> يتم استخدامها بطريقة طبيعية (مرة أو مرتين فقط) لضمان جودة المحتوى
+                      <strong>تحكم كامل:</strong> البرومبت المخصص يضمن الحصول على نتائج متسقة وعالية الجودة حسب احتياجاتك
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
-                    <div className="text-purple-500 mt-0.5">📝</div>
+                    <div className="text-purple-500 mt-0.5">⚡</div>
                     <div>
-                      <strong>أسلوب الكتابة:</strong> محتوى يبيع المنتج ويقنع العميل - ليس مجرد تحسين تقني
+                      <strong>سرعة وموثوقية:</strong> استجابة أسرع ونتائج أكثر دقة مع البرومبت المخصص
                     </div>
                   </div>
                   
                   <div className="flex items-start gap-3 p-3 bg-orange-50 rounded-lg">
-                    <div className="text-orange-500 mt-0.5">💎</div>
+                    <div className="text-orange-500 mt-0.5">🎨</div>
                     <div>
-                      <strong>الجودة:</strong> مناسب للمتاجر الاحترافية والعلامات التجارية الكبيرة
+                      <strong>تخصيص كامل:</strong> يمكنك تعديل البرومبت حسب احتياجاتك المحددة
                     </div>
                   </div>
                 </div>
@@ -1669,10 +1528,10 @@ export default function ProductSEO() {
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-t-2xl">
               <div className="flex items-center gap-3">
-                <div className="text-3xl">🧠</div>
+                <div className="text-3xl">🎯</div>
                 <div>
-                  <h2 className="text-xl font-bold">التوليد الذكي لمحتوى SEO</h2>
-                  <p className="text-blue-100 text-sm mt-1">خصص خيارات التوليد حسب احتياجاتك</p>
+                  <h2 className="text-xl font-bold">البرومبت المخصص</h2>
+                  <p className="text-blue-100 text-sm mt-1">خصص خيارات التوليد لاستخدامها مع البرومبت المخصص</p>
                 </div>
               </div>
             </div>
@@ -1683,16 +1542,15 @@ export default function ProductSEO() {
               {/* شرح توضيحي */}
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                 <div className="flex items-start gap-3">
-                  <div className="text-2xl">💡</div>
+                  <div className="text-2xl">🎯</div>
                   <div>
-                    <h3 className="font-semibold text-blue-900 mb-2">كيف يعمل التوليد الذكي المحسّن؟</h3>
+                    <h3 className="font-semibold text-blue-900 mb-2">كيف يعمل البرومبت المخصص؟</h3>
                     <p className="text-blue-800 text-sm leading-relaxed mb-3">
-                      سيقوم بإنشاء محتوى احترافي عالي الجودة مناسب للمتاجر المحترفة. تم تطوير النظام ليعطي نتائج تبيع المنتج فعلاً وتقنع العملاء.
+                      سيتم إرسال جميع البيانات والخيارات التي تحددها هنا إلى البرومبت المخصص الخاص بك في OpenAI مباشرة. هذا يضمن حصولك على نتائج متسقة وعالية الجودة.
                     </p>
                     <div className="bg-blue-100 border border-blue-300 rounded-lg p-3">
                       <p className="text-blue-900 text-sm font-medium">
-                        🔥 <strong>جديد:</strong> لا مزيد من المحتوى المحشو بالكلمات المفتاحية! 
-                        المحتوى الآن طبيعي ومقنع ومناسب للعلامات التجارية الاحترافية.
+                        🔥 <strong>المزايا:</strong> تحكم كامل، نتائج متسقة، إمكانية التخصيص الكامل، سرعة أعلى
                       </p>
                     </div>
                   </div>
@@ -1781,7 +1639,7 @@ export default function ProductSEO() {
                         onChange={(e) => updateGenerateOptions({ keywordAction: e.target.value })}
                         className="text-green-600"
                       />
-                      <span className="text-sm font-medium">توليد تلقائي</span>
+                      <span className="text-sm font-medium">توليد بالبرومبت المخصص</span>
                     </label>
                     
                     <label className="flex items-center space-x-3 space-x-reverse cursor-pointer">
@@ -1814,13 +1672,13 @@ export default function ProductSEO() {
 
                   {generateOptions.keywordAction === "generate" && (
                     <div className="text-xs text-green-600 bg-green-50 p-2 rounded">
-                      🎯 سيتم اختيار أفضل كلمة مفتاحية تلقائياً بناءً على اسم المنتج والسوق السعودي
+                      🎯 سيتم اختيار أفضل كلمة مفتاحية باستخدام البرومبت المخصص
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* خيار الجمهور المستهدف - جديد */}
+              {/* خيار الجمهور المستهدف */}
               <div className="space-y-3">
                 <label className="text-sm font-semibold text-gray-800 flex items-center gap-2">
                   <Users className="w-4 h-4 text-purple-500" />
@@ -1840,12 +1698,12 @@ export default function ProductSEO() {
                     ))}
                   </select>
                   <div className="text-xs text-gray-600 mt-2">
-                    💡 اختر الجمهور المناسب لتحسين أسلوب الكتابة
+                    💡 سيتم إرسال هذا الجمهور للبرومبت المخصص لتحسين أسلوب الكتابة
                   </div>
                 </div>
               </div>
 
-              {/* خيار نبرة الكتابة - جديد */}
+              {/* خيار نبرة الكتابة */}
               <div className="space-y-3">
                 <label className="text-sm font-semibold text-gray-800 flex items-center gap-2">
                   <Type className="w-4 h-4 text-orange-500" />
@@ -1865,48 +1723,28 @@ export default function ProductSEO() {
                     ))}
                   </select>
                   <div className="text-xs text-gray-600 mt-2">
-                    💡 النبرة تؤثر على أسلوب الكتابة ونوع اللغة المستخدمة
+                    💡 سيتم إرسال هذه النبرة للبرومبت المخصص
                   </div>
                 </div>
               </div>
 
               {/* ملخص سريع */}
               <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl p-4">
-                <h4 className="font-semibold text-purple-900 mb-2">📋 ما ستحصل عليه:</h4>
+                <h4 className="font-semibold text-purple-900 mb-2">📋 البيانات التي سيتم إرسالها للبرومبت المخصص:</h4>
                 <ul className="text-sm text-purple-800 space-y-1">
-                  <li>✅ محتوى احترافي يبيع المنتج ويقنع العملاء</li>
-                  <li>✅ Page Title جذاب يزيد النقرات من Google</li>
-                  <li>✅ Page Description مقنع يحفز على الزيارة</li>
-                  <li>✅ مسار URL محسن وصديق لمحركات البحث</li>
-                  <li>✅ وصف صورة مناسب للمكفوفين ومحركات البحث</li>
-                  <li>✅ أسلوب كتابة طبيعي (لا يبدو محشو أو مصطنع)</li>
+                  <li>✅ اسم المنتج: {product.name}</li>
+                  <li>✅ إجراء الاسم: {generateOptions.productNameAction}</li>
+                  <li>✅ إجراء الكلمة المفتاحية: {generateOptions.keywordAction}</li>
+                  {generateOptions.keywordAction === "use_existing" && (
+                    <li>✅ الكلمة المفتاحية: {generateOptions.customKeyword}</li>
+                  )}
+                  <li>✅ الجمهور المستهدف: {generateOptions.audience}</li>
+                  <li>✅ نبرة الكتابة: {generateOptions.tone}</li>
                 </ul>
                 
                 <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
                   <div className="text-green-800 text-sm">
-                    <strong>🎯 الهدف:</strong> محتوى يحسن SEO ويزيد المبيعات معاً - مناسب للعلامات التجارية المحترفة
-                  </div>
-                </div>
-                
-                <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <div className="text-yellow-800 text-sm">
-                    <strong>💡 نصيحة:</strong> ستتذكر خياراتك للمرة القادمة لتوفير الوقت!
-                  </div>
-                </div>
-                
-                {/* معاينة سريعة للنتيجة المتوقعة */}
-                <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <div className="text-blue-800 text-sm">
-                    <strong>🎯 المتوقع:</strong> 
-                    {generateOptions.productNameAction === "keep" && " اسم المنتج الحالي"}
-                    {generateOptions.productNameAction === "add_keyword" && " اسم المنتج + كلمة مفتاحية"}
-                    {generateOptions.productNameAction === "regenerate" && " اسم محسن جديد"}
-                    {" + "}
-                    {generateOptions.keywordAction === "generate" && "كلمة مفتاحية مقترحة"}
-                    {generateOptions.keywordAction === "use_existing" && `كلمتك: "${generateOptions.customKeyword}"`}
-                    <br />
-                    <strong>👥 الجمهور:</strong> {generateOptions.audience} | 
-                    <strong> 🎨 النبرة:</strong> {generateOptions.tone}
+                    <strong>🎯 النتيجة:</strong> سيقوم البرومبت المخصص بمعالجة هذه البيانات وإنتاج محتوى متسق وعالي الجودة
                   </div>
                 </div>
               </div>
@@ -1945,7 +1783,7 @@ export default function ProductSEO() {
                 ) : (
                   <>
                     <Sparkles className="w-5 h-5" />
-                    🚀 ابدأ التوليد الذكي
+                    🎯 إرسال للبرومبت المخصص
                   </>
                 )}
               </button>
@@ -1956,70 +1794,3 @@ export default function ProductSEO() {
     </>
   );
 }
-
-/*
-===========================================
-🔧 إعداد النظام للعمل مع API فقط
-===========================================
-
-هذا النظام يعتمد على:
-1. Backend API للمنتجات
-2. OpenAI API للتوليد الذكي
-
-لا يوجد localStorage fallback - العمل على الـ API الحقيقي فقط!
-
-===========================================
-📝 متغيرات البيئة المطلوبة:
-===========================================
-
-أنشئ ملف .env في جذر المشروع:
-
-REACT_APP_OPENAI_API_KEY=sk-your-openai-api-key-here
-REACT_APP_API_URL=https://your-backend-url.com
-
-===========================================
-🔑 الحصول على OpenAI API Key:
-===========================================
-
-1. اذهب إلى: https://platform.openai.com/api-keys
-2. اضغط "Create new secret key"
-3. انسخ المفتاح وضعه في .env
-4. تأكد من وجود رصيد في حسابك
-
-===========================================
-🌐 إعداد Backend API:
-===========================================
-
-يجب أن يدعم الـ Backend هذه النهايات:
-- GET /product/{id} - جلب منتج
-- PUT /product/{id} - تحديث منتج
-
-مع Auth Headers:
-Authorization: Bearer {token}
-
-===========================================
-🎯 معرف البرومبت المخصص:
-===========================================
-
-pmpt_685ffc0009bc81978d0bb122e0917a900a4178e0f8d7cd17
-
-===========================================
-⚠️ مهم - لا يوجد fallback:
-===========================================
-
-- إذا فشل الـ Backend API → خطأ واضح
-- إذا فشل OpenAI API → خطأ واضح  
-- لا يوجد localStorage backup
-- العمل على البيانات الحقيقية فقط
-
-===========================================
-✅ رسائل الأخطاء الواضحة:
-===========================================
-
-- 401: انتهت صلاحية الجلسة
-- 404: المنتج غير موجود
-- 422: بيانات غير صحيحة
-- 429: تجاوز حد الاستخدام
-- 500: خطأ في الخادم
-
-*/
