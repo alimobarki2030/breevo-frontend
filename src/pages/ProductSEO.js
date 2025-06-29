@@ -396,9 +396,8 @@ export default function ProductSEO() {
   const [editorKey, setEditorKey] = useState(Date.now()); // ← جديد: لإجبار تحديث المحرر
   const [copiedFields, setCopiedFields] = useState({}); // ← جديد: لتتبع الحقول المنسوخة
 
-  // User subscription info and trial tracking
+  // 🔧 فصل العدادات - التوليد الذكي فقط
   const [userPlan, setUserPlan] = useState("free");
-  const [canUseAI, setCanUseAI] = useState(false);
   const [trialUsage, setTrialUsage] = useState({ used: 0, limit: 3, resetDate: null });
   const [isTrialExpired, setIsTrialExpired] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
@@ -415,7 +414,7 @@ export default function ProductSEO() {
     };
   });
 
-  // Load user plan and trial usage
+  // Load user plan and trial usage - التوليد الذكي فقط
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const subscription = JSON.parse(localStorage.getItem("subscription") || "{}");
@@ -427,11 +426,13 @@ export default function ProductSEO() {
                    user.id === "1";
     
     setUserPlan(isOwner ? "owner" : plan);
-    setCanUseAI(true);
-    setIsTrialExpired(false);
-
+    
+    // التحقق من التجربة المجانية للتوليد الذكي فقط
     if (!isOwner && plan === "free") {
       loadTrialUsage();
+    } else {
+      // المستخدمين المدفوعين لديهم استخدام غير محدود
+      setIsTrialExpired(false);
     }
 
     // تنظيف الخيارات القديمة وإبقاء الأساسيات فقط
@@ -468,7 +469,7 @@ export default function ProductSEO() {
       setTrialUsage(newUsage);
       setIsTrialExpired(false);
     } else {
-      setTrialUsage(usage);
+      setTrialUsage(newUsage);
       setIsTrialExpired(usage.used >= usage.limit);
     }
   };
@@ -481,10 +482,11 @@ export default function ProductSEO() {
     setIsTrialExpired(usage.used >= usage.limit);
   };
 
+  // 🔧 تبسيط checkTrialAccess
   const checkTrialAccess = () => {
     if (userPlan === "owner") return true;
-    if (userPlan !== "free") return true;
-    return trialUsage.used < trialUsage.limit;
+    if (userPlan !== "free") return true; // المدفوعين لديهم وصول غير محدود
+    return trialUsage.used < trialUsage.limit; // المجانيين محدودين بـ 3 مرات
   };
 
   const showUpgradePrompt = () => {
@@ -589,19 +591,6 @@ export default function ProductSEO() {
   }, [id, passedProduct]);
 
   const handleProductChange = useCallback((field, value) => {
-    if (userPlan === "owner") {
-      setProduct(prev => ({
-        ...prev,
-        [field]: value,
-        lastUpdated: new Date().toISOString()
-      }));
-      
-      if (errors[field]) {
-        setErrors(prev => ({ ...prev, [field]: null }));
-      }
-      return;
-    }
-
     setProduct(prev => ({
       ...prev,
       [field]: value,
@@ -611,7 +600,7 @@ export default function ProductSEO() {
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: null }));
     }
-  }, [userPlan]);
+  }, [errors]);
 
   const validateProduct = useCallback(() => {
     const newErrors = {};
@@ -713,8 +702,9 @@ export default function ProductSEO() {
     }
   }, [validateProduct, product]);
 
-  // التوليد الذكي الشامل - مع نافذة التحكم
+  // 🔧 التوليد الذكي الشامل - مع التحقق من التوليد الذكي فقط
   const handleGenerateAll = useCallback(async () => {
+    // التحقق من صلاحية التوليد الذكي فقط
     if (userPlan === "free" && !checkTrialAccess()) {
       showUpgradePrompt();
       return;
@@ -728,7 +718,7 @@ export default function ProductSEO() {
 
     // إظهار نافذة التحكم بدلاً من التوليد المباشر
     setShowGenerateModal(true);
-  }, [userPlan, trialUsage.used, trialUsage.limit, product.name, checkTrialAccess]);
+  }, [userPlan, product.name, checkTrialAccess]);
 
   // تنفيذ التوليد الذكي مع الخيارات المحددة - باستخدام البرومبت المحفوظ فقط
   const executeSmartGeneration = useCallback(async () => {
@@ -739,6 +729,7 @@ export default function ProductSEO() {
     try {
       toast.loading("🧠 جاري التوليد الذكي باستخدام البرومبت المحفوظ...", { id: 'generating' });
 
+      // استهلاك من التجربة المجانية فقط عند الاستخدام الفعلي
       if (userPlan === "free") {
         incrementTrialUsage();
       }
@@ -837,9 +828,14 @@ export default function ProductSEO() {
         toast.warning("⚠️ لم يتم توليد كلمة مفتاحية. يمكنك إضافتها يدوياً.", { duration: 4000 });
       }
       
+      // رسالة للمستخدمين المجانيين
       if (userPlan === "free") {
         const remaining = trialUsage.limit - trialUsage.used - 1;
-        toast.success(`✨ ${remaining} توليدة مجانية متبقية هذا الشهر`, { duration: 4000 });
+        if (remaining > 0) {
+          toast.success(`✨ ${remaining} توليدة مجانية متبقية هذا الشهر`, { duration: 4000 });
+        } else {
+          toast.warning(`🔒 انتهت التجربة المجانية لهذا الشهر. ترقية للمزيد!`, { duration: 6000 });
+        }
       }
 
     } catch (error) {
@@ -861,10 +857,16 @@ export default function ProductSEO() {
     } finally {
       setGenerating(false);
     }
-  }, [userPlan, trialUsage.used, trialUsage.limit, product.name, generateOptions, checkTrialAccess]);
+  }, [userPlan, product.name, generateOptions, checkTrialAccess]);
 
   // التوليد لحقل واحد - باستخدام البرومبت المحفوظ فقط
   const handleGenerateField = useCallback(async (fieldType) => {
+    // التحقق من صلاحية التوليد الذكي
+    if (userPlan === "free" && !checkTrialAccess()) {
+      showUpgradePrompt();
+      return;
+    }
+
     setFieldLoading(fieldType);
     setErrors(prev => ({ ...prev, [fieldType]: null }));
 
@@ -930,7 +932,7 @@ export default function ProductSEO() {
     } finally {
       setFieldLoading("");
     }
-  }, [product.name, product.keyword, product.description]);
+  }, [userPlan, product.name, product.keyword, product.description, checkTrialAccess]);
 
   const copyToClipboard = async (text, label, fieldKey) => {
     try {
@@ -1060,8 +1062,12 @@ export default function ProductSEO() {
     const hasError = errors[key];
     const isLoading = fieldLoading === key;
     const fieldValue = product[key] || "";
-    const isLocked = userPlan === "free" && isTrialExpired;
+    
+    // التحقق من قفل التوليد الذكي فقط (وليس إدخال البيانات)
+    const isAiLocked = userPlan === "free" && !checkTrialAccess();
     const isCopied = copiedFields[key];
+    
+    // المستخدم يمكنه دائماً إدخال البيانات يدوياً، لكن التوليد الذكي محدود
     
     const showCharCount = ['meta_title', 'meta_description', 'name'].includes(key);
     const charLimit = FIELD_LIMITS[key + '_limit'] || (FIELD_LIMITS[key]?.max || FIELD_LIMITS[key]);
@@ -1072,152 +1078,46 @@ export default function ProductSEO() {
 
     if (key === "description") {
       return (
-        <div className={`relative bg-white p-6 rounded-2xl shadow-sm border transition-colors ${
-          isLocked ? 'border-red-200 bg-red-50' : 'border-gray-200 hover:border-gray-300'
-        }`}>
+        <div className="relative bg-white p-6 rounded-2xl shadow-sm border transition-colors border-gray-200 hover:border-gray-300">
           <div className="flex items-center justify-between mb-4">
             <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
               {icon}
               {label}
-              {!isLocked && <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">Rich Text Editor</span>}
-              {isLocked && <span className="text-xs text-red-600 bg-red-100 px-2 py-1 rounded">🔒 مؤمن</span>}
+              <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">Rich Text Editor</span>
             </label>
             <div className="flex items-center gap-2">
-              {(userPlan !== "free" || checkTrialAccess()) && !isLocked && (
-                <button
-                  onClick={() => handleGenerateField(key)}
-                  className={`p-2 rounded-lg transition-all ${
-                    isLoading 
-                      ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
-                      : "bg-blue-100 text-blue-700 hover:bg-blue-200 hover:scale-105"
-                  }`}
-                  disabled={isLoading}
-                  title="التوليد الفردي "
-                >
-                  {isLoading ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border border-yellow-600 border-t-transparent"></div>
-                  ) : (
-                    <Sparkles className="w-4 h-4" />
-                  )}
-                </button>
-              )}
-              
-              {/* زر النسخ المحسن */}
-              {!isLocked && (
-                <button
-                  onClick={() => {
-                    if (fieldValue.trim()) {
-                      copyToClipboard(fieldValue, label, key);
-                    } else {
-                      toast.warning(`${label} فارغ - لا يوجد محتوى للنسخ`);
-                    }
-                  }}
-                  className={`p-2 rounded-lg transition-all duration-200 ${
-                    isCopied 
-                      ? "bg-green-100 text-green-700 scale-110" 
-                      : fieldValue.trim()
-                        ? "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                        : "bg-gray-50 text-gray-400"
-                  }`}
-                  title={
-                    isCopied ? "تم النسخ!" : 
-                    fieldValue.trim() ? "نسخ" : 
-                    "لا يوجد محتوى للنسخ"
-                  }
-                >
-                  {isCopied ? (
-                    <CheckCircle className="w-4 h-4" />
-                  ) : (
-                    <Copy className="w-4 h-4" />
-                  )}
-                </button>
-              )}
-            </div>
-          </div>
-          
-          {isLocked ? (
-            <div className="w-full p-3 border border-red-300 rounded-lg bg-red-50 text-red-700 text-center">
-              🔒 انتهت التجربة المجانية. ترقية مطلوبة للمتابعة
-              <div className="mt-2">
-                <button
-                  onClick={showUpgradePrompt}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-                >
-                  ترقية الآن
-                </button>
-              </div>
-            </div>
-          ) : (
-            <TiptapEditor
-              key={editorKey}
-              value={fieldValue}
-              onChange={(val) => handleProductChange(key, val)}
-              placeholder={placeholder}
-            />
-          )}
-          
-          {hasError && (
-            <div className="text-red-500 text-xs mt-2 flex items-center gap-1">
-              <XCircle className="w-3 h-3" />
-              {hasError}
-            </div>
-          )}
-          
-          {!isLocked && (
-            <div className="text-xs text-gray-500 mt-2">
-              💡 استخدم المحرر لإضافة <strong>التنسيق</strong>، <strong>الروابط الداخلية</strong>، والقوائم المنظمة | أو جرب التوليد الذكي بالبرومبت المحفوظ 🧠
-            </div>
-          )}
-        </div>
-      );
-    }
-
-    return (
-      <div className={`relative bg-white p-6 rounded-2xl shadow-sm border transition-colors ${
-        isLocked ? 'border-red-200 bg-red-50' : 'border-gray-200 hover:border-gray-300'
-      }`}>
-        <div className="flex items-center justify-between mb-3">
-          <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-            {icon}
-            {label}
-            {isLocked && <span className="text-xs text-red-600 bg-red-100 px-2 py-1 rounded">🔒 مؤمن</span>}
-          </label>
-          <div className="flex items-center gap-2">
-            {showCharCount && (
-              <span className={`text-xs ${
-                isOverLimit ? 'text-red-500' : 
-                isUnderLimit ? 'text-orange-500' : 
-                'text-gray-500'
-              }`}>
-                {charCount}
-                {charMin && charLimit ? `/${charMin}-${charLimit}` : 
-                 charLimit ? `/${charLimit}` : ''}
-                {isUnderLimit && ` (قليل)`}
-                {isOverLimit && ` (كثير)`}
-              </span>
-            )}
-            
-            {(userPlan !== "free" || checkTrialAccess()) && !isLocked && (
+              {/* زر التوليد الذكي - محدود للمجانيين */}
               <button
-                onClick={() => handleGenerateField(key)}
+                onClick={() => {
+                  if (isAiLocked) {
+                    showUpgradePrompt();
+                    return;
+                  }
+                  handleGenerateField(key);
+                }}
                 className={`p-2 rounded-lg transition-all ${
                   isLoading 
                     ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
-                    : "bg-blue-100 text-blue-700 hover:bg-blue-200 hover:scale-105"
+                    : isAiLocked
+                      ? "bg-red-100 text-red-700 hover:bg-red-200"
+                      : "bg-blue-100 text-blue-700 hover:bg-blue-200 hover:scale-105"
                 }`}
                 disabled={isLoading}
-                title="التوليد الذكي بالبرومبت المحفوظ"
+                title={
+                  isAiLocked ? "انتهت التجربة المجانية - ترقية مطلوبة" :
+                  "التوليد الذكي بالبرومبت المحفوظ"
+                }
               >
                 {isLoading ? (
                   <div className="animate-spin rounded-full h-4 w-4 border border-yellow-600 border-t-transparent"></div>
+                ) : isAiLocked ? (
+                  <Crown className="w-4 h-4" />
                 ) : (
                   <Sparkles className="w-4 h-4" />
                 )}
               </button>
-            )}
-            
-            {/* زر النسخ المحسن */}
-            {!isLocked && (
+              
+              {/* زر النسخ - دائماً متاح */}
               <button
                 onClick={() => {
                   if (fieldValue.trim()) {
@@ -1245,23 +1145,117 @@ export default function ProductSEO() {
                   <Copy className="w-4 h-4" />
                 )}
               </button>
+            </div>
+          </div>
+          
+          {/* حقل الإدخال - دائماً متاح للتعديل اليدوي */}
+          <TiptapEditor
+            key={editorKey}
+            value={fieldValue}
+            onChange={(val) => handleProductChange(key, val)}
+            placeholder={placeholder}
+          />
+          
+          {hasError && (
+            <div className="text-red-500 text-xs mt-2 flex items-center gap-1">
+              <XCircle className="w-3 h-3" />
+              {hasError}
+            </div>
+          )}
+          
+          <div className="text-xs text-gray-500 mt-2">
+            💡 استخدم المحرر لإضافة <strong>التنسيق</strong>، <strong>الروابط الداخلية</strong>، والقوائم المنظمة | أو جرب التوليد الذكي بالبرومبت المحفوظ 🧠
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="relative bg-white p-6 rounded-2xl shadow-sm border transition-colors border-gray-200 hover:border-gray-300">
+        <div className="flex items-center justify-between mb-3">
+          <label className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+            {icon}
+            {label}
+          </label>
+          <div className="flex items-center gap-2">
+            {showCharCount && (
+              <span className={`text-xs ${
+                isOverLimit ? 'text-red-500' : 
+                isUnderLimit ? 'text-orange-500' : 
+                'text-gray-500'
+              }`}>
+                {charCount}
+                {charMin && charLimit ? `/${charMin}-${charLimit}` : 
+                 charLimit ? `/${charLimit}` : ''}
+                {isUnderLimit && ` (قليل)`}
+                {isOverLimit && ` (كثير)`}
+              </span>
             )}
+            
+            {/* زر التوليد الذكي - محدود للمجانيين */}
+            <button
+              onClick={() => {
+                if (isAiLocked) {
+                  showUpgradePrompt();
+                  return;
+                }
+                handleGenerateField(key);
+              }}
+              className={`p-2 rounded-lg transition-all ${
+                isLoading 
+                  ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
+                  : isAiLocked
+                    ? "bg-red-100 text-red-700 hover:bg-red-200"
+                    : "bg-blue-100 text-blue-700 hover:bg-blue-200 hover:scale-105"
+              }`}
+              disabled={isLoading}
+              title={
+                isAiLocked ? "انتهت التجربة المجانية - ترقية مطلوبة" :
+                "التوليد الذكي بالبرومبت المحفوظ"
+              }
+            >
+              {isLoading ? (
+                <div className="animate-spin rounded-full h-4 w-4 border border-yellow-600 border-t-transparent"></div>
+              ) : isAiLocked ? (
+                <Crown className="w-4 h-4" />
+              ) : (
+                <Sparkles className="w-4 h-4" />
+              )}
+            </button>
+            
+            {/* زر النسخ - دائماً متاح */}
+            <button
+              onClick={() => {
+                if (fieldValue.trim()) {
+                  copyToClipboard(fieldValue, label, key);
+                } else {
+                  toast.warning(`${label} فارغ - لا يوجد محتوى للنسخ`);
+                }
+              }}
+              className={`p-2 rounded-lg transition-all duration-200 ${
+                isCopied 
+                  ? "bg-green-100 text-green-700 scale-110" 
+                  : fieldValue.trim()
+                    ? "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    : "bg-gray-50 text-gray-400"
+              }`}
+              title={
+                isCopied ? "تم النسخ!" : 
+                fieldValue.trim() ? "نسخ" : 
+                "لا يوجد محتوى للنسخ"
+              }
+            >
+              {isCopied ? (
+                <CheckCircle className="w-4 h-4" />
+              ) : (
+                <Copy className="w-4 h-4" />
+              )}
+            </button>
           </div>
         </div>
         
-        {isLocked ? (
-          <div className="w-full p-3 border border-red-300 rounded-lg bg-red-50 text-red-700 text-center">
-            🔒 انتهت التجربة المجانية. ترقية مطلوبة للمتابعة
-            <div className="mt-2">
-              <button
-                onClick={showUpgradePrompt}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-              >
-                ترقية الآن
-              </button>
-            </div>
-          </div>
-        ) : multiline ? (
+        {/* حقل الإدخال - دائماً متاح للتعديل اليدوي */}
+        {multiline ? (
           <textarea
             value={fieldValue}
             onChange={(e) => handleProductChange(key, e.target.value)}
@@ -1290,22 +1284,23 @@ export default function ProductSEO() {
           </div>
         )}
 
-        {key === 'meta_title' && !isLocked && (
+        {/* رسائل توضيحية */}
+        {key === 'meta_title' && (
           <div className="text-xs text-gray-500 mt-2">
             💡 Page Title المثالي: 53-60 حرف بالضبط، يحتوي الكلمة المفتاحية، جذاب للنقر
           </div>
         )}
-        {key === 'meta_description' && !isLocked && (
+        {key === 'meta_description' && (
           <div className="text-xs text-gray-500 mt-2">
             💡 Page Description المثالي: 130-150 حرف بالضبط، يحتوي الكلمة المفتاحية، يحفز على الزيارة
           </div>
         )}
-        {key === 'keyword' && !isLocked && (
+        {key === 'keyword' && (
           <div className="text-xs text-gray-500 mt-2">
             💡 اختر كلمة مفتاحية بحجم بحث عالي ومنافسة معقولة - أو جرب التوليد الذكي بالبرومبت المحفوظ 🧠
           </div>
         )}
-        {key === 'url_path' && !isLocked && (
+        {key === 'url_path' && (
           <div className="text-xs text-amber-600 bg-amber-50 p-2 rounded mt-2">
             ⚠️ إذا كان الموقع مفهرس مسبقاً، لا تعدل هذا الحقل حيث قد يؤثر على الفهرسة
           </div>
@@ -1397,61 +1392,57 @@ export default function ProductSEO() {
                     معلومات المنتج
                   </h2>
                   <div className="flex gap-3">
-                    {(userPlan !== "free" || checkTrialAccess()) && (
-                      <button
-                        onClick={handleGenerateAll}
-                        disabled={generating || !product.name?.trim()}
-                        className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 shadow-sm ${
-                          generating 
-                            ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
-                            : !product.name?.trim()
-                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    {/* زر التوليد الذكي - التحقق من التوليد الذكي فقط */}
+                    <button
+                      onClick={handleGenerateAll}
+                      disabled={generating || !product.name?.trim() || (userPlan === "free" && !checkTrialAccess())}
+                      className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 shadow-sm ${
+                        generating 
+                          ? "bg-yellow-100 text-yellow-700 cursor-not-allowed" 
+                          : !product.name?.trim()
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : (userPlan === "free" && !checkTrialAccess())
+                              ? "bg-red-100 text-red-700 hover:bg-red-200"
                               : userPlan === "free"
                                 ? "bg-gradient-to-r from-green-500 to-blue-500 text-white hover:from-green-600 hover:to-blue-600 hover:shadow-md"
                                 : "bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 hover:shadow-md"
-                        }`}
-                      >
-                        {generating ? (
-                          <>
-                            <div className="animate-spin rounded-full h-5 w-5 border-2 border-yellow-600 border-t-transparent"></div>
-                            جاري التوليد الذكي...
-                          </>
-                        ) : !product.name?.trim() ? (
-                          <>
-                            <Sparkles className="w-5 h-5" />
-                            أدخل اسم المنتج أولاً
-                          </>
-                        ) : userPlan === "free" ? (
-                          <>
-                            <Sparkles className="w-5 h-5" />
-                             التوليد الذكي ({trialUsage.limit - trialUsage.used} متبقي)
-                          </>
-                        ) : (
-                          <>
-                            <Sparkles className="w-5 h-5" />
-                             التوليد الذكي
-                          </>
-                        )}
-                      </button>
-                    )}
-
-                    {userPlan === "free" && !checkTrialAccess() && (
-                      <button
-                        onClick={showUpgradePrompt}
-                        className="px-6 py-3 rounded-xl font-medium bg-gradient-to-r from-red-500 to-pink-500 text-white hover:from-red-600 hover:to-pink-600 transition-all flex items-center gap-2 shadow-sm hover:shadow-md"
-                      >
-                        <Crown className="w-5 h-5" />
-                        🔓 ترقية للاستمرار
-                      </button>
-                    )}
+                      }`}
+                    >
+                      {generating ? (
+                        <>
+                          <div className="animate-spin rounded-full h-5 w-5 border-2 border-yellow-600 border-t-transparent"></div>
+                          جاري التوليد الذكي...
+                        </>
+                      ) : !product.name?.trim() ? (
+                        <>
+                          <Sparkles className="w-5 h-5" />
+                          أدخل اسم المنتج أولاً
+                        </>
+                      ) : (userPlan === "free" && !checkTrialAccess()) ? (
+                        <>
+                          <Crown className="w-5 h-5" />
+                          🔓 ترقية للتوليد الذكي
+                        </>
+                      ) : userPlan === "free" ? (
+                        <>
+                          <Sparkles className="w-5 h-5" />
+                           التوليد الذكي ({trialUsage.limit - trialUsage.used} متبقي)
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-5 h-5" />
+                           التوليد الذكي
+                        </>
+                      )}
+                    </button>
 
                     <button
                       onClick={handleSave}
-                      disabled={saving || !hasUnsavedChanges || (userPlan === "free" && isTrialExpired)}
+                      disabled={saving || !hasUnsavedChanges}
                       className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 shadow-sm ${
                         saving 
                           ? "bg-blue-100 text-blue-700 cursor-not-allowed"
-                          : hasUnsavedChanges && !(userPlan === "free" && isTrialExpired)
+                          : hasUnsavedChanges
                             ? "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md" 
                             : "bg-gray-100 text-gray-400 cursor-not-allowed"
                       }`}
@@ -1464,7 +1455,7 @@ export default function ProductSEO() {
                       ) : (
                         <>
                           <Save className="w-5 h-5" />
-                          {userPlan === "free" && isTrialExpired ? "🔒 حفظ مؤمن" : hasUnsavedChanges ? "حفظ" : "✅ محفوظ"}
+                          {hasUnsavedChanges ? "حفظ" : "✅ محفوظ"}
                         </>
                       )}
                     </button>
@@ -1478,14 +1469,18 @@ export default function ProductSEO() {
                   </div>
                 )}
 
+                {/* عرض التجربة المجانية */}
                 {userPlan === "free" && (
                   <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100">
                     <div className="flex items-center gap-3">
                       <div className="text-2xl">🎁</div>
                       <div>
-                        <div className="font-semibold text-blue-800">البرومبت المحفوظ - التجربة المجانية</div>
+                        <div className="font-semibold text-blue-800">التوليد الذكي - التجربة المجانية</div>
                         <div className="text-sm text-blue-600">
                           استخدمت {trialUsage.used} من {trialUsage.limit} توليدات ذكية هذا الشهر
+                          {!checkTrialAccess() && (
+                            <span className="text-red-600 font-medium"> - انتهت التجربة!</span>
+                          )}
                         </div>
                       </div>
                       {!checkTrialAccess() && (

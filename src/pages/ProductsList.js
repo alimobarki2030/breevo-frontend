@@ -19,7 +19,10 @@ import {
   Eye,
   Crown,
   RefreshCw,
-  Sparkles
+  Sparkles,
+  Star,
+  ShoppingBag,
+  Image as ImageIcon
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
@@ -36,14 +39,26 @@ const SORT_OPTIONS = [
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
+// صور افتراضية جميلة للمنتجات
+const DEFAULT_PRODUCT_IMAGES = [
+  "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=300&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&h=300&fit=crop&crop=center", 
+  "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=300&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=400&h=300&fit=crop&crop=center",
+  "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&h=300&fit=crop&crop=center"
+];
+
 // Utility functions
 const getStatusColor = (status) => {
   const colors = {
-    "ممتاز": "bg-green-100 text-green-800 border-green-200",
+    "ممتاز": "bg-emerald-100 text-emerald-800 border-emerald-200",
     "جيد": "bg-blue-100 text-blue-800 border-blue-200", 
-    "متوسط": "bg-yellow-100 text-yellow-800 border-yellow-200",
+    "متوسط": "bg-amber-100 text-amber-800 border-amber-200",
     "ضعيف": "bg-red-100 text-red-800 border-red-200",
-    "جديد": "bg-gray-100 text-gray-800 border-gray-200"
+    "جديد": "bg-purple-100 text-purple-800 border-purple-200"
   };
   return colors[status] || colors["جديد"];
 };
@@ -54,7 +69,7 @@ const getStatusIcon = (status) => {
     "جيد": <TrendingUp className="w-4 h-4" />,
     "متوسط": <AlertCircle className="w-4 h-4" />,
     "ضعيف": <XCircle className="w-4 h-4" />,
-    "جديد": <Package className="w-4 h-4" />
+    "جديد": <Sparkles className="w-4 h-4" />
   };
   return icons[status] || icons["جديد"];
 };
@@ -65,6 +80,12 @@ const calculateSEOStatus = (score) => {
   if (score >= 70) return "جيد";
   if (score >= 50) return "متوسط";
   return "ضعيف";
+};
+
+// دالة لإنشاء صورة افتراضية بناء على اسم المنتج
+const getProductImage = (productName, productId) => {
+  const index = productId % DEFAULT_PRODUCT_IMAGES.length;
+  return DEFAULT_PRODUCT_IMAGES[index];
 };
 
 export default function ProductsList() {
@@ -89,15 +110,44 @@ export default function ProductsList() {
     name: ""
   });
 
-  // User subscription info
+  // User subscription info - فصل العدادات
   const [userPlan, setUserPlan] = useState("free");
+  
+  // عداد المنتجات منفصل
   const [usageStats, setUsageStats] = useState({
     productsUsed: 0,
     productsLimit: 3,
     canAddMore: true
   });
 
+  // عداد التوليد الذكي منفصل
+  const [aiUsageStats, setAiUsageStats] = useState({
+    used: 0,
+    limit: 3,
+    resetDate: null
+  });
+
   const navigate = useNavigate();
+
+  // تحميل إحصائيات التوليد الذكي
+  const loadAiUsage = () => {
+    const usage = JSON.parse(localStorage.getItem("seo_trial_usage") || "{}");
+    const now = new Date();
+    const currentMonth = `${now.getFullYear()}-${now.getMonth()}`;
+    
+    if (!usage.month || usage.month !== currentMonth) {
+      const newUsage = {
+        used: 0,
+        limit: 3,
+        month: currentMonth,
+        resetDate: new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString()
+      };
+      localStorage.setItem("seo_trial_usage", JSON.stringify(newUsage));
+      setAiUsageStats(newUsage);
+    } else {
+      setAiUsageStats(usage);
+    }
+  };
 
   // Load user plan and usage
   useEffect(() => {
@@ -105,9 +155,14 @@ export default function ProductsList() {
     const subscription = JSON.parse(localStorage.getItem("subscription") || "{}");
     
     const plan = subscription.plan || user.plan || "free";
-    setUserPlan(plan);
+    const isOwner = user.email === "alimobarki.ad@gmail.com" || 
+                   user.email === "owner@breevo.com" || 
+                   user.role === "owner" || 
+                   user.id === "1";
     
-    // Set limits based on plan
+    setUserPlan(isOwner ? "owner" : plan);
+    
+    // Set limits based on plan - للمنتجات فقط
     const limits = {
       free: 3,
       pro: 30,
@@ -119,9 +174,14 @@ export default function ProductsList() {
       ...prev,
       productsLimit: currentLimit
     }));
+
+    // تحميل إحصائيات التوليد الذكي للمجانيين فقط
+    if (!isOwner && plan === "free") {
+      loadAiUsage();
+    }
   }, []);
 
-  // ✅ FIXED: Load products from localStorage only (until backend is ready)
+  // Load products from localStorage only (until backend is ready)
   useEffect(() => {
     loadProducts();
   }, []);
@@ -290,11 +350,16 @@ export default function ProductsList() {
 
       const updatedProducts = [...products, productData];
       setProducts(updatedProducts);
+      
+      // تحديث عداد المنتجات فقط
       setUsageStats(prev => ({ 
         ...prev, 
         productsUsed: prev.productsUsed + 1,
         canAddMore: prev.productsLimit === -1 || prev.productsUsed + 1 < prev.productsLimit
       }));
+      
+      // لا نلمس عداد التوليد الذكي هنا!
+      
       localStorage.setItem("saved_products", JSON.stringify(updatedProducts));
 
       toast.success("تم إضافة المنتج بنجاح! 🎉");
@@ -323,11 +388,17 @@ export default function ProductsList() {
       
       const updatedProducts = products.filter(p => p.id !== productId);
       setProducts(updatedProducts);
+      
+      // تحديث عداد المنتجات فقط (وليس عداد التوليد الذكي)
       setUsageStats(prev => ({ 
         ...prev, 
         productsUsed: Math.max(0, prev.productsUsed - 1),
         canAddMore: prev.productsLimit === -1 || prev.productsUsed - 1 < prev.productsLimit
       }));
+      
+      // 🚨 لا نلمس عداد التوليد الذكي هنا - هذا مهم!
+      // setAiUsageStats ← لا نغيره عند حذف المنتج
+      
       localStorage.setItem("saved_products", JSON.stringify(updatedProducts));
       
       toast.success("تم حذف المنتج بنجاح");
@@ -384,7 +455,7 @@ export default function ProductsList() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
           <p className="text-gray-600">جاري تحميل المنتجات...</p>
         </div>
       </div>
@@ -405,49 +476,87 @@ export default function ProductsList() {
             </div>
           )}
 
-          {/* API Status Notice */}
-          <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded-lg mb-4">
-            ℹ️ <strong>وضع التطوير:</strong> يتم حفظ البيانات محلياً. سيتم ربط قاعدة البيانات قريباً.
+          {/* Beautiful Hero Section */}
+          <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-2xl p-8 text-white shadow-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold mb-2">🛍️ إدارة المنتجات</h1>
+                <p className="text-blue-100 text-lg">قم بإدارة وتحسين منتجاتك بكل سهولة</p>
+              </div>
+              <div className="text-right">
+                <div className="text-4xl font-bold">{stats.total}</div>
+                <div className="text-blue-100">منتج إجمالي</div>
+              </div>
+            </div>
           </div>
 
-          {/* Header Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white rounded-xl p-6 shadow-sm border">
+          {/* Header Stats - 5 إحصائيات منفصلة */}
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">إجمالي المنتجات</p>
                   <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
                 </div>
-                <Package className="w-8 h-8 text-blue-500" />
+                <div className="p-3 bg-blue-100 rounded-full">
+                  <Package className="w-6 h-6 text-blue-600" />
+                </div>
               </div>
             </div>
             
-            <div className="bg-white rounded-xl p-6 shadow-sm border">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">متوسط درجة السيو</p>
                   <p className="text-3xl font-bold text-green-600">{stats.averageScore}%</p>
                 </div>
-                <BarChart3 className="w-8 h-8 text-green-500" />
+                <div className="p-3 bg-green-100 rounded-full">
+                  <BarChart3 className="w-6 h-6 text-green-600" />
+                </div>
               </div>
             </div>
             
-            <div className="bg-white rounded-xl p-6 shadow-sm border">
+            {/* عداد المنتجات المضافة */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">الاستخدام الشهري</p>
-                  <p className="text-3xl font-bold text-purple-600">
+                  <p className="text-sm font-medium text-gray-600">المنتجات المضافة</p>
+                  <p className="text-3xl font-bold text-blue-600">
                     {usageStats.productsUsed}
                     {usageStats.productsLimit !== -1 && (
                       <span className="text-lg text-gray-400">/{usageStats.productsLimit}</span>
                     )}
                   </p>
                 </div>
-                <TrendingUp className="w-8 h-8 text-purple-500" />
+                <div className="p-3 bg-blue-100 rounded-full">
+                  <ShoppingBag className="w-6 h-6 text-blue-600" />
+                </div>
               </div>
             </div>
             
-            <div className="bg-white rounded-xl p-6 shadow-sm border">
+            {/* عداد التوليد الذكي منفصل */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">استخدام التوليد الذكي</p>
+                  <p className="text-3xl font-bold text-purple-600">
+                    {userPlan === "free" ? (
+                      <>
+                        {aiUsageStats.used}
+                        <span className="text-lg text-gray-400">/{aiUsageStats.limit}</span>
+                      </>
+                    ) : (
+                      "∞"
+                    )}
+                  </p>
+                </div>
+                <div className="p-3 bg-purple-100 rounded-full">
+                  <Sparkles className="w-6 h-6 text-purple-600" />
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">خطتك الحالية</p>
@@ -456,14 +565,15 @@ export default function ProductsList() {
                     {userPlan === "free" ? "مجانية" : userPlan === "pro" ? "احترافية" : "أعمال"}
                   </p>
                 </div>
-                <Crown className="w-8 h-8 text-yellow-500" />
+                <div className="p-3 bg-yellow-100 rounded-full">
+                  <Crown className="w-6 h-6 text-yellow-600" />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Rest of the component remains the same... */}
           {/* Toolbar */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
               
               {/* Search and Filters */}
@@ -475,14 +585,14 @@ export default function ProductsList() {
                     placeholder="ابحث في المنتجات..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent w-full sm:w-64"
+                    className="pl-4 pr-10 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-64"
                   />
                 </div>
                 
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {STATUS_OPTIONS.map(status => (
                     <option key={status} value={status}>{status}</option>
@@ -492,7 +602,7 @@ export default function ProductsList() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {SORT_OPTIONS.map(option => (
                     <option key={option.value} value={option.value}>{option.label}</option>
@@ -501,7 +611,7 @@ export default function ProductsList() {
                 
                 <button
                   onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
-                  className="px-3 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
                   title={sortOrder === "asc" ? "تصاعدي" : "تنازلي"}
                 >
                   {sortOrder === "asc" ? "⬆️" : "⬇️"}
@@ -513,7 +623,7 @@ export default function ProductsList() {
                 <select
                   value={itemsPerPage}
                   onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {ITEMS_PER_PAGE_OPTIONS.map(num => (
                     <option key={num} value={num}>{num} لكل صفحة</option>
@@ -522,7 +632,7 @@ export default function ProductsList() {
                 
                 <button
                   onClick={loadProducts}
-                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors flex items-center gap-2"
+                  className="px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-colors flex items-center gap-2"
                   title="تحديث"
                 >
                   <RefreshCw className="w-4 h-4" />
@@ -530,31 +640,54 @@ export default function ProductsList() {
                 
                 <button
                   onClick={openModal}
-                  className={`px-6 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                  className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 shadow-sm ${
                     usageStats.canAddMore
-                      ? "bg-green-600 hover:bg-green-700 text-white"
+                      ? "bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white"
                       : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
                   disabled={!usageStats.canAddMore}
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-5 h-5" />
                   إضافة منتج
                 </button>
               </div>
             </div>
 
-            {/* Usage Warning */}
-            {usageStats.productsLimit !== -1 && usageStats.productsUsed >= usageStats.productsLimit * 0.8 && (
-              <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                <div className="flex items-center gap-2 text-yellow-800">
-                  <AlertCircle className="w-4 h-4" />
-                  <span className="text-sm">
-                    اقتربت من الحد الأقصى للمنتجات ({usageStats.productsUsed}/{usageStats.productsLimit}). 
-                    <Link to="/account" className="underline hover:no-underline mr-1">
-                      قم بترقية خطتك
-                    </Link>
-                  </span>
-                </div>
+            {/* Usage Warning - للعدادين المنفصلين */}
+            {(
+              (usageStats.productsLimit !== -1 && usageStats.productsUsed >= usageStats.productsLimit * 0.8) ||
+              (userPlan === "free" && aiUsageStats.used >= aiUsageStats.limit * 0.8)
+            ) && (
+              <div className="mt-4 space-y-2">
+                {/* تحذير المنتجات */}
+                {usageStats.productsLimit !== -1 && usageStats.productsUsed >= usageStats.productsLimit * 0.8 && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                    <div className="flex items-center gap-2 text-yellow-800">
+                      <AlertCircle className="w-4 h-4" />
+                      <span className="text-sm">
+                        اقتربت من الحد الأقصى للمنتجات ({usageStats.productsUsed}/{usageStats.productsLimit}). 
+                        <Link to="/account" className="underline hover:no-underline mr-1">
+                          قم بترقية خطتك
+                        </Link>
+                      </span>
+                    </div>
+                  </div>
+                )}
+                
+                {/* تحذير التوليد الذكي */}
+                {userPlan === "free" && aiUsageStats.used >= aiUsageStats.limit * 0.8 && (
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                    <div className="flex items-center gap-2 text-purple-800">
+                      <Sparkles className="w-4 h-4" />
+                      <span className="text-sm">
+                        اقتربت من الحد الأقصى للتوليد الذكي ({aiUsageStats.used}/{aiUsageStats.limit}) هذا الشهر. 
+                        <Link to="/account" className="underline hover:no-underline mr-1">
+                          قم بترقية خطتك
+                        </Link>
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -589,36 +722,53 @@ export default function ProductsList() {
             )}
           </div>
 
-          {/* Products Grid */}
+          {/* Beautiful Products Grid */}
           {displayedProducts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {displayedProducts.map((product) => (
-                <div key={product.id} className="bg-white rounded-xl shadow-sm border hover:shadow-md transition-shadow">
-                  <div className="p-6">
-                    {/* Header */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={selectedProducts.includes(product.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedProducts([...selectedProducts, product.id]);
-                            } else {
-                              setSelectedProducts(selectedProducts.filter(id => id !== product.id));
-                            }
-                          }}
-                          className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
-                        />
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(product.status)}`}>
-                          {getStatusIcon(product.status)}
-                          {product.status}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
+                <div key={product.id} className="group bg-white rounded-2xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden">
+                  
+                  {/* Product Image */}
+                  <div className="relative h-48 overflow-hidden">
+                    <img
+                      src={getProductImage(product.name, product.id)}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNzUgMTIwSDIyNVYxNzBIMTc1VjEyMFoiIGZpbGw9IiM5Q0E0QUYiLz4KPHBhdGggZD0iTTE1NSAxNDBIMTc1VjE2MEgxNTVWMTQwWiIgZmlsbD0iIzlDQTRBRiIvPgo8cGF0aCBkPSJNMjI1IDE0MEgyNDVWMTYwSDIyNVYxNDBaIiBmaWxsPSIjOUNBNEFGIi8+CjxwYXRoIGQ9Ik0xNzUgMTcwSDIyNVYxODBIMTc1VjE3MFoiIGZpbGw9IiM5Q0E0QUYiLz4KPC9zdmc+";
+                      }}
+                    />
+                    
+                    {/* Status Badge */}
+                    <div className="absolute top-3 right-3">
+                      <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border backdrop-blur-sm ${getStatusColor(product.status)}`}>
+                        {getStatusIcon(product.status)}
+                        {product.status}
+                      </span>
+                    </div>
+
+                    {/* Checkbox */}
+                    <div className="absolute top-3 left-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedProducts.includes(product.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedProducts([...selectedProducts, product.id]);
+                          } else {
+                            setSelectedProducts(selectedProducts.filter(id => id !== product.id));
+                          }
+                        }}
+                        className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 bg-white border-gray-300"
+                      />
+                    </div>
+
+                    {/* Action Buttons Overlay */}
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                      <div className="flex gap-2">
                         <button
                           onClick={() => handleAnalyze(product)}
-                          className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                          className="p-2 bg-white text-blue-600 rounded-full shadow-lg hover:bg-blue-50 transition-colors"
                           title="عرض/تحرير"
                         >
                           <Edit className="w-4 h-4" />
@@ -628,37 +778,42 @@ export default function ProductsList() {
                             setProductToDelete(product.id);
                             setShowDeleteConfirm(true);
                           }}
-                          className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                          className="p-2 bg-white text-red-600 rounded-full shadow-lg hover:bg-red-50 transition-colors"
                           title="حذف"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
+                  </div>
 
-                    {/* Product Info */}
-                    <h3 className="font-bold text-gray-900 mb-2 line-clamp-2" title={product.name}>
+                  {/* Product Content */}
+                  <div className="p-6">
+                    {/* Product Name */}
+                    <h3 className="font-bold text-gray-900 mb-2 line-clamp-2 text-lg" title={product.name}>
                       {product.name}
                     </h3>
                     
+                    {/* Product Description */}
                     {product.description && (
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2" title={product.description}>
-                        {product.description}
+                      <p className="text-sm text-gray-600 mb-4 line-clamp-2" title={product.description}>
+                        {product.description.replace(/<[^>]*>/g, '')}
                       </p>
                     )}
 
-                    {/* SEO Score */}
+                    {/* SEO Score Progress */}
                     {product.seoScore !== null && (
-                      <div className="mb-3">
-                        <div className="flex items-center justify-between text-sm mb-1">
-                          <span className="text-gray-600">درجة السيو</span>
-                          <span className="font-bold">{product.seoScore}%</span>
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between text-sm mb-2">
+                          <span className="text-gray-600 font-medium">درجة السيو</span>
+                          <span className="font-bold text-lg">{product.seoScore}%</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div
                             className={`h-2 rounded-full transition-all ${
-                              product.seoScore >= 80 ? 'bg-green-500' :
-                              product.seoScore >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                              product.seoScore >= 80 ? 'bg-emerald-500' :
+                              product.seoScore >= 60 ? 'bg-blue-500' : 
+                              product.seoScore >= 40 ? 'bg-yellow-500' : 'bg-red-500'
                             }`}
                             style={{ width: `${product.seoScore}%` }}
                           />
@@ -667,7 +822,7 @@ export default function ProductsList() {
                     )}
 
                     {/* Meta Info */}
-                    <div className="text-xs text-gray-500 space-y-1">
+                    <div className="text-xs text-gray-500 space-y-1 mb-4">
                       {product.category && (
                         <div className="flex items-center gap-1">
                           <Package className="w-3 h-3" />
@@ -683,7 +838,7 @@ export default function ProductsList() {
                     {/* Action Button */}
                     <button
                       onClick={() => handleAnalyze(product)}
-                      className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                      className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-3 px-4 rounded-xl font-medium transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md"
                     >
                       <Zap className="w-4 h-4" />
                       {product.seoScore === null ? "بدء التحليل" : "عرض التحليل"}
@@ -693,19 +848,21 @@ export default function ProductsList() {
               ))}
             </div>
           ) : (
-            <div className="bg-white rounded-xl shadow-sm border p-12 text-center">
-              <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">لا توجد منتجات</h3>
-              <p className="text-gray-500 mb-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
+              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <ShoppingBag className="w-12 h-12 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-medium text-gray-900 mb-2">لا توجد منتجات</h3>
+              <p className="text-gray-500 mb-8 max-w-md mx-auto">
                 {searchQuery || statusFilter !== "الكل" 
                   ? "لم يتم العثور على منتجات تطابق البحث أو التصفية المحددة"
-                  : "ابدأ بإضافة منتجك الأول لتحليل السيو"
+                  : "ابدأ بإضافة منتجك الأول لتحليل السيو وتحسين ظهورك في محركات البحث"
                 }
               </p>
               {(!searchQuery && statusFilter === "الكل") && (
                 <button
                   onClick={openModal}
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2 mx-auto"
+                  className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white px-8 py-4 rounded-xl font-medium transition-all flex items-center gap-3 mx-auto shadow-lg hover:shadow-xl"
                   disabled={!usageStats.canAddMore}
                 >
                   <Plus className="w-5 h-5" />
@@ -715,12 +872,12 @@ export default function ProductsList() {
             </div>
           )}
 
-          {/* Pagination */}
+          {/* Beautiful Pagination */}
           {totalPages > 1 && (
             <div className="flex justify-center items-center gap-2 mt-8">
               <button
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={currentPage === 1}
               >
                 ⬅️ السابق
@@ -743,9 +900,9 @@ export default function ProductsList() {
                     <button
                       key={pageNum}
                       onClick={() => setCurrentPage(pageNum)}
-                      className={`px-3 py-2 rounded-lg transition-colors ${
+                      className={`px-4 py-2 rounded-xl transition-colors ${
                         currentPage === pageNum
-                          ? 'bg-green-600 text-white'
+                          ? 'bg-blue-600 text-white shadow-lg'
                           : 'bg-white border border-gray-300 hover:bg-gray-50'
                       }`}
                     >
@@ -757,13 +914,13 @@ export default function ProductsList() {
               
               <button
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={currentPage === totalPages}
               >
                 التالي ➡️
               </button>
               
-              <span className="text-sm text-gray-600 mr-4">
+              <span className="text-sm text-gray-600 mr-4 bg-white px-3 py-2 rounded-xl border border-gray-200">
                 صفحة {currentPage} من {totalPages} ({filteredProducts.length} منتج)
               </span>
             </div>
@@ -771,7 +928,7 @@ export default function ProductsList() {
         </div>
       </div>
 
-      {/* Add Product Modal */}
+      {/* Beautiful Add Product Modal */}
       <Transition appear show={showModal} as={React.Fragment}>
         <Dialog as="div" className="relative z-10" onClose={setShowModal}>
           <Transition.Child
@@ -783,7 +940,7 @@ export default function ProductsList() {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black bg-opacity-25" />
+            <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm" />
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
@@ -798,63 +955,88 @@ export default function ProductsList() {
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-right align-middle shadow-xl transition-all">
-                  <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900 mb-4 flex items-center gap-2">
-                    <Plus className="w-5 h-5 text-green-500" />
-                    ➕ إضافة منتج جديد
+                  <Dialog.Title as="h3" className="text-xl font-bold leading-6 text-gray-900 mb-6 flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-r from-green-500 to-blue-500 rounded-xl">
+                      <Plus className="w-5 h-5 text-white" />
+                    </div>
+                    إضافة منتج جديد
                   </Dialog.Title>
                   
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <div>
                       <input
                         type="text"
                         placeholder="اسم المنتج (مثل: سماعات بلوتوث لاسلكية)"
                         value={newProduct.name}
                         onChange={(e) => handleNewProductChange(e.target.value)}
-                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-right ${
+                        className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-right text-lg ${
                           errors.name ? 'border-red-300' : 'border-gray-300'
                         }`}
                         autoFocus
                       />
                       {errors.name && (
-                        <p className="text-red-500 text-xs mt-1 flex items-center gap-1">
-                          <XCircle className="w-3 h-3" />
+                        <p className="text-red-500 text-sm mt-2 flex items-center gap-1">
+                          <XCircle className="w-4 h-4" />
                           {errors.name}
                         </p>
                       )}
                     </div>
 
                     {/* شرح ما سيحدث */}
-                    <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-                      <h4 className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
-                        🎯 ماذا سيحدث بعد إضافة المنتج؟
+                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-5 border border-blue-200">
+                      <h4 className="font-bold text-blue-900 mb-3 flex items-center gap-2">
+                        <Sparkles className="w-5 h-5" />
+                        ماذا سيحدث بعد إضافة المنتج؟
                       </h4>
-                      <ul className="text-sm text-blue-700 space-y-1">
-                        <li>📝 ستنتقل لصفحة تحسين السيو</li>
-                        <li>🤖 يمكنك اختيار التوليد التلقائي بالذكاء الاصطناعي</li>
-                        <li>⚙️ أو توليد كل حقل منفصل حسب احتياجك</li>
-                        <li>✏️ أو الكتابة يدوياً كما تشاء</li>
-                        <li>📊 ومتابعة تحليل السيو المباشر</li>
+                      <ul className="text-sm text-blue-800 space-y-2">
+                        <li className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          ستنتقل لصفحة تحسين السيو
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          يمكنك اختيار التوليد التلقائي بالذكاء الاصطناعي
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          أو توليد كل حقل منفصل حسب احتياجك
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          أو الكتابة يدوياً كما تشاء
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          ومتابعة تحليل السيو المباشر
+                        </li>
                       </ul>
                     </div>
 
                     {/* معلومات الاستخدام */}
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-sm text-gray-700 flex items-center gap-2">
-                        📊 الاستخدام: {usageStats.productsUsed} / {usageStats.productsLimit === -1 ? '∞' : usageStats.productsLimit}
-                        {userPlan === "free" && (
-                          <span className="text-xs text-blue-600">
-                            (💡 ترقية للمزيد)
-                          </span>
-                        )}
-                      </p>
+                    <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+                      <div className="flex items-center gap-2 text-sm text-gray-700">
+                        <ShoppingBag className="w-4 h-4 text-blue-500" />
+                        <span>المنتجات: {usageStats.productsUsed} / {usageStats.productsLimit === -1 ? '∞' : usageStats.productsLimit}</span>
+                      </div>
+                      {userPlan === "free" && (
+                        <div className="flex items-center gap-2 text-sm text-purple-700">
+                          <Sparkles className="w-4 h-4 text-purple-500" />
+                          <span>التوليد الذكي: {aiUsageStats.used} / {aiUsageStats.limit} هذا الشهر</span>
+                        </div>
+                      )}
+                      {userPlan === "free" && (
+                        <div className="text-xs text-blue-600 bg-blue-100 px-3 py-2 rounded-lg">
+                          💡 ترقية للمزيد من كليهما
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  <div className="flex justify-end gap-3 mt-6">
+                  <div className="flex justify-end gap-3 mt-8">
                     <button
                       type="button"
                       onClick={() => setShowModal(false)}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
+                      className="px-6 py-3 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-xl hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
                     >
                       إلغاء
                     </button>
@@ -862,7 +1044,7 @@ export default function ProductsList() {
                       type="button"
                       onClick={handleSubmit}
                       disabled={!usageStats.canAddMore || !newProduct.name.trim()}
-                      className="px-6 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      className="px-8 py-3 text-sm font-medium text-white bg-gradient-to-r from-green-500 to-blue-500 border border-transparent rounded-xl hover:from-green-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
                     >
                       🚀 انتقل للتحسين
                     </button>
@@ -886,7 +1068,7 @@ export default function ProductsList() {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black bg-opacity-25" />
+            <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm" />
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
@@ -901,11 +1083,14 @@ export default function ProductsList() {
                 leaveTo="opacity-0 scale-95"
               >
                 <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-right align-middle shadow-xl transition-all">
-                  <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-red-700 mb-4">
-                    🗑️ تأكيد الحذف
+                  <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-red-700 mb-4 flex items-center gap-2">
+                    <div className="p-2 bg-red-100 rounded-xl">
+                      <Trash2 className="w-5 h-5 text-red-600" />
+                    </div>
+                    تأكيد الحذف
                   </Dialog.Title>
                   
-                  <p className="text-gray-600 mb-6">
+                  <p className="text-gray-600 mb-6 bg-gray-50 p-4 rounded-xl">
                     هل أنت متأكد من حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.
                   </p>
 
@@ -913,14 +1098,14 @@ export default function ProductsList() {
                     <button
                       type="button"
                       onClick={() => setShowDeleteConfirm(false)}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200"
+                      className="px-6 py-3 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-xl hover:bg-gray-200"
                     >
                       إلغاء
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDeleteProduct(productToDelete)}
-                      className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700"
+                      className="px-6 py-3 text-sm font-medium text-white bg-red-600 border border-transparent rounded-xl hover:bg-red-700 shadow-lg hover:shadow-xl"
                     >
                       نعم، احذف
                     </button>
