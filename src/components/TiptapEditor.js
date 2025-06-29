@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
@@ -47,6 +47,16 @@ const TiptapEditor = ({ value = '', onChange, placeholder = '' }) => {
       },
     },
   });
+
+  // 🔧 الإصلاح: مراقبة تغييرات value من الخارج
+  useEffect(() => {
+    if (editor && value !== editor.getHTML()) {
+      // تجنب التحديث إذا كان المستخدم يكتب حالياً
+      if (!editor.isFocused) {
+        editor.commands.setContent(value, false);
+      }
+    }
+  }, [editor, value]);
 
   const setLink = useCallback(() => {
     if (!editor) return;

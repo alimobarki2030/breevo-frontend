@@ -66,8 +66,8 @@ const SAVED_PROMPT_TEMPLATE = `هذا هو انت خبير كتابة المحت
    - فقرة عن طريقة الاستخدام إن أمكن.
    - دعوة واضحة للشراء.
    - رابط داخلي في النهاية <a href="/products">تصفح منتجاتنا الأخرى</a>
-3. اكتب Page Title واضح وجذاب (50-60 حرف).
-4. اكتب Meta Description تسويقي (140-150حرف).
+3. اكتب Page Title واضح وجذاب (53-60 حرف بالضبط).
+4. اكتب Meta Description تسويقي (130-150 حرف بالضبط).
 5. اكتب URL path قصير بالإنجليزية.
 6. اكتب ALT نص بديل يحتوي على الكلمة المفتاحية.
 🔹 قواعد عامة:
@@ -90,8 +90,8 @@ const SAVED_PROMPT_TEMPLATE = `هذا هو انت خبير كتابة المحت
 
 // Constants
 const FIELD_LIMITS = {
-  meta_title: 60,
-  meta_description: 150,
+  meta_title: { min: 53, max: 60 }, // تحديث: إضافة حد أدنى وأقصى
+  meta_description: { min: 130, max: 150 }, // تحديث: إضافة حد أدنى وأقصى  
   keyword_limit: 100,
   name_limit: 70
 };
@@ -393,6 +393,7 @@ export default function ProductSEO() {
   const [errors, setErrors] = useState({});
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [editorKey, setEditorKey] = useState(Date.now()); // ← جديد: لإجبار تحديث المحرر
 
   // User subscription info and trial tracking
   const [userPlan, setUserPlan] = useState("free");
@@ -409,9 +410,7 @@ export default function ProductSEO() {
     return saved ? JSON.parse(saved) : {
       productNameAction: "keep",
       keywordAction: "generate", 
-      customKeyword: "",
-      audience: "العملاء العرب",
-      tone: "احترافية"
+      customKeyword: ""
     };
   });
 
@@ -432,6 +431,23 @@ export default function ProductSEO() {
 
     if (!isOwner && plan === "free") {
       loadTrialUsage();
+    }
+
+    // تنظيف الخيارات القديمة وإبقاء الأساسيات فقط
+    const saved = localStorage.getItem("seo_generate_options");
+    if (saved) {
+      try {
+        const options = JSON.parse(saved);
+        const simplifiedOptions = {
+          productNameAction: options.productNameAction || "keep",
+          keywordAction: options.keywordAction || "generate",
+          customKeyword: options.customKeyword || ""
+        };
+        localStorage.setItem("seo_generate_options", JSON.stringify(simplifiedOptions));
+      } catch (error) {
+        // في حالة الخطأ، احذف الخيارات القديمة
+        localStorage.removeItem("seo_generate_options");
+      }
     }
   }, []);
 
@@ -605,12 +621,24 @@ export default function ProductSEO() {
       newErrors.name = `اسم المنتج يجب ألا يتجاوز ${FIELD_LIMITS.name_limit} حرف`;
     }
 
-    if (product.meta_title && product.meta_title.length > FIELD_LIMITS.meta_title) {
-      newErrors.meta_title = `Page Title يجب ألا يتجاوز ${FIELD_LIMITS.meta_title} حرف`;
+    // التحقق من Page Title مع الحدود الجديدة
+    if (product.meta_title) {
+      const titleLength = product.meta_title.length;
+      if (titleLength > FIELD_LIMITS.meta_title.max) {
+        newErrors.meta_title = `Page Title يجب ألا يتجاوز ${FIELD_LIMITS.meta_title.max} حرف (حالياً ${titleLength})`;
+      } else if (titleLength < FIELD_LIMITS.meta_title.min) {
+        newErrors.meta_title = `Page Title يجب ألا يقل عن ${FIELD_LIMITS.meta_title.min} حرف (حالياً ${titleLength})`;
+      }
     }
 
-    if (product.meta_description && product.meta_description.length > FIELD_LIMITS.meta_description) {
-      newErrors.meta_description = `Page Description يجب ألا يتجاوز ${FIELD_LIMITS.meta_description} حرف`;
+    // التحقق من Meta Description مع الحدود الجديدة
+    if (product.meta_description) {
+      const descLength = product.meta_description.length;
+      if (descLength > FIELD_LIMITS.meta_description.max) {
+        newErrors.meta_description = `Page Description يجب ألا يتجاوز ${FIELD_LIMITS.meta_description.max} حرف (حالياً ${descLength})`;
+      } else if (descLength < FIELD_LIMITS.meta_description.min) {
+        newErrors.meta_description = `Page Description يجب ألا يقل عن ${FIELD_LIMITS.meta_description.min} حرف (حالياً ${descLength})`;
+      }
     }
 
     setErrors(newErrors);
@@ -750,8 +778,8 @@ export default function ProductSEO() {
       const variables = {
         product_name: finalProductName,
         keyword: finalKeyword || "توليد تلقائي", // إشارة للبرومبت لتوليد كلمة مفتاحية
-        audience: generateOptions.audience,
-        tone: generateOptions.tone,
+        audience: "العملاء العرب", // قيمة افتراضية ثابتة
+        tone: "احترافية", // قيمة افتراضية ثابتة
         existing_description: product.description || ""
       };
 
@@ -785,8 +813,8 @@ export default function ProductSEO() {
         keyword: fields.keyword || finalKeyword || "يحتاج كلمة مفتاحية", // إعطاء أولوية لما يولده البرومبت
         name: finalProductName,
         description: fields.description || "",
-        meta_title: truncateText(fields.meta_title, FIELD_LIMITS.meta_title),
-        meta_description: truncateText(fields.meta_description, FIELD_LIMITS.meta_description),
+        meta_title: truncateText(fields.meta_title, FIELD_LIMITS.meta_title.max),
+        meta_description: truncateText(fields.meta_description, FIELD_LIMITS.meta_description.max),
         url_path: fields.url_path?.trim() || "",
         imageAlt: fields.imageAlt?.trim() || ""
       };
@@ -844,8 +872,8 @@ export default function ProductSEO() {
       const variables = {
         product_name: product.name,
         keyword: fieldType === "keyword" ? "توليد تلقائي" : (product.keyword || "توليد تلقائي"),
-        audience: generateOptions.audience,
-        tone: generateOptions.tone,
+        audience: "العملاء العرب", // قيمة افتراضية ثابتة
+        tone: "احترافية", // قيمة افتراضية ثابتة
         existing_description: product.description || ""
       };
 
@@ -872,9 +900,9 @@ export default function ProductSEO() {
       value = value.replace(/^`+|`+$/g, '');
 
       if (fieldType === "meta_title") {
-        value = truncateText(value, FIELD_LIMITS.meta_title);
+        value = truncateText(value, FIELD_LIMITS.meta_title.max);
       } else if (fieldType === "meta_description") {
-        value = truncateText(value, FIELD_LIMITS.meta_description);
+        value = truncateText(value, FIELD_LIMITS.meta_description.max);
       }
 
       setProduct(prev => ({
@@ -901,7 +929,7 @@ export default function ProductSEO() {
     } finally {
       setFieldLoading("");
     }
-  }, [product.name, product.keyword, generateOptions.audience, generateOptions.tone, product.description]);
+  }, [product.name, product.keyword, product.description]);
 
   const copyToClipboard = async (text, label) => {
     try {
@@ -993,8 +1021,8 @@ export default function ProductSEO() {
           <div className="flex items-center gap-4">
             <div className="text-4xl">⚡</div>
             <div>
-              <h3 className="font-bold text-amber-900 text-lg">استخدم البرومبت المحفوظ!</h3>
-              <p className="text-amber-700">اضغط "التوليد الذكي" للحصول على محتوى احترافي باستخدام البرومبت المحفوظ الخاص بك</p>
+              <h3 className="font-bold text-amber-900 text-lg">استخدم التوليد الذكي!</h3>
+              <p className="text-amber-700">اضغط "التوليد الذكي" للحصول على محتوى احترافي </p>
             </div>
           </div>
         </div>
@@ -1025,9 +1053,11 @@ export default function ProductSEO() {
     const isLocked = userPlan === "free" && isTrialExpired;
     
     const showCharCount = ['meta_title', 'meta_description', 'name'].includes(key);
-    const charLimit = FIELD_LIMITS[key + '_limit'] || FIELD_LIMITS[key];
+    const charLimit = FIELD_LIMITS[key + '_limit'] || (FIELD_LIMITS[key]?.max || FIELD_LIMITS[key]);
+    const charMin = FIELD_LIMITS[key]?.min;
     const charCount = fieldValue.length;
     const isOverLimit = charLimit && charCount > charLimit;
+    const isUnderLimit = charMin && charCount < charMin && charCount > 0;
 
     if (key === "description") {
       return (
@@ -1120,8 +1150,16 @@ export default function ProductSEO() {
           </label>
           <div className="flex items-center gap-2">
             {showCharCount && (
-              <span className={`text-xs ${isOverLimit ? 'text-red-500' : 'text-gray-500'}`}>
-                {charCount}{charLimit && `/${charLimit}`}
+              <span className={`text-xs ${
+                isOverLimit ? 'text-red-500' : 
+                isUnderLimit ? 'text-orange-500' : 
+                'text-gray-500'
+              }`}>
+                {charCount}
+                {charMin && charLimit ? `/${charMin}-${charLimit}` : 
+                 charLimit ? `/${charLimit}` : ''}
+                {isUnderLimit && ` (قليل)`}
+                {isOverLimit && ` (كثير)`}
               </span>
             )}
             {(userPlan !== "free" || checkTrialAccess()) && !isLocked && (
@@ -1197,12 +1235,12 @@ export default function ProductSEO() {
 
         {key === 'meta_title' && !isLocked && (
           <div className="text-xs text-gray-500 mt-2">
-            💡 Page Title المثالي: 50-60 حرف، يحتوي الكلمة المفتاحية، جذاب للنقر
+            💡 Page Title المثالي: 53-60 حرف بالضبط، يحتوي الكلمة المفتاحية، جذاب للنقر
           </div>
         )}
         {key === 'meta_description' && !isLocked && (
           <div className="text-xs text-gray-500 mt-2">
-            💡 Page Description المثالي: 140-150 حرف، يحتوي الكلمة المفتاحية، يحفز على الزيارة
+            💡 Page Description المثالي: 130-150 حرف بالضبط، يحتوي الكلمة المفتاحية، يحفز على الزيارة
           </div>
         )}
         {key === 'keyword' && !isLocked && (
@@ -1329,12 +1367,12 @@ export default function ProductSEO() {
                         ) : userPlan === "free" ? (
                           <>
                             <Sparkles className="w-5 h-5" />
-                            🚀 البرومبت المحفوظ ({trialUsage.limit - trialUsage.used} متبقي)
+                             التوليد الذكي ({trialUsage.limit - trialUsage.used} متبقي)
                           </>
                         ) : (
                           <>
                             <Sparkles className="w-5 h-5" />
-                            🚀 البرومبت المحفوظ
+                             التوليد الذكي
                           </>
                         )}
                       </button>
@@ -1369,7 +1407,7 @@ export default function ProductSEO() {
                       ) : (
                         <>
                           <Save className="w-5 h-5" />
-                          {userPlan === "free" && isTrialExpired ? "🔒 حفظ مؤمن" : hasUnsavedChanges ? "💾 حفظ التغييرات" : "✅ محفوظ"}
+                          {userPlan === "free" && isTrialExpired ? "🔒 حفظ مؤمن" : hasUnsavedChanges ? "حفظ" : "✅ محفوظ"}
                         </>
                       )}
                     </button>
@@ -1589,15 +1627,15 @@ export default function ProductSEO() {
             setShowGenerateModal(false);
           }}
         >
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full">
             
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-t-2xl">
               <div className="flex items-center gap-3">
-                <div className="text-3xl">🎯</div>
+                <div className="text-2xl">🚀</div>
                 <div>
-                  <h2 className="text-xl font-bold">البرومبت المحفوظ</h2>
-                  <p className="text-blue-100 text-sm mt-1">خصص خيارات التوليد لاستخدامها مع البرومبت المحفوظ</p>
+                  <h2 className="text-xl font-bold">التوليد الذكي</h2>
+                  <p className="text-blue-100 text-sm mt-1">إنشاء محتوى احترافي بنقرة واحدة</p>
                 </div>
               </div>
             </div>
@@ -1605,33 +1643,22 @@ export default function ProductSEO() {
             {/* Content */}
             <div className="p-6 space-y-6">
               
-              {/* شرح توضيحي */}
+              {/* نص توضيحي بسيط */}
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                <div className="flex items-start gap-3">
-                  <div className="text-2xl">🎯</div>
-                  <div>
-                    <h3 className="font-semibold text-blue-900 mb-2">كيف يعمل البرومبت المحفوظ؟</h3>
-                    <p className="text-blue-800 text-sm leading-relaxed mb-3">
-                      سيتم إرسال جميع البيانات والخيارات التي تحددها هنا إلى البرومبت المحفوظ في الكود مباشرة باستخدام OpenAI Chat Completions API. هذا يضمن حصولك على نتائج متسقة وعالية الجودة.
-                    </p>
-                    <div className="bg-blue-100 border border-blue-300 rounded-lg p-3">
-                      <p className="text-blue-900 text-sm font-medium">
-                        🔥 <strong>المزايا:</strong> تحكم كامل، نتائج متسقة، إمكانية التخصيص الكامل، سرعة أعلى
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <p className="text-blue-800 text-sm leading-relaxed">
+                  سيساعدك التوليد الذكي على إنشاء وتحسين كل محتوى منتجك بنقرة واحدة، سنستخدم اسم المنتج والمعلومات المتوفرة، لا تنسى مراجعة المحتوى قبل النسخ أو النشر.
+                </p>
               </div>
 
-              {/* خيار اسم المنتج */}
+              {/* اسم المنتج وخياراته */}
               <div className="space-y-3">
                 <label className="text-sm font-semibold text-gray-800 flex items-center gap-2">
                   <Package className="w-4 h-4 text-blue-500" />
-                  اسم المنتج الحالي: "{product.name}"
+                  اسم المنتج: "{product.name}"
                 </label>
                 
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <div className="grid grid-cols-1 gap-3">
                     <label className="flex items-center space-x-3 space-x-reverse cursor-pointer">
                       <input
                         type="radio"
@@ -1641,7 +1668,7 @@ export default function ProductSEO() {
                         onChange={(e) => updateGenerateOptions({ productNameAction: e.target.value })}
                         className="text-blue-600"
                       />
-                      <span className="text-sm font-medium">لا تغير</span>
+                      <span className="text-sm font-medium">☐ لا تغير</span>
                     </label>
                     
                     <label className="flex items-center space-x-3 space-x-reverse cursor-pointer">
@@ -1653,7 +1680,7 @@ export default function ProductSEO() {
                         onChange={(e) => updateGenerateOptions({ productNameAction: e.target.value })}
                         className="text-blue-600"
                       />
-                      <span className="text-sm font-medium">أضف كلمة مفتاحية</span>
+                      <span className="text-sm font-medium">☐ أضف كلمة مفتاحية</span>
                     </label>
                     
                     <label className="flex items-center space-x-3 space-x-reverse cursor-pointer">
@@ -1665,37 +1692,21 @@ export default function ProductSEO() {
                         onChange={(e) => updateGenerateOptions({ productNameAction: e.target.value })}
                         className="text-blue-600"
                       />
-                      <span className="text-sm font-medium">أعد توليد</span>
+                      <span className="text-sm font-medium">☐ أعد توليد</span>
                     </label>
                   </div>
-
-                  {generateOptions.productNameAction === "keep" && (
-                    <div className="text-xs text-green-600 bg-green-50 p-2 rounded">
-                      ✅ سيتم الاحتفاظ باسم المنتج كما هو: "{product.name}"
-                    </div>
-                  )}
-                  {generateOptions.productNameAction === "add_keyword" && (
-                    <div className="text-xs text-blue-600 bg-blue-50 p-2 rounded">
-                      🔧 سيتم إضافة الكلمة المفتاحية لاسم المنتج لتحسين SEO
-                    </div>
-                  )}
-                  {generateOptions.productNameAction === "regenerate" && (
-                    <div className="text-xs text-purple-600 bg-purple-50 p-2 rounded">
-                      🚀 سيتم إنشاء اسم محسن جديد مع الحفاظ على المعنى الأساسي
-                    </div>
-                  )}
                 </div>
               </div>
 
-              {/* خيار الكلمة المفتاحية */}
+              {/* الكلمة المفتاحية وخياراتها */}
               <div className="space-y-3">
                 <label className="text-sm font-semibold text-gray-800 flex items-center gap-2">
                   <Search className="w-4 h-4 text-green-500" />
-                  الكلمة المفتاحية
+                  الكلمة المفتاحية:
                 </label>
                 
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-3">
                     <label className="flex items-center space-x-3 space-x-reverse cursor-pointer">
                       <input
                         type="radio"
@@ -1705,7 +1716,7 @@ export default function ProductSEO() {
                         onChange={(e) => updateGenerateOptions({ keywordAction: e.target.value })}
                         className="text-green-600"
                       />
-                      <span className="text-sm font-medium">توليد بالبرومبت المحفوظ</span>
+                      <span className="text-sm font-medium">☐ توليد تلقائي</span>
                     </label>
                     
                     <label className="flex items-center space-x-3 space-x-reverse cursor-pointer">
@@ -1717,12 +1728,12 @@ export default function ProductSEO() {
                         onChange={(e) => updateGenerateOptions({ keywordAction: e.target.value })}
                         className="text-green-600"
                       />
-                      <span className="text-sm font-medium">لدي كلمة مفتاحية</span>
+                      <span className="text-sm font-medium">☐ لدي كلمة مفتاحية:</span>
                     </label>
                   </div>
 
                   {generateOptions.keywordAction === "use_existing" && (
-                    <div className="space-y-2">
+                    <div className="space-y-2 mr-6">
                       <input
                         type="text"
                         value={generateOptions.customKeyword}
@@ -1730,88 +1741,8 @@ export default function ProductSEO() {
                         placeholder="أدخل الكلمة المفتاحية هنا..."
                         className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
-                      <div className="text-xs text-gray-600">
-                        💡 مثال: كريم مرطب أو هاتف ذكي أو أحذية رياضية"
-                      </div>
                     </div>
                   )}
-
-                  {generateOptions.keywordAction === "generate" && (
-                    <div className="text-xs text-green-600 bg-green-50 p-2 rounded">
-                      🎯 سيتم اختيار أفضل كلمة مفتاحية باستخدام البرومبت المحفوظ
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* خيار الجمهور المستهدف */}
-              <div className="space-y-3">
-                <label className="text-sm font-semibold text-gray-800 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-purple-500" />
-                  الجمهور المستهدف
-                </label>
-                
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                  <select
-                    value={generateOptions.audience}
-                    onChange={(e) => updateGenerateOptions({ audience: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white"
-                  >
-                    {AUDIENCE_OPTIONS.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="text-xs text-gray-600 mt-2">
-                    💡 سيتم إرسال هذا الجمهور للبرومبت المحفوظ لتحسين أسلوب الكتابة
-                  </div>
-                </div>
-              </div>
-
-              {/* خيار نبرة الكتابة */}
-              <div className="space-y-3">
-                <label className="text-sm font-semibold text-gray-800 flex items-center gap-2">
-                  <Type className="w-4 h-4 text-orange-500" />
-                  نبرة الكتابة
-                </label>
-                
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                  <select
-                    value={generateOptions.tone}
-                    onChange={(e) => updateGenerateOptions({ tone: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white"
-                  >
-                    {TONE_OPTIONS.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="text-xs text-gray-600 mt-2">
-                    💡 سيتم إرسال هذه النبرة للبرومبت المحفوظ
-                  </div>
-                </div>
-              </div>
-
-              {/* ملخص سريع */}
-              <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-xl p-4">
-                <h4 className="font-semibold text-purple-900 mb-2">📋 البيانات التي سيتم إرسالها للبرومبت المحفوظ:</h4>
-                <ul className="text-sm text-purple-800 space-y-1">
-                  <li>✅ اسم المنتج: {product.name}</li>
-                  <li>✅ إجراء الاسم: {generateOptions.productNameAction}</li>
-                  <li>✅ إجراء الكلمة المفتاحية: {generateOptions.keywordAction}</li>
-                  {generateOptions.keywordAction === "use_existing" && (
-                    <li>✅ الكلمة المفتاحية: {generateOptions.customKeyword}</li>
-                  )}
-                  <li>✅ الجمهور المستهدف: {generateOptions.audience}</li>
-                  <li>✅ نبرة الكتابة: {generateOptions.tone}</li>
-                </ul>
-                
-                <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <div className="text-green-800 text-sm">
-                    <strong>🎯 النتيجة:</strong> سيقوم البرومبت المحفوظ بمعالجة هذه البيانات وإنتاج محتوى متسق وعالي الجودة
-                  </div>
                 </div>
               </div>
             </div>
@@ -1838,7 +1769,7 @@ export default function ProductSEO() {
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                     : (generateOptions.keywordAction === "use_existing" && !generateOptions.customKeyword.trim())
                       ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-gradient-to-r from-purple-500 to-blue-500 text-white hover:from-purple-600 hover:to-blue-600 shadow-md hover:shadow-lg"
+                      : "bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 shadow-md hover:shadow-lg"
                 }`}
               >
                 {generating ? (
@@ -1849,7 +1780,7 @@ export default function ProductSEO() {
                 ) : (
                   <>
                     <Sparkles className="w-5 h-5" />
-                    🎯 إرسال للبرومبت المحفوظ
+                    إنشاء المحتوى
                   </>
                 )}
               </button>
