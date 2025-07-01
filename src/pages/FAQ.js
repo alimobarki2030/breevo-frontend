@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import PublicNavbar from '../components/navbars/PublicNavbar';
 
 export default function FAQPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -13,6 +14,8 @@ export default function FAQPage() {
       [categoryId]: !prev[categoryId]
     }));
   };
+
+  <PublicNavbar />
 
   const toggleQuestion = (questionId) => {
     setOpenQuestions(prev => ({

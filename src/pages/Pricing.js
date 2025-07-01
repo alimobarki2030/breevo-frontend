@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import PublicNavbar from '../components/navbars/PublicNavbar';
 
 export default function PricingPage() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [billingCycle, setBillingCycle] = useState('monthly'); // monthly or annual
 
   const plans = [
@@ -27,7 +27,7 @@ export default function PricingPage() {
       ],
       limitations: [],
       cta: 'ابدأ مجاناً',
-      ctaLink: '/login?plan=free',
+      ctaLink: '/checkout?plan=free',
       popular: false
     },
     {
@@ -51,7 +51,7 @@ export default function PricingPage() {
       ],
       limitations: [],
       cta: 'اشترك الآن',
-      ctaLink: '/login?plan=pro',
+      ctaLink: '/checkout?plan=pro',
       popular: true
     },
     {
@@ -77,7 +77,7 @@ export default function PricingPage() {
       ],
       limitations: [],
       cta: 'للشركات',
-      ctaLink: '/login?plan=business',
+      ctaLink: '/checkout?plan=business',
       popular: false
     }
   ];
@@ -148,475 +148,392 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-white font-arabic">
-      {/* Navigation */}
-      <nav className="max-w-screen-xl mx-auto px-4 py-4 flex items-center justify-between relative">
-        <img src="/logo2.png" alt="Logo" className="h-8 md:h-12" />
+      
+      {/* استخدام النافبار الموحد */}
+      <PublicNavbar />
+      
+      {/* مساحة للنافبار الثابت */}
+      <div className="pt-20">
         
-        {/* Desktop Menu */}
-        <div className="hidden md:flex items-center space-x-8 space-x-reverse">
-          <Link to="/features" className="hover:text-[#83dcc9] transition-colors">المميزات</Link>
-          <Link to="/pricing" className="text-[#83dcc9] font-semibold">الأسعار</Link>
-          <Link to="/how-it-works" className="hover:text-[#83dcc9] transition-colors">كيف يعمل</Link>
-          <Link to="/about" className="hover:text-[#83dcc9] transition-colors">من نحن</Link>
-          <Link to="/contact" className="hover:text-[#83dcc9] transition-colors">اتصل بنا</Link>
-          <Link to="/login" className="bg-[#83dcc9] text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-[#6cc9b9] transition">
-            دخول
-          </Link>
-        </div>
-        
-        {/* Mobile menu button */}
-        <button 
-          className="md:hidden text-white z-50 relative"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          <svg 
-            className={`w-6 h-6 transition-transform ${isMobileMenuOpen ? 'rotate-90' : ''}`} 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            {isMobileMenuOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
-
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="absolute top-full left-4 right-4 bg-gray-900 border border-gray-700 rounded-xl mt-2 py-4 px-4 shadow-2xl z-40"
-          >
-            <div className="flex flex-col space-y-4">
-              <Link 
-                to="/features" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                المميزات
-              </Link>
-              <Link 
-                to="/pricing" 
-                className="text-[#83dcc9] font-semibold py-2 border-b border-gray-700"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                الأسعار
-              </Link>
-              <Link 
-                to="/how-it-works" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                كيف يعمل
-              </Link>
-              <Link 
-                to="/about" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                من نحن
-              </Link>
-              <Link 
-                to="/contact" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                اتصل بنا
-              </Link>
-              <Link 
-                to="/login" 
-                className="bg-[#83dcc9] text-gray-900 font-bold py-3 px-4 rounded-lg hover:bg-[#6cc9b9] transition text-center mt-4"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                دخول
-              </Link>
-            </div>
-          </motion.div>
-        )}
-      </nav>
-
-      {/* Hero Section */}
-      <section className="w-full px-4 py-16 text-center">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h1 className="text-3xl md:text-5xl font-extrabold mb-6 leading-tight">
-              اختر الباقة المناسبة لطموحك
-            </h1>
-            <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-              خطط مرنة تنمو معك، من التجربة المجانية إلى الحلول المؤسسية الشاملة
-            </p>
-            <div className="bg-[#83dcc9]/10 border border-[#83dcc9]/30 rounded-2xl p-6">
-              <div className="flex items-center justify-center space-x-4 space-x-reverse text-[#83dcc9]">
-                <span className="text-2xl">💰</span>
-                <p className="text-lg font-semibold">
-                  ضمان استرداد كامل خلال 30 يوم - جرب بدون مخاطر
-                </p>
+        {/* Hero Section */}
+        <section className="w-full px-4 py-16 text-center">
+          <div className="max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <h1 className="text-3xl md:text-5xl font-extrabold mb-6 leading-tight">
+                اختر الباقة المناسبة لطموحك
+              </h1>
+              <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+                خطط مرنة تنمو معك، من التجربة المجانية إلى الحلول المؤسسية الشاملة
+              </p>
+              <div className="bg-[#83dcc9]/10 border border-[#83dcc9]/30 rounded-2xl p-6">
+                <div className="flex items-center justify-center space-x-4 space-x-reverse text-[#83dcc9]">
+                  <span className="text-2xl">💰</span>
+                  <p className="text-lg font-semibold">
+                    ضمان استرداد كامل خلال 30 يوم - جرب بدون مخاطر
+                  </p>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+            </motion.div>
+          </div>
+        </section>
 
-      {/* Billing Toggle */}
-      <section className="w-full px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="flex justify-center"
-          >
-            <div className="bg-gray-800 p-2 rounded-2xl flex items-center">
-              <button
-                onClick={() => setBillingCycle('monthly')}
-                className={`px-6 py-3 rounded-xl font-semibold transition-all ${
-                  billingCycle === 'monthly'
-                    ? 'bg-[#83dcc9] text-gray-900'
-                    : 'text-gray-300 hover:text-white'
-                }`}
-              >
-                شهري
-              </button>
-              <button
-                onClick={() => setBillingCycle('annual')}
-                className={`px-6 py-3 rounded-xl font-semibold transition-all relative ${
-                  billingCycle === 'annual'
-                    ? 'bg-[#83dcc9] text-gray-900'
-                    : 'text-gray-300 hover:text-white'
-                }`}
-              >
-                سنوي
-                <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
-                  وفر 20%
-                </span>
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+        {/* Billing Toggle */}
+        <section className="w-full px-4 py-8">
+          <div className="max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="flex justify-center"
+            >
+              <div className="bg-gray-800 p-2 rounded-2xl flex items-center">
+                <button
+                  onClick={() => setBillingCycle('monthly')}
+                  className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+                    billingCycle === 'monthly'
+                      ? 'bg-[#83dcc9] text-gray-900'
+                      : 'text-gray-300 hover:text-white'
+                  }`}
+                >
+                  شهري
+                </button>
+                <button
+                  onClick={() => setBillingCycle('annual')}
+                  className={`px-6 py-3 rounded-xl font-semibold transition-all relative ${
+                    billingCycle === 'annual'
+                      ? 'bg-[#83dcc9] text-gray-900'
+                      : 'text-gray-300 hover:text-white'
+                  }`}
+                >
+                  سنوي
+                  <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
+                    وفر 20%
+                  </span>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        </section>
 
-      {/* Pricing Cards */}
-      <section className="w-full px-4 py-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {plans.map((plan, index) => (
-              <motion.div
-                key={plan.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className={`relative p-8 rounded-2xl border-2 transition-all hover:shadow-2xl ${
-                  plan.popular
-                    ? 'bg-[#83dcc9] text-gray-900 border-white scale-105'
-                    : 'bg-gray-800 border-gray-700 hover:border-[#83dcc9]/50'
-                }`}
-              >
-                {/* Badge */}
-                {plan.badge && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className={`px-4 py-2 rounded-full text-sm font-bold ${
-                      plan.popular ? 'bg-orange-500 text-white' : 'bg-[#83dcc9] text-gray-900'
-                    }`}>
-                      {plan.badge}
-                    </span>
-                  </div>
-                )}
-
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                  <p className={`text-sm mb-4 ${plan.popular ? 'text-gray-700' : 'text-gray-400'}`}>
-                    {plan.subtitle}
-                  </p>
-                  
-                  <div className="mb-4">
-                    <span className="text-4xl font-extrabold">
-                      {getCurrentPrice(plan)} ريال
-                    </span>
-                    {plan.monthlyPrice > 0 && (
-                      <>
-                        <span className={`text-lg ${plan.popular ? 'text-gray-700' : 'text-gray-400'}`}>
-                          /شهرياً
-                        </span>
-                        {billingCycle === 'annual' && getSavingPercentage(plan) > 0 && (
-                          <div className="mt-2">
-                            <span className={`text-sm line-through ${plan.popular ? 'text-gray-600' : 'text-gray-500'}`}>
-                              {plan.monthlyPrice} ريال/شهرياً
-                            </span>
-                            <span className="text-sm text-green-500 font-semibold mr-2">
-                              وفر {getSavingPercentage(plan)}%
-                            </span>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </div>
-                  
-                  <p className={`text-sm ${plan.popular ? 'text-gray-700' : 'text-gray-400'}`}>
-                    {plan.description}
-                  </p>
-                </div>
-
-                {/* Features */}
-                <div className="space-y-3 mb-8">
-                  {plan.features.map((feature, idx) => (
-                    <div key={idx} className="flex items-center space-x-3 space-x-reverse">
-                      <span className={`text-lg ${plan.popular ? 'text-gray-900' : 'text-[#83dcc9]'}`}>
-                        ✓
-                      </span>
-                      <span className={`text-sm ${plan.popular ? 'text-gray-800' : 'text-gray-300'}`}>
-                        {feature}
-                      </span>
-                    </div>
-                  ))}
-                  
-                  {plan.limitations.map((limitation, idx) => (
-                    <div key={idx} className="flex items-center space-x-3 space-x-reverse">
-                      <span className={`text-lg ${plan.popular ? 'text-gray-600' : 'text-gray-600'}`}>
-                        ❌
-                      </span>
-                      <span className={`text-sm ${plan.popular ? 'text-gray-600' : 'text-gray-500'}`}>
-                        {limitation}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* CTA */}
-                <Link to={plan.ctaLink} className="block">
-                  <button className={`w-full font-bold py-4 px-6 rounded-xl transition-all ${
+        {/* Pricing Cards */}
+        <section className="w-full px-4 py-8">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {plans.map((plan, index) => (
+                <motion.div
+                  key={plan.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  className={`relative p-8 rounded-2xl border-2 transition-all hover:shadow-2xl ${
                     plan.popular
-                      ? 'bg-gray-900 text-white hover:bg-gray-800'
-                      : 'bg-[#83dcc9] text-gray-900 hover:bg-[#6cc9b9]'
-                  }`}>
-                    {plan.cta}
+                      ? 'bg-[#83dcc9] text-gray-900 border-white scale-105'
+                      : 'bg-gray-800 border-gray-700 hover:border-[#83dcc9]/50'
+                  }`}
+                >
+                  {/* Badge */}
+                  {plan.badge && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                      <span className={`px-4 py-2 rounded-full text-sm font-bold ${
+                        plan.popular ? 'bg-orange-500 text-white' : 'bg-[#83dcc9] text-gray-900'
+                      }`}>
+                        {plan.badge}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="text-center mb-8">
+                    <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                    <p className={`text-sm mb-4 ${plan.popular ? 'text-gray-700' : 'text-gray-400'}`}>
+                      {plan.subtitle}
+                    </p>
+                    
+                    <div className="mb-4">
+                      <span className="text-4xl font-extrabold">
+                        {getCurrentPrice(plan)} ريال
+                      </span>
+                      {plan.monthlyPrice > 0 && (
+                        <>
+                          <span className={`text-lg ${plan.popular ? 'text-gray-700' : 'text-gray-400'}`}>
+                            /شهرياً
+                          </span>
+                          {billingCycle === 'annual' && getSavingPercentage(plan) > 0 && (
+                            <div className="mt-2">
+                              <span className={`text-sm line-through ${plan.popular ? 'text-gray-600' : 'text-gray-500'}`}>
+                                {plan.monthlyPrice} ريال/شهرياً
+                              </span>
+                              <span className="text-sm text-green-500 font-semibold mr-2">
+                                وفر {getSavingPercentage(plan)}%
+                              </span>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                    
+                    <p className={`text-sm ${plan.popular ? 'text-gray-700' : 'text-gray-400'}`}>
+                      {plan.description}
+                    </p>
+                  </div>
+
+                  {/* Features */}
+                  <div className="space-y-3 mb-8">
+                    {plan.features.map((feature, idx) => (
+                      <div key={idx} className="flex items-center space-x-3 space-x-reverse">
+                        <span className={`text-lg ${plan.popular ? 'text-gray-900' : 'text-[#83dcc9]'}`}>
+                          ✓
+                        </span>
+                        <span className={`text-sm ${plan.popular ? 'text-gray-800' : 'text-gray-300'}`}>
+                          {feature}
+                        </span>
+                      </div>
+                    ))}
+                    
+                    {plan.limitations.map((limitation, idx) => (
+                      <div key={idx} className="flex items-center space-x-3 space-x-reverse">
+                        <span className={`text-lg ${plan.popular ? 'text-gray-600' : 'text-gray-600'}`}>
+                          ❌
+                        </span>
+                        <span className={`text-sm ${plan.popular ? 'text-gray-600' : 'text-gray-500'}`}>
+                          {limitation}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* CTA */}
+                  <Link to={plan.ctaLink} className="block">
+                    <button className={`w-full font-bold py-4 px-6 rounded-xl transition-all ${
+                      plan.popular
+                        ? 'bg-gray-900 text-white hover:bg-gray-800'
+                        : 'bg-[#83dcc9] text-gray-900 hover:bg-[#6cc9b9]'
+                    }`}>
+                      {plan.cta}
+                    </button>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Feature Comparison Table */}
+        <section className="w-full px-4 py-16 bg-gray-900">
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">مقارنة مفصلة للمميزات</h2>
+              <p className="text-xl text-gray-300">اكتشف الفروق بين الباقات بالتفصيل</p>
+            </motion.div>
+
+            <div className="bg-gray-800 rounded-2xl overflow-hidden">
+              {/* Headers */}
+              <div className="grid grid-cols-4 bg-gray-700 p-4 font-bold text-center sticky top-0">
+                <div></div>
+                <div className="text-gray-300">المجانية</div>
+                <div className="text-[#83dcc9]">الاحترافية</div>
+                <div className="text-yellow-400">الأعمال</div>
+              </div>
+              
+              {featureComparison.map((category, categoryIndex) => (
+                <div key={categoryIndex}>
+                  {/* Category Header */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -50 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6, delay: categoryIndex * 0.1 }}
+                    viewport={{ once: true }}
+                    className="bg-[#83dcc9] text-gray-900 p-4 font-bold text-lg"
+                  >
+                    {category.category}
+                  </motion.div>
+                  
+                  {/* Features */}
+                  {category.features.map((feature, featureIndex) => (
+                    <motion.div
+                      key={featureIndex}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: featureIndex * 0.05 }}
+                      viewport={{ once: true }}
+                      className="grid grid-cols-4 p-4 border-b border-gray-700 last:border-b-0 text-sm"
+                    >
+                      <div className="font-semibold text-gray-300 text-right">{feature.name}</div>
+                      <div className="text-center text-gray-400">{feature.free}</div>
+                      <div className="text-center text-[#83dcc9] font-medium">{feature.pro}</div>
+                      <div className="text-center text-yellow-400 font-medium">{feature.business}</div>
+                    </motion.div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing FAQ */}
+        <section className="w-full px-4 py-16">
+          <div className="max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">أسئلة شائعة حول الأسعار</h2>
+              <p className="text-xl text-gray-300">إجابات واضحة لاستفساراتك المالية</p>
+            </motion.div>
+
+            <div className="space-y-6">
+              {pricingFAQs.map((faq, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="bg-gray-800 p-6 rounded-xl"
+                >
+                  <h3 className="text-lg font-bold text-[#83dcc9] mb-3">{faq.question}</h3>
+                  <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Money Back Guarantee */}
+        <section className="w-full px-4 py-16 bg-gray-900">
+          <div className="max-w-4xl mx-auto text-center">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="bg-gradient-to-r from-green-600/20 to-transparent border border-green-500/30 rounded-2xl p-8"
+            >
+              <div className="text-6xl mb-6">💰</div>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 text-green-400">
+                ضمان استرداد كامل لمدة 30 يوم
+              </h2>
+              <p className="text-xl text-gray-300 mb-6 leading-relaxed">
+                جرب منصتنا بدون أي مخاطر. إذا لم تكن راضياً عن النتائج خلال 30 يوم، 
+                سنرد لك كامل المبلغ دون أسئلة أو شروط معقدة.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                <div className="flex items-center space-x-3 space-x-reverse">
+                  <span className="text-green-400 text-2xl">✓</span>
+                  <span>استرداد فوري خلال 30 يوم</span>
+                </div>
+                <div className="flex items-center space-x-3 space-x-reverse">
+                  <span className="text-green-400 text-2xl">✓</span>
+                  <span>بدون أسئلة أو شروط</span>
+                </div>
+                <div className="flex items-center space-x-3 space-x-reverse">
+                  <span className="text-green-400 text-2xl">✓</span>
+                  <span>احتفظ بالمحتوى المولد</span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="w-full px-4 py-16 text-center">
+          <div className="max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                ابدأ رحلة نجاحك اليوم
+              </h2>
+              <p className="text-xl text-gray-300 mb-8">
+                انضم لآلاف التجار الذين حققوا نتائج استثنائية مع منصتنا
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+                <Link to="/checkout?plan=free" className="w-full sm:w-auto">
+                  <button className="w-full bg-[#83dcc9] text-gray-900 font-bold py-4 px-8 rounded-xl hover:bg-[#6cc9b9] transition text-lg">
+                    جرب مجاناً الآن
                   </button>
                 </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Feature Comparison Table */}
-      <section className="w-full px-4 py-16 bg-gray-900">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">مقارنة مفصلة للمميزات</h2>
-            <p className="text-xl text-gray-300">اكتشف الفروق بين الباقات بالتفصيل</p>
-          </motion.div>
-
-          <div className="bg-gray-800 rounded-2xl overflow-hidden">
-            {featureComparison.map((category, categoryIndex) => (
-              <div key={categoryIndex}>
-                {/* Category Header */}
-                <motion.div
-                  initial={{ opacity: 0, x: -50 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, delay: categoryIndex * 0.1 }}
-                  viewport={{ once: true }}
-                  className="bg-[#83dcc9] text-gray-900 p-4 font-bold text-lg"
-                >
-                  {category.category}
-                </motion.div>
-                
-                {/* Features */}
-                {category.features.map((feature, featureIndex) => (
-                  <motion.div
-                    key={featureIndex}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: featureIndex * 0.05 }}
-                    viewport={{ once: true }}
-                    className="grid grid-cols-4 p-4 border-b border-gray-700 last:border-b-0 text-sm"
-                  >
-                    <div className="font-semibold text-gray-300 text-right">{feature.name}</div>
-                    <div className="text-center text-gray-400">{feature.free}</div>
-                    <div className="text-center text-[#83dcc9] font-medium">{feature.pro}</div>
-                    <div className="text-center text-yellow-400 font-medium">{feature.business}</div>
-                  </motion.div>
-                ))}
+                <Link to="/contact" className="w-full sm:w-auto">
+                  <button className="w-full border border-[#83dcc9] text-[#83dcc9] font-bold py-4 px-8 rounded-xl hover:bg-[#83dcc9] hover:text-gray-900 transition text-lg">
+                    تحدث مع المبيعات
+                  </button>
+                </Link>
               </div>
-            ))}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="py-8 sm:py-12 px-4 sm:px-6 border-t border-gray-700 bg-gray-900">
+          <div className="max-w-screen-xl mx-auto">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 text-xs sm:text-sm mb-6 sm:mb-8">
+              <div>
+                <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">المنصة</h4>
+                <div className="space-y-1 sm:space-y-2">
+                  <Link to="/features" className="block text-gray-400 hover:text-white transition">المميزات</Link>
+                  <Link to="/pricing" className="block text-[#83dcc9] font-semibold">الأسعار</Link>
+                  <Link to="/how-it-works" className="block text-gray-400 hover:text-white transition">كيف يعمل</Link>
+                  <Link to="/demo" className="block text-gray-400 hover:text-white transition">تجربة تفاعلية</Link>
+                </div>
+              </div>
+              <div>
+                <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">الشركة</h4>
+                <div className="space-y-1 sm:space-y-2">
+                  <Link to="/about" className="block text-gray-400 hover:text-white transition">من نحن</Link>
+                  <Link to="/contact" className="block text-gray-400 hover:text-white transition">اتصل بنا</Link>
+                  <Link to="/careers" className="block text-gray-400 hover:text-white transition">الوظائف</Link>
+                  <Link to="/blog" className="block text-gray-400 hover:text-white transition">المدونة</Link>
+                </div>
+              </div>
+              <div>
+                <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">الدعم</h4>
+                <div className="space-y-1 sm:space-y-2">
+                  <Link to="/faq" className="block text-gray-400 hover:text-white transition">الأسئلة الشائعة</Link>
+                  <Link to="/help" className="block text-gray-400 hover:text-white transition">مركز المساعدة</Link>
+                  <Link to="/tutorials" className="block text-gray-400 hover:text-white transition">الدروس التعليمية</Link>
+                  <Link to="/support" className="block text-gray-400 hover:text-white transition">الدعم الفني</Link>
+                </div>
+              </div>
+              <div>
+                <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">قانوني</h4>
+                <div className="space-y-1 sm:space-y-2">
+                  <Link to="/privacy" className="block text-gray-400 hover:text-white transition">سياسة الخصوصية</Link>
+                  <Link to="/terms" className="block text-gray-400 hover:text-white transition">شروط الخدمة</Link>
+                  <Link to="/cookies" className="block text-gray-400 hover:text-white transition">سياسة ملفات تعريف الارتباط</Link>
+                  <Link to="/refund" className="block text-gray-400 hover:text-white transition">سياسة الاسترداد</Link>
+                </div>
+              </div>
+            </div>
             
-            {/* Headers */}
-            <div className="grid grid-cols-4 bg-gray-700 p-4 font-bold text-center sticky top-0">
-              <div></div>
-              <div className="text-gray-300">المجانية</div>
-              <div className="text-[#83dcc9]">الاحترافية</div>
-              <div className="text-yellow-400">الأعمال</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing FAQ */}
-      <section className="w-full px-4 py-16">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">أسئلة شائعة حول الأسعار</h2>
-            <p className="text-xl text-gray-300">إجابات واضحة لاستفساراتك المالية</p>
-          </motion.div>
-
-          <div className="space-y-6">
-            {pricingFAQs.map((faq, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-gray-800 p-6 rounded-xl"
-              >
-                <h3 className="text-lg font-bold text-[#83dcc9] mb-3">{faq.question}</h3>
-                <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Money Back Guarantee */}
-      <section className="w-full px-4 py-16 bg-gray-900">
-        <div className="max-w-4xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="bg-gradient-to-r from-green-600/20 to-transparent border border-green-500/30 rounded-2xl p-8"
-          >
-            <div className="text-6xl mb-6">💰</div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-green-400">
-              ضمان استرداد كامل لمدة 30 يوم
-            </h2>
-            <p className="text-xl text-gray-300 mb-6 leading-relaxed">
-              جرب منصتنا بدون أي مخاطر. إذا لم تكن راضياً عن النتائج خلال 30 يوم، 
-              سنرد لك كامل المبلغ دون أسئلة أو شروط معقدة.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-              <div className="flex items-center space-x-3 space-x-reverse">
-                <span className="text-green-400 text-2xl">✓</span>
-                <span>استرداد فوري خلال 30 يوم</span>
+            <div className="flex flex-col sm:flex-row justify-between items-center pt-6 sm:pt-8 border-t border-gray-700 space-y-4 sm:space-y-0">
+              <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 sm:space-x-reverse">
+                <img src="/logo2.png" alt="Logo" className="h-6 sm:h-8" />
+                <span className="text-gray-400 text-xs text-center sm:text-right">© 2025 مشروع السيو الذكي. جميع الحقوق محفوظة.</span>
               </div>
-              <div className="flex items-center space-x-3 space-x-reverse">
-                <span className="text-green-400 text-2xl">✓</span>
-                <span>بدون أسئلة أو شروط</span>
-              </div>
-              <div className="flex items-center space-x-3 space-x-reverse">
-                <span className="text-green-400 text-2xl">✓</span>
-                <span>احتفظ بالمحتوى المولد</span>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="w-full px-4 py-16 text-center">
-        <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              ابدأ رحلة نجاحك اليوم
-            </h2>
-            <p className="text-xl text-gray-300 mb-8">
-              انضم لآلاف التجار الذين حققوا نتائج استثنائية مع منصتنا
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-              <Link to="/login?plan=free" className="w-full sm:w-auto">
-                <button className="w-full bg-[#83dcc9] text-gray-900 font-bold py-4 px-8 rounded-xl hover:bg-[#6cc9b9] transition text-lg">
-                  جرب مجاناً الآن
-                </button>
-              </Link>
-              <Link to="/contact" className="w-full sm:w-auto">
-                <button className="w-full border border-[#83dcc9] text-[#83dcc9] font-bold py-4 px-8 rounded-xl hover:bg-[#83dcc9] hover:text-gray-900 transition text-lg">
-                  تحدث مع المبيعات
-                </button>
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-8 sm:py-12 px-4 sm:px-6 border-t border-gray-700 bg-gray-900">
-        <div className="max-w-screen-xl mx-auto">
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 text-xs sm:text-sm mb-6 sm:mb-8">
-            <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">المنصة</h4>
-              <div className="space-y-1 sm:space-y-2">
-                <Link to="/features" className="block text-gray-400 hover:text-white transition">المميزات</Link>
-                <Link to="/pricing" className="block text-[#83dcc9] font-semibold">الأسعار</Link>
-                <Link to="/how-it-works" className="block text-gray-400 hover:text-white transition">كيف يعمل</Link>
-                <Link to="/demo" className="block text-gray-400 hover:text-white transition">تجربة تفاعلية</Link>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">الشركة</h4>
-              <div className="space-y-1 sm:space-y-2">
-                <Link to="/about" className="block text-gray-400 hover:text-white transition">من نحن</Link>
-                <Link to="/contact" className="block text-gray-400 hover:text-white transition">اتصل بنا</Link>
-                <Link to="/careers" className="block text-gray-400 hover:text-white transition">الوظائف</Link>
-                <Link to="/blog" className="block text-gray-400 hover:text-white transition">المدونة</Link>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">الدعم</h4>
-              <div className="space-y-1 sm:space-y-2">
-                <Link to="/faq" className="block text-gray-400 hover:text-white transition">الأسئلة الشائعة</Link>
-                <Link to="/help" className="block text-gray-400 hover:text-white transition">مركز المساعدة</Link>
-                <Link to="/tutorials" className="block text-gray-400 hover:text-white transition">الدروس التعليمية</Link>
-                <Link to="/support" className="block text-gray-400 hover:text-white transition">الدعم الفني</Link>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">قانوني</h4>
-              <div className="space-y-1 sm:space-y-2">
-                <Link to="/privacy" className="block text-gray-400 hover:text-white transition">سياسة الخصوصية</Link>
-                <Link to="/terms" className="block text-gray-400 hover:text-white transition">شروط الخدمة</Link>
-                <Link to="/cookies" className="block text-gray-400 hover:text-white transition">سياسة ملفات تعريف الارتباط</Link>
-                <Link to="/refund" className="block text-gray-400 hover:text-white transition">سياسة الاسترداد</Link>
+              <div className="flex space-x-3 sm:space-x-4 space-x-reverse">
+                <Link to="/social/twitter" className="text-gray-400 hover:text-[#83dcc9] transition text-xs sm:text-sm">تويتر</Link>
+                <Link to="/social/linkedin" className="text-gray-400 hover:text-[#83dcc9] transition text-xs sm:text-sm">لينكد إن</Link>
+                <Link to="/social/instagram" className="text-gray-400 hover:text-[#83dcc9] transition text-xs sm:text-sm">إنستجرام</Link>
               </div>
             </div>
           </div>
-          
-          <div className="flex flex-col sm:flex-row justify-between items-center pt-6 sm:pt-8 border-t border-gray-700 space-y-4 sm:space-y-0">
-            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 sm:space-x-reverse">
-              <img src="/logo2.png" alt="Logo" className="h-6 sm:h-8" />
-              <span className="text-gray-400 text-xs text-center sm:text-right">© 2025 مشروع السيو الذكي. جميع الحقوق محفوظة.</span>
-            </div>
-            <div className="flex space-x-3 sm:space-x-4 space-x-reverse">
-              <Link to="/social/twitter" className="text-gray-400 hover:text-[#83dcc9] transition text-xs sm:text-sm">تويتر</Link>
-              <Link to="/social/linkedin" className="text-gray-400 hover:text-[#83dcc9] transition text-xs sm:text-sm">لينكد إن</Link>
-              <Link to="/social/instagram" className="text-gray-400 hover:text-[#83dcc9] transition text-xs sm:text-sm">إنستجرام</Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
     </div>
   );
 }

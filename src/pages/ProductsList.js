@@ -24,8 +24,9 @@ import {
   ShoppingBag,
   Image as ImageIcon
 } from "lucide-react";
-import Navbar from "../components/Navbar";
-import Sidebar from "../components/Sidebar";
+
+// ✅ استبدال النافبار القديم بالنافبار الموحد
+import UserNavbar from '../components/navbars/UserNavbar';
 
 // Constants
 const ITEMS_PER_PAGE_OPTIONS = [8, 12, 16, 20, 24];
@@ -454,7 +455,8 @@ export default function ProductsList() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
+        <UserNavbar />
+        <div className="text-center pt-20">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
           <p className="text-gray-600">جاري تحميل المنتجات...</p>
         </div>
@@ -463,11 +465,13 @@ export default function ProductsList() {
   }
 
   return (
-    <>
-      <Navbar />
-      <div className="min-h-screen flex bg-gray-50">
-        <Sidebar />
-        <div className="flex-1 p-6 space-y-6">
+    <div className="min-h-screen bg-gray-50">
+      {/* ✅ استخدام النافبار الموحد */}
+      <UserNavbar />
+      
+      {/* ✅ المحتوى الرئيسي متوسط ومحدود العرض */}
+      <div className="pt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
           
           {/* Error Display */}
           {errors.load && (
@@ -1116,6 +1120,6 @@ export default function ProductsList() {
           </div>
         </Dialog>
       </Transition>
-    </>
+    </div>
   );
 }

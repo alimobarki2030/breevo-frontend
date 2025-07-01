@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast"; // ✅ إضافة Toaster
 import ProductsList from "./pages/ProductsList";
 import ProductSEO from "./pages/ProductSEO";
 import Account from "./pages/Account";
@@ -9,7 +10,7 @@ import Videos from "./pages/Videos";
 import Settings from "./pages/Settings";
 import LandingPage from "./pages/LandingPage";
 import ManualLogin from "./pages/ManualLogin";
-import { AuthProvider } from "./AuthContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import Checkout from "./pages/Checkout";
 import AdminPromo from './pages/AdminPromo';
 import PromoCodesManagement from './pages/PromoCodesManagement';
@@ -26,6 +27,8 @@ import DataForSEOTest from './components/DataForSEOTest';
 import AdminVideoUpload from './pages/AdminVideoUpload';
 
 
+// 🧪 اختبار Supabase - مؤقت
+import SupabaseTest from './components/SupabaseTest';
 
 import "./index.css";
 
@@ -41,6 +44,9 @@ function App() {
           
           {/* صفحات التسجيل والدخول */}
           <Route path="/login" element={<ManualLogin />} />
+          
+          {/* 🧪 اختبار Supabase - مؤقت */}
+          <Route path="/supabase-test" element={<SupabaseTest />} />
           
           {/* الصفحات المحمية (بعد تسجيل الدخول) */}
           <Route path="/products" element={<ProductsList />} />
@@ -63,16 +69,44 @@ function App() {
           <Route path="/competitor-analysis" element={<CompetitorAnalysis />} />
           <Route path="/api-test" element={<DataForSEOTest />} />
           <Route path="/admin/videos" element={<AdminVideoUpload />} />
-
-
-
-
-
-
           
           {/* مسارات إضافية للتوافق مع الكود القديم */}
           <Route path="/manual-login" element={<ManualLogin />} />
         </Routes>
+        
+        {/* ✅ إضافة Toaster لعرض رسائل Toast في كل التطبيق */}
+        <Toaster 
+          position="top-center"
+          toastOptions={{
+            duration: 6000,
+            style: {
+              background: '#16a34a',
+              color: '#fff',
+              fontSize: '16px',
+              fontFamily: 'Arial, sans-serif',
+              padding: '16px',
+              borderRadius: '12px',
+              fontWeight: '500',
+              textAlign: 'center',
+              direction: 'rtl'
+            },
+            success: {
+              iconTheme: {
+                primary: '#16a34a',
+                secondary: '#fff',
+              },
+            },
+            error: {
+              style: {
+                background: '#dc2626',
+              },
+              iconTheme: {
+                primary: '#dc2626',
+                secondary: '#fff',
+              },
+            },
+          }}
+        />
       </div>
     </AuthProvider>
   );

@@ -25,8 +25,9 @@ import {
   Eye,
   Calendar
 } from 'lucide-react';
-import Navbar from '../components/Navbar';
-import Sidebar from '../components/Sidebar';
+
+// ✅ استبدال النافبار القديم بالنافبار الموحد
+import UnifiedNavbar from '../components/UnifiedNavbar';
 
 const Videos = () => {
   // State management
@@ -407,9 +408,11 @@ const Videos = () => {
 
   return (
     <>
-      <Navbar />
-      <div className="min-h-screen flex bg-gray-50">
-        <Sidebar />
+      {/* ✅ استخدام النافبار الموحد */}
+      <UnifiedNavbar />
+      
+      {/* ✅ إضافة مساحة للنافبار الثابت */}
+      <div className="pt-20 min-h-screen flex bg-gray-50">
         <main className="flex-1 p-6">
           <div className="max-w-7xl mx-auto space-y-8">
             

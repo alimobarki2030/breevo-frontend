@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Upload, 
@@ -27,8 +27,10 @@ import {
   Lock,
   Globe
 } from 'lucide-react';
-import Navbar from '../components/Navbar';
-import Sidebar from '../components/Sidebar';
+
+// ✅ استخدام lazy loading لتجنب circular dependencies
+const UnifiedNavbar = lazy(() => import('../components/UnifiedNavbar'));
+const Sidebar = lazy(() => import('../components/Sidebar'));
 
 const AdminVideoUpload = () => {
   // State management
@@ -488,10 +490,18 @@ const AdminVideoUpload = () => {
   // Access denied for non-admins
   if (!isAdmin) {
     return (
-      <>
-        <Navbar />
-        <div className="min-h-screen flex bg-gray-50">
-          <Sidebar />
+      <Suspense fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        </div>
+      }>
+        {/* ✅ استخدام النافبار الموحد */}
+        <UnifiedNavbar />
+        
+        {/* ✅ إضافة مساحة للنافبار الثابت */}
+        <div className="min-h-screen flex bg-gray-50 pt-20">
+          <Suspense fallback={<div className="w-64 bg-white"></div>}>
+          </Suspense>
           <div className="flex-1 flex items-center justify-center p-6">
             <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center border border-gray-200">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -504,15 +514,23 @@ const AdminVideoUpload = () => {
             </div>
           </div>
         </div>
-      </>
+      </Suspense>
     );
   }
 
   return (
-    <>
-      <Navbar />
-      <div className="min-h-screen flex bg-gray-50">
-        <Sidebar />
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+    }>
+      {/* ✅ استخدام النافبار الموحد */}
+      <UnifiedNavbar />
+      
+      {/* ✅ إضافة مساحة للنافبار الثابت */}
+      <div className="min-h-screen flex bg-gray-50 pt-20">
+        <Suspense fallback={<div className="w-64 bg-white"></div>}>
+        </Suspense>
         <main className="flex-1 p-6">
           <div className="max-w-7xl mx-auto space-y-6">
             
@@ -1135,7 +1153,7 @@ const AdminVideoUpload = () => {
           </motion.div>
         </div>
       )}
-    </>
+    </Suspense>
   );
 };
 

@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import PublicNavbar from '../components/navbars/PublicNavbar';
 
 export default function FeaturesPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  <PublicNavbar />
 
   const mainFeatures = [
     {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PublicNavbar from '../components/navbars/PublicNavbar';
 import { Link } from 'react-router-dom';
 import { 
   Play, 
@@ -66,6 +67,8 @@ const generateWithCustomPrompt = async (variables) => {
         variables: variables
       })
     });
+
+<PublicNavbar />
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));

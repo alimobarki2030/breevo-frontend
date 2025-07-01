@@ -3,8 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Crown, Lock, ArrowLeft } from 'lucide-react';
 import DataForSEOService from '../services/DataForSEOService';
-import Navbar from '../components/Navbar';
-import Sidebar from '../components/Sidebar';
+
+// ✅ استبدال النافبار القديم بالنافبار الموحد
+import UnifiedNavbar from '../components/UnifiedNavbar';
 
 const KeywordResearch = () => {
   const [keyword, setKeyword] = useState('');
@@ -91,9 +92,11 @@ const KeywordResearch = () => {
   if (!hasAccess) {
     return (
       <>
-        <Navbar />
-        <div className="min-h-screen flex bg-gray-50">
-          <Sidebar />
+        {/* ✅ استخدام النافبار الموحد */}
+        <UnifiedNavbar />
+        
+        {/* ✅ إضافة مساحة للنافبار الثابت */}
+        <div className="pt-20 min-h-screen flex bg-gray-50">
           <div className="flex-1 flex items-center justify-center p-6">
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
@@ -148,9 +151,11 @@ const KeywordResearch = () => {
   // ✅ العرض العادي للمستخدمين المصرح لهم
   return (
     <>
-      <Navbar />
-      <div className="min-h-screen flex bg-gray-50">
-        <Sidebar />
+      {/* ✅ استخدام النافبار الموحد */}
+      <UnifiedNavbar />
+      
+      {/* ✅ إضافة مساحة للنافبار الثابت */}
+      <div className="pt-20 min-h-screen flex bg-gray-50">
         <main className="flex-1 p-6">
           <div className="max-w-7xl mx-auto">
             {/* Header with breadcrumb */}

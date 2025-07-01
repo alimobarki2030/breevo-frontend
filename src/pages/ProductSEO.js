@@ -28,10 +28,13 @@ import {
   Package,
   ChevronDown,
   ChevronRight,
-  Brain
+  Brain,
+  AlertTriangle
 } from "lucide-react";
-import Navbar from "../components/Navbar";
-import Sidebar from "../components/Sidebar";
+
+// ✅ استبدال النافبار القديم بالنافبار الموحد
+import UserNavbar from '../components/navbars/UserNavbar';
+
 import analyzeSEO from "../analyzeSEO";
 import TiptapEditor from "../components/TiptapEditor";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
@@ -42,6 +45,8 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 - ✅ البرومبت محفوظ في الكود مباشرة كـ system message
 - ✅ استخدام منطق استبدال المتغيرات {{variable}}
 - ✅ طريقة أكثر موثوقية واستقراراً
+- ✅ تبسيط تجربة المستخدم: السماح بالحفظ في جميع الأوقات
+- ✅ عرض التحذيرات فقط (لا توجد أخطاء تمنع الحفظ)
 */
 
 // نص البرومبت المحفوظ من Dashboard
@@ -391,6 +396,7 @@ export default function ProductSEO() {
   const [generating, setGenerating] = useState(false);
   const [fieldLoading, setFieldLoading] = useState("");
   const [errors, setErrors] = useState({});
+  const [warnings, setWarnings] = useState({}); // 🔧 جديد: التحذيرات منفصلة عن الأخطاء
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [editorKey, setEditorKey] = useState(Date.now()); // ← جديد: لإجبار تحديث المحرر
@@ -469,7 +475,7 @@ export default function ProductSEO() {
       setTrialUsage(newUsage);
       setIsTrialExpired(false);
     } else {
-      setTrialUsage(newUsage);
+      setTrialUsage(usage);
       setIsTrialExpired(usage.used >= usage.limit);
     }
   };
@@ -597,48 +603,54 @@ export default function ProductSEO() {
       lastUpdated: new Date().toISOString()
     }));
     
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: null }));
+    // مسح التحذيرات عند التغيير
+    if (warnings[field]) {
+      setWarnings(prev => ({ ...prev, [field]: null }));
     }
-  }, [errors]);
+  }, [warnings]);
 
+  // 🔧 تحسين منطق التحقق: السماح بالحفظ دائماً مع عرض التحذيرات فقط
   const validateProduct = useCallback(() => {
-    const newErrors = {};
+    const newWarnings = {};
     
-    if (!product.name?.trim()) {
-      newErrors.name = "اسم المنتج مطلوب";
-    } else if (product.name.length > FIELD_LIMITS.name_limit) {
-      newErrors.name = `اسم المنتج يجب ألا يتجاوز ${FIELD_LIMITS.name_limit} حرف`;
+    // ⚠️ تحذيرات فقط - لا تمنع الحفظ
+    if (product.name && product.name.length > FIELD_LIMITS.name_limit) {
+      newWarnings.name = `يُفضل ألا يتجاوز اسم المنتج ${FIELD_LIMITS.name_limit} حرف (حالياً ${product.name.length})`;
     }
 
-    // التحقق من Page Title مع الحدود الجديدة
-    if (product.meta_title) {
+    if (product.meta_title && product.meta_title.trim()) {
       const titleLength = product.meta_title.length;
       if (titleLength > FIELD_LIMITS.meta_title.max) {
-        newErrors.meta_title = `Page Title يجب ألا يتجاوز ${FIELD_LIMITS.meta_title.max} حرف (حالياً ${titleLength})`;
+        newWarnings.meta_title = `Page Title مثالي بين ${FIELD_LIMITS.meta_title.min}-${FIELD_LIMITS.meta_title.max} حرف (حالياً ${titleLength})`;
       } else if (titleLength < FIELD_LIMITS.meta_title.min) {
-        newErrors.meta_title = `Page Title يجب ألا يقل عن ${FIELD_LIMITS.meta_title.min} حرف (حالياً ${titleLength})`;
+        newWarnings.meta_title = `Page Title مثالي بين ${FIELD_LIMITS.meta_title.min}-${FIELD_LIMITS.meta_title.max} حرف (حالياً ${titleLength})`;
       }
     }
 
-    // التحقق من Meta Description مع الحدود الجديدة
-    if (product.meta_description) {
+    if (product.meta_description && product.meta_description.trim()) {
       const descLength = product.meta_description.length;
       if (descLength > FIELD_LIMITS.meta_description.max) {
-        newErrors.meta_description = `Page Description يجب ألا يتجاوز ${FIELD_LIMITS.meta_description.max} حرف (حالياً ${descLength})`;
+        newWarnings.meta_description = `Page Description مثالي بين ${FIELD_LIMITS.meta_description.min}-${FIELD_LIMITS.meta_description.max} حرف (حالياً ${descLength})`;
       } else if (descLength < FIELD_LIMITS.meta_description.min) {
-        newErrors.meta_description = `Page Description يجب ألا يقل عن ${FIELD_LIMITS.meta_description.min} حرف (حالياً ${descLength})`;
+        newWarnings.meta_description = `Page Description مثالي بين ${FIELD_LIMITS.meta_description.min}-${FIELD_LIMITS.meta_description.max} حرف (حالياً ${descLength})`;
       }
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors({}); // لا توجد أخطاء تمنع الحفظ
+    setWarnings(newWarnings);
+    
+    // إرجاع true دائماً - السماح بالحفظ في جميع الأوقات
+    return true;
   }, [product.name, product.meta_title, product.meta_description]);
 
   const handleSave = useCallback(async () => {
-    if (!validateProduct()) {
-      toast.error("يرجى تصحيح الأخطاء قبل الحفظ");
-      return;
+    // 🔧 تشغيل التحقق لعرض التحذيرات فقط (لا يمنع الحفظ)
+    validateProduct();
+
+    // 🔧 إظهار رسالة تحذيرية إذا كانت هناك تحذيرات لكن السماح بالحفظ
+    const hasWarnings = Object.keys(warnings).length > 0;
+    if (hasWarnings) {
+      toast.warning("تم الحفظ! لكن هناك اقتراحات لتحسين السيو", { duration: 4000 });
     }
 
     setSaving(true);
@@ -691,7 +703,9 @@ export default function ProductSEO() {
       setProduct(updatedProduct);
       setOriginalProduct(JSON.parse(JSON.stringify(updatedProduct)));
 
-      toast.success("تم حفظ التعديلات بنجاح! ✅");
+      if (!hasWarnings) {
+        toast.success("تم حفظ التعديلات بنجاح! ✅");
+      }
     } catch (error) {
       console.error("Error saving product:", error);
       const errorMessage = error?.response?.data?.message || error?.message || "حدث خطأ أثناء الحفظ";
@@ -700,7 +714,7 @@ export default function ProductSEO() {
     } finally {
       setSaving(false);
     }
-  }, [validateProduct, product]);
+  }, [validateProduct, warnings, product]);
 
   // 🔧 التوليد الذكي الشامل - مع التحقق من التوليد الذكي فقط
   const handleGenerateAll = useCallback(async () => {
@@ -711,7 +725,6 @@ export default function ProductSEO() {
     }
 
     if (!product.name?.trim()) {
-      setErrors(prev => ({ ...prev, generate: "اسم المنتج مطلوب للتوليد الذكي" }));
       toast.error("⚠️ أدخل اسم المنتج أولاً");
       return;
     }
@@ -1059,7 +1072,7 @@ export default function ProductSEO() {
   };
 
   const renderInputField = (label, key, multiline = false, placeholder = "", icon = null) => {
-    const hasError = errors[key];
+    const hasWarning = warnings[key]; // 🔧 فقط التحذيرات، لا توجد أخطاء
     const isLoading = fieldLoading === key;
     const fieldValue = product[key] || "";
     
@@ -1156,10 +1169,11 @@ export default function ProductSEO() {
             placeholder={placeholder}
           />
           
-          {hasError && (
-            <div className="text-red-500 text-xs mt-2 flex items-center gap-1">
-              <XCircle className="w-3 h-3" />
-              {hasError}
+          {/* 🔧 عرض التحذيرات فقط */}
+          {hasWarning && (
+            <div className="text-amber-500 text-xs mt-2 flex items-center gap-1">
+              <AlertTriangle className="w-3 h-3" />
+              {hasWarning}
             </div>
           )}
           
@@ -1261,7 +1275,8 @@ export default function ProductSEO() {
             onChange={(e) => handleProductChange(key, e.target.value)}
             placeholder={placeholder}
             className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 resize-y min-h-[120px] transition-colors ${
-              hasError ? "border-red-300 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+              hasWarning ? "border-amber-300 focus:ring-amber-500" :
+              "border-gray-300 focus:ring-blue-500"
             }`}
             rows={4}
           />
@@ -1272,15 +1287,17 @@ export default function ProductSEO() {
             onChange={(e) => handleProductChange(key, e.target.value)}
             placeholder={placeholder}
             className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors ${
-              hasError ? "border-red-300 focus:ring-red-500" : "border-gray-300 focus:ring-blue-500"
+              hasWarning ? "border-amber-300 focus:ring-amber-500" :
+              "border-gray-300 focus:ring-blue-500"
             }`}
           />
         )}
         
-        {hasError && (
-          <div className="text-red-500 text-xs mt-2 flex items-center gap-1">
-            <XCircle className="w-3 h-3" />
-            {hasError}
+        {/* 🔧 عرض التحذيرات فقط */}
+        {hasWarning && (
+          <div className="text-amber-500 text-xs mt-2 flex items-center gap-1">
+            <AlertTriangle className="w-3 h-3" />
+            {hasWarning}
           </div>
         )}
 
@@ -1362,19 +1379,32 @@ export default function ProductSEO() {
 
   return (
     <>
-      <Navbar />
+      {/* ✅ استخدام النافبار الموحد */}
+      <UserNavbar />
+      
       <div className="min-h-screen flex bg-gray-50">
-        <Sidebar />
         <main className="flex-1 p-6 max-w-7xl mx-auto">
           
           {renderPageHeader()}
 
-          {(errors.save || errors.generate || errors.analyze) && (
+          {/* 🔧 عرض أخطاء التحميل والحفظ فقط */}
+          {(errors.save || errors.generate || errors.analyze || errors.load) && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
               <div className="flex items-center gap-2 text-red-800">
                 <XCircle className="w-5 h-5" />
                 <span className="font-medium">خطأ:</span>
-                <span>{errors.save || errors.generate || errors.analyze}</span>
+                <span>{errors.save || errors.generate || errors.analyze || errors.load}</span>
+              </div>
+            </div>
+          )}
+
+          {/* 🔧 عرض التحذيرات العامة */}
+          {Object.keys(warnings).length > 0 && (
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center gap-2 text-amber-800">
+                <AlertTriangle className="w-5 h-5" />
+                <span className="font-medium">اقتراحات تحسين السيو:</span>
+                <span>هناك بعض الاقتراحات لتحسين المحتوى</span>
               </div>
             </div>
           )}
@@ -1436,6 +1466,7 @@ export default function ProductSEO() {
                       )}
                     </button>
 
+                    {/* 🔧 زر الحفظ مبسط: السماح بالحفظ في جميع الأوقات */}
                     <button
                       onClick={handleSave}
                       disabled={saving || !hasUnsavedChanges}
@@ -1443,7 +1474,7 @@ export default function ProductSEO() {
                         saving 
                           ? "bg-blue-100 text-blue-700 cursor-not-allowed"
                           : hasUnsavedChanges
-                            ? "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md" 
+                            ? "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md"
                             : "bg-gray-100 text-gray-400 cursor-not-allowed"
                       }`}
                     >
@@ -1452,10 +1483,15 @@ export default function ProductSEO() {
                           <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent"></div>
                           جاري الحفظ...
                         </>
-                      ) : (
+                      ) : hasUnsavedChanges ? (
                         <>
                           <Save className="w-5 h-5" />
-                          {hasUnsavedChanges ? "حفظ" : "✅ محفوظ"}
+                          حفظ
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="w-5 h-5" />
+                          محفوظ
                         </>
                       )}
                     </button>
@@ -1639,6 +1675,14 @@ export default function ProductSEO() {
                     <div className="text-orange-500 mt-0.5">🎨</div>
                     <div>
                       <strong>تحديث سهل:</strong> يمكن تعديل البرومبت مباشرة في الكود حسب الحاجة
+                    </div>
+                  </div>
+
+                  {/* 🔧 جديد: توضيح النظام المبسط */}
+                  <div className="flex items-start gap-3 p-3 bg-emerald-50 rounded-lg">
+                    <div className="text-emerald-500 mt-0.5">✨</div>
+                    <div>
+                      <strong>تجربة مبسطة:</strong> احفظ في أي وقت بكل بساطة - العميل بكيفه ويقرر متى يحسن المحتوى
                     </div>
                   </div>
                 </div>

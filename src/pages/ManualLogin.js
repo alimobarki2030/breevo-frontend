@@ -2,13 +2,18 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
-import Footer from "../components/Footer";
-import { API_ENDPOINTS, apiCall } from "../config/api";
 
-// إعداد Google Client ID
+// ✅ إضافة النافبار الموحد
+import PublicNavbar from '../components/navbars/PublicNavbar';
+import Footer from "../components/Footer";
+
+// ✅ استيراد Supabase
+import { auth, database } from "../config/supabase";
+
+// إعداد Google Client ID (محفوظ من الكود الأصلي)
 const GOOGLE_CLIENT_ID = "403864871499-59f26jiafopipeplaq09bplabe594q0o.apps.googleusercontent.com";
 
-// تعريف الخطط
+// تعريف الخطط (محفوظ من الكود الأصلي)
 const PLAN_INFO = {
   free: { name: "المجانية", price: "مجانًا", icon: "🆓" },
   pro: { name: "الاحترافية", price: "49 ريال/شهر", icon: "💎" },
@@ -41,7 +46,7 @@ export default function ManualLogin() {
     plan: selectedPlan || "free"
   });
 
-  // تحميل Google Identity Services
+  // ✅ تحميل الخطة من URL والبيانات المحفوظة
   useEffect(() => {
     // قراءة معامل الخطة من URL
     const urlParams = new URLSearchParams(location.search);
@@ -49,7 +54,6 @@ export default function ManualLogin() {
     
     if (planParam && PLAN_INFO[planParam]) {
       setSelectedPlan(planParam);
-      // إذا كانت خطة مدفوعة، اعرض نموذج التسجيل
       if (planParam !== 'free') {
         setIsLogin(false);
       }
@@ -62,52 +66,8 @@ export default function ManualLogin() {
       setLoginForm(prev => ({ ...prev, email: savedEmail, rememberMe: true }));
     }
 
-    // تحميل Google Script
-    const loadGoogleScript = () => {
-      if (document.getElementById('google-identity-script')) {
-        initializeGoogle();
-        return;
-      }
-
-      const script = document.createElement('script');
-      script.id = 'google-identity-script';
-      script.src = 'https://accounts.google.com/gsi/client';
-      script.async = true;
-      script.defer = true;
-      script.onload = initializeGoogle;
-      document.head.appendChild(script);
-    };
-
-    // تهيئة Google Sign-In
-    const initializeGoogle = () => {
-      if (!window.google) {
-        console.error('Google script not loaded');
-        return;
-      }
-      
-      if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com") {
-        console.error('Google Client ID not configured');
-        toast.error("إعداد Google غير مكتمل");
-        return;
-      }
-
-      try {
-        window.google.accounts.id.initialize({
-          client_id: GOOGLE_CLIENT_ID,
-          callback: handleGoogleResponse,
-          auto_select: false,
-          cancel_on_tap_outside: true,
-          use_fedcm_for_prompt: false
-        });
-        
-        console.log('✅ Google Sign-In initialized successfully');
-      } catch (error) {
-        console.error('خطأ في تهيئة Google Sign-In:', error);
-        toast.error("فشل في تهيئة Google Sign-In");
-      }
-    };
-
-    loadGoogleScript();
+    // ✅ فحص الجلسة الحالية
+    checkCurrentSession();
   }, [location.search]);
 
   // تحديث خطة التسجيل عند تغيير الخطة المختارة
@@ -117,217 +77,93 @@ export default function ManualLogin() {
     }
   }, [selectedPlan]);
 
-  // ✅ معالجة Google Login - مُصححة لاستخدام endpoint الصحيح
-  const handleGoogleResponse = async (response) => {
-    setGoogleLoading(true);
-    
+  // ✅ فحص الجلسة الحالية
+  const checkCurrentSession = async () => {
     try {
-      console.log('🔑 Google Sign-In Response received');
+      const { session, error } = await auth.getSession();
       
-      // البيانات المطلوبة - فقط id_token
-      const requestData = {
-        id_token: response.credential
-      };
-      
-      console.log('📤 Sending to /auth/google-login:', requestData);
-      
-      // ✅ استخدام endpoint الصحيح للـ Google Login
-      const res = await apiCall(API_ENDPOINTS.auth.googleLogin, {
-        method: "POST",
-        body: JSON.stringify(requestData),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json();
-        console.error('❌ Google login failed:', errData);
-        toast.error(errData.detail || "فشل تسجيل الدخول بـ Google");
-        return;
-      }
-
-      const data = await res.json();
-      console.log('✅ Google Sign-In successful:', data);
-      
-      const token = data.access_token || data.token;
-      const clientName = data.client_name;
-      const email = data.email;
-
-      localStorage.setItem("token", token);
-      localStorage.setItem("clientName", clientName);
-      localStorage.setItem("user", JSON.stringify({ 
-        name: clientName,
-        email: email,
-        provider: 'google'
-      }));
-
-      toast.success(`مرحباً ${clientName}، تم تسجيل الدخول بنجاح`);
-      
-      // التحقق من الخطة المختارة للتوجيه المناسب
-      if (selectedPlan && selectedPlan !== 'free') {
-        setTimeout(() => {
+      if (session && session.user) {
+        // المستخدم مسجل دخول مسبقاً
+        console.log('✅ User already logged in:', session.user.email);
+        
+        // تحديث localStorage للتوافق مع الكود القديم
+        localStorage.setItem("token", session.access_token);
+        localStorage.setItem("user", JSON.stringify({
+          name: session.user.user_metadata?.full_name || session.user.email,
+          email: session.user.email,
+          provider: 'supabase'
+        }));
+        
+        // توجيه للصفحة المناسبة
+        if (selectedPlan && selectedPlan !== 'free') {
           navigate(`/checkout?plan=${selectedPlan}`);
-        }, 1000);
-      } else {
-        setTimeout(() => {
+        } else {
           navigate("/products");
-        }, 500);
+        }
       }
-
-    } catch (err) {
-      console.error('Google login error:', err);
-      toast.error("حدث خطأ أثناء تسجيل الدخول بـ Google");
-    } finally {
-      setGoogleLoading(false);
-    }
-  };
-
-  // معالجة Google Login Button
-  const handleGoogleLogin = () => {
-    if (!window.google) {
-      toast.error("خدمة Google غير متاحة حالياً");
-      console.error('Google object not available');
-      return;
-    }
-
-    if (GOOGLE_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com") {
-      toast.error("يرجى إعداد Google Client ID أولاً");
-      return;
-    }
-
-    try {
-      console.log('🚀 Attempting Google Sign-In...');
-      window.google.accounts.id.prompt((notification) => {
-        console.log('Google prompt notification:', notification);
-        
-        if (notification.isNotDisplayed()) {
-          console.log('Google prompt not displayed, trying alternative method');
-          const buttonDiv = document.createElement('div');
-          buttonDiv.id = 'g_id_signin_temp';
-          buttonDiv.style.visibility = 'hidden';
-          document.body.appendChild(buttonDiv);
-          
-          window.google.accounts.id.renderButton(buttonDiv, {
-            theme: "outline",
-            size: "large"
-          });
-          
-          setTimeout(() => {
-            window.google.accounts.id.prompt();
-            document.body.removeChild(buttonDiv);
-          }, 100);
-        }
-        
-        if (notification.isSkippedMoment()) {
-          console.log('Google Sign-In was skipped by user');
-        }
-      });
     } catch (error) {
-      console.error('Google login error:', error);
-      toast.error("حدث خطأ في خدمة Google");
+      console.log('No active session:', error.message);
     }
   };
 
-  // معالجة تغيير نماذج الدخول
-  const handleLoginChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setLoginForm(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  };
-
-  // معالجة تغيير نماذج التسجيل
-  const handleRegisterChange = (e) => {
-    const { name, value } = e.target;
-    let processedValue = value;
-
-    // معالجة خاصة للحقول
-    switch (name) {
-      case 'phone':
-        // السماح بالأرقام فقط وتحديد الطول
-        processedValue = value.replace(/\D/g, '').slice(0, 9);
-        break;
-        
-      case 'email':
-        // تحويل إلى أحرف صغيرة
-        processedValue = value.toLowerCase().trim();
-        break;
-        
-      case 'fullName':
-        // إزالة المسافات الزائدة
-        processedValue = value.trim();
-        break;
-        
-      case 'storeUrl':
-        // معالجة أساسية للـ URL
-        processedValue = value.trim();
-        break;
-        
-      default:
-        processedValue = value;
-    }
-
-    setRegisterForm(prev => ({ ...prev, [name]: processedValue }));
-
-    // التحقق من رقم الهاتف
-    if (name === "phone" && processedValue.length > 0) {
-      if (processedValue.length === 9 && !processedValue.startsWith('5')) {
-        toast.error("رقم الجوال يجب أن يبدأ بـ 5");
-      }
-    }
-  };
-
-  // تسجيل الدخول اليدوي
+  // ✅ تسجيل الدخول مع Supabase - مُصحح
   const handleLogin = async (e) => {
     e.preventDefault();
     if (loading) return;
     setLoading(true);
 
     try {
-      const res = await apiCall(API_ENDPOINTS.auth.login, {
-        method: "POST",
-        body: JSON.stringify({
-          email: loginForm.email,
-          password: loginForm.password
-        }),
-      });
+      // ✅ استخدام signIn المتوفرة في ملف supabase.js
+      const { data, error } = await auth.signIn(loginForm.email, loginForm.password);
 
-      if (!res.ok) {
-        const errData = await res.json();
+      if (error) {
+        console.error('Login error:', error);
         toast.error("البريد الإلكتروني أو كلمة المرور غير صحيحة");
         return;
       }
 
-      const data = await res.json();
-      const token = data.access_token || data.token;
-      const clientName = data.client_name || loginForm.email;
+      if (data.user) {
+        // ✅ تحديث localStorage للتوافق مع الكود القديم
+        localStorage.setItem("token", data.session.access_token);
+        localStorage.setItem("clientName", data.user.user_metadata?.full_name || loginForm.email);
+        localStorage.setItem("user", JSON.stringify({
+          name: data.user.user_metadata?.full_name || loginForm.email,
+          email: loginForm.email,
+          provider: 'supabase'
+        }));
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("clientName", clientName);
-      localStorage.setItem("user", JSON.stringify({ 
-        name: clientName,
-        email: loginForm.email,
-        provider: 'manual'
-      }));
+        // حفظ البريد إذا كان المستخدم يريد التذكر
+        if (loginForm.rememberMe) {
+          localStorage.setItem("rememberedEmail", loginForm.email);
+        } else {
+          localStorage.removeItem("rememberedEmail");
+        }
 
-      if (loginForm.rememberMe) {
-        localStorage.setItem("rememberedEmail", loginForm.email);
-      } else {
-        localStorage.removeItem("rememberedEmail");
+        toast.success(`مرحباً ${data.user.user_metadata?.full_name || loginForm.email}، تم تسجيل الدخول بنجاح`);
+        
+        // توجيه مناسب
+        setTimeout(() => {
+          if (selectedPlan && selectedPlan !== 'free') {
+            navigate(`/checkout?plan=${selectedPlan}`);
+          } else {
+            navigate("/products");
+          }
+        }, 1000);
       }
 
-      toast.success(`مرحباً ${clientName}، تم تسجيل الدخول بنجاح`);
-      navigate("/products");
-
     } catch (err) {
-      toast.error("حدث خطأ أثناء الاتصال بالخادم");
+      console.error('Login exception:', err);
+      toast.error("حدث خطأ أثناء تسجيل الدخول");
     } finally {
       setLoading(false);
     }
   };
 
-  // التسجيل اليدوي
+  // ✅ التسجيل مع Supabase + حفظ في profiles
   const handleRegister = async (e) => {
     e.preventDefault();
+
+    toast.success("🧪 اختبار Toast - يعمل!");
     if (loading) return;
     
     // التحقق من صحة البيانات
@@ -365,64 +201,176 @@ export default function ManualLogin() {
         storeUrl = 'https://' + storeUrl;
       }
 
-      const res = await apiCall(API_ENDPOINTS.auth.register, {
-        method: "POST",
-        body: JSON.stringify({
+      // ✅ التسجيل مع Supabase
+      const { data, error } = await auth.signUp(
+        registerForm.email.trim().toLowerCase(),
+        registerForm.password,
+        {
           full_name: registerForm.fullName.trim(),
-          email: registerForm.email.trim().toLowerCase(),
-          password: registerForm.password,
           phone: registerForm.phone,
           store_url: storeUrl,
-          plan: registerForm.plan,
-        }),
-      });
+          plan: registerForm.plan
+        }
+      );
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        if (data.detail && (data.detail.includes("already exists") || data.detail.includes("مستخدم مسبقًا"))) {
+      if (error) {
+        if (error.message.includes("already exists") || error.message.includes("User already registered")) {
           toast.error("🚫 هذا البريد الإلكتروني مسجّل مسبقًا. يرجى تسجيل الدخول أو استخدام بريد آخر.");
         } else {
-          toast.error(data.detail || "حدث خطأ أثناء إنشاء الحساب");
+          toast.error(error.message || "حدث خطأ أثناء إنشاء الحساب");
         }
         return;
       }
 
-      if (data.token) {
-        localStorage.setItem("token", data.token);
+      if (data.user) {
+        // ✅ حفظ البيانات الإضافية في profiles table
+        const profileData = {
+          full_name: registerForm.fullName.trim(),
+          phone: registerForm.phone,
+          company_name: storeUrl,
+          plan: registerForm.plan,
+          subscription_status: 'trial'
+        };
+
+        const { error: profileError } = await database.updateProfile(profileData);
+        
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+          // لا نوقف العملية - فقط نسجل الخطأ
+        }
+
+        // ✅ تحديث localStorage للتوافق
+        if (data.session) {
+          localStorage.setItem("token", data.session.access_token);
+        }
         localStorage.setItem("clientName", registerForm.fullName);
-        localStorage.setItem("user", JSON.stringify({ 
+        localStorage.setItem("user", JSON.stringify({
           name: registerForm.fullName,
           email: registerForm.email,
-          provider: 'manual'
+          provider: 'supabase'
         }));
         
         // رسالة نجاح مخصصة حسب الخطة
         if (selectedPlan && selectedPlan !== 'free') {
-          toast.success(`🎉 تم إنشاء الحساب بنجاح! سيتم توجيهك لإتمام الدفع للخطة ${PLAN_INFO[selectedPlan].name}`);
-          setTimeout(() => {
-            navigate(`/checkout?plan=${selectedPlan}`);
-          }, 1500);
+          toast.success(`🎉 تم إنشاء الحساب بنجاح! تحقق من بريدك الإلكتروني لتأكيد الحساب، ثم سيتم توجيهك لإتمام الدفع للخطة ${PLAN_INFO[selectedPlan].name}`, {
+            duration: 6000
+          });
+          // لا ننتقل مباشرة - ننتظر تأكيد الإيميل
         } else {
-          toast.success("تم إنشاء الحساب بنجاح 🎉");
-          navigate("/products");
+          console.log("🧪 الكود وصل لهنا!");
+          toast.success("🎉 تم إنشاء الحساب بنجاح! يرجى مراجعة بريدك الإلكتروني وتأكيد حسابك للمتابعة 📧", {
+            duration: 6000
+          });
+           console.log("🧪 تم استدعاء toast.success");
+          // لا ننتقل مباشرة - ننتظر تأكيد الإيميل
         }
       }
       
     } catch (err) {
-      toast.error("حدث خطأ أثناء الاتصال بالسيرفر");
+      console.error('Registration error:', err);
+      toast.error("حدث خطأ أثناء إنشاء الحساب");
     } finally {
       setLoading(false);
     }
   };
 
-  // نسيان كلمة المرور
-  const handleForgotPassword = () => {
+  // ✅ Google Login مع Supabase
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    
+    try {
+      const { data, error } = await auth.signInWithGoogle();
+      
+      if (error) {
+        console.error('Google login error:', error);
+        toast.error("فشل تسجيل الدخول بـ Google");
+        return;
+      }
+      
+      // Supabase سيقوم بالتوجيه تلقائياً
+      console.log('✅ Google Sign-In initiated');
+      
+    } catch (err) {
+      console.error('Google login exception:', err);
+      toast.error("حدث خطأ أثناء تسجيل الدخول بـ Google");
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
+  // معالجة تغيير نماذج الدخول
+  const handleLoginChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setLoginForm(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  // ✅ معالجة تغيير نماذج التسجيل - مُصحح للمسافات
+  const handleRegisterChange = (e) => {
+    const { name, value } = e.target;
+    let processedValue = value;
+
+    // معالجة خاصة للحقول
+    switch (name) {
+      case 'phone':
+        // إزالة كل شيء عدا الأرقام
+        processedValue = value.replace(/\D/g, '').slice(0, 9);
+        break;
+        
+      case 'email':
+        // تحويل لأحرف صغيرة وإزالة المسافات
+        processedValue = value.toLowerCase().replace(/\s/g, '');
+        break;
+        
+      case 'fullName':
+        // ✅ السماح بالمسافات - فقط تنظيف بسيط
+        processedValue = value
+          .replace(/^\s+/, '') // إزالة المسافات من البداية
+          .replace(/\s{2,}/g, ' '); // تحويل مسافات متعددة إلى مسافة واحدة
+        break;
+        
+      case 'storeUrl':
+        // إزالة المسافات تماماً من URL
+        processedValue = value.replace(/\s/g, '');
+        break;
+        
+      default:
+        // للحقول الأخرى - لا نعالج شيء
+        processedValue = value;
+    }
+
+    setRegisterForm(prev => ({ ...prev, [name]: processedValue }));
+
+    // التحقق من رقم الهاتف
+    if (name === "phone" && processedValue.length > 0) {
+      if (processedValue.length === 9 && !processedValue.startsWith('5')) {
+        toast.error("رقم الجوال يجب أن يبدأ بـ 5");
+      }
+    }
+  };
+
+  // نسيان كلمة المرور - ✅ مع Supabase
+  const handleForgotPassword = async () => {
     if (!loginForm.email) {
       toast.error("يرجى إدخال البريد الإلكتروني أولاً");
       return;
     }
-    toast.success("تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني");
+    
+    try {
+      // ✅ استخدام الدالة الجديدة (بعد إضافتها لملف supabase.js)
+      const { error } = await auth.resetPasswordForEmail(loginForm.email);
+      
+      if (error) {
+        toast.error("حدث خطأ في إرسال رابط إعادة التعيين");
+      } else {
+        toast.success("تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني");
+      }
+    } catch (error) {
+      console.error('Reset password error:', error);
+      toast.error("حدث خطأ في إرسال رابط إعادة التعيين");
+    }
   };
 
   // التحقق من صحة النموذج
@@ -440,7 +388,12 @@ export default function ManualLogin() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col justify-between font-arabic">
-      <div className="flex-grow flex items-center justify-center px-4 py-12">
+      
+      {/* ✅ إضافة النافبار الموحد */}
+      <PublicNavbar />
+      
+      {/* ✅ إضافة مساحة للنافبار الثابت */}
+      <div className="pt-20 flex-grow flex items-center justify-center px-4 py-12">
         <div className="max-w-7xl w-full grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
           
           {/* الجانب الأيسر - المعلومات */}
@@ -756,6 +709,7 @@ export default function ManualLogin() {
           </div>
         </div>
       </div>
+      
       <Footer />
     </div>
   );
