@@ -634,7 +634,7 @@ const AdminVideoUpload = () => {
                   onClick={loadVideos}
                   className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >
-                  <async className="w-5 h-5" />
+                  <RefreshCw className="w-5 h-5" />
                 </button>
               </div>
 

@@ -15,6 +15,7 @@ import {
   Search,
   Globe,
   Image,
+  RefreshCw,
   Type,
   FileText,
   Target,
@@ -1500,7 +1501,7 @@ export default function ProductSEO() {
 
                 {product.lastUpdated && (
                   <div className="text-xs text-gray-500 flex items-center gap-1">
-                    <async className="w-3 h-3" />
+                    <RefreshCw className="w-3 h-3" />
                     آخر تحديث: {formatDate(product.lastUpdated)}
                   </div>
                 )}

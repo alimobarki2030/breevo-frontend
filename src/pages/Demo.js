@@ -22,6 +22,7 @@ import {
   PlusCircle,
   Package,
   Edit,
+  RefreshCw,
   Wand2,
   Sparkles,
   FileText,
@@ -473,7 +474,7 @@ export default function Demo() {
         >
           {isAnalyzing ? (
             <>
-              <async className="w-4 h-4 animate-spin" />
+              <RefreshCw className="w-4 h-4 animate-spin" />
               يحلل...
             </>
           ) : (
@@ -499,7 +500,7 @@ export default function Demo() {
         >
           {isAnalyzing ? (
             <>
-              <async className="w-4 h-4 animate-spin" />
+              <RefreshCw className="w-4 h-4 animate-spin" />
               يحلل...
             </>
           ) : (
@@ -525,7 +526,7 @@ export default function Demo() {
         >
           {isAnalyzing ? (
             <>
-              <async className="w-4 h-4 animate-spin" />
+              <RefreshCw className="w-4 h-4 animate-spin" />
               يحلل...
             </>
           ) : (
@@ -699,7 +700,7 @@ export default function Demo() {
           >
             {isAnalyzing ? (
               <>
-                <async className="w-4 h-4 animate-spin" />
+                <RefreshCw className="w-4 h-4 animate-spin" />
                 يحلل...
               </>
             ) : userAccess.isOwner ? (
@@ -739,7 +740,7 @@ export default function Demo() {
       {isAnalyzing && (
         <div className="mb-6 bg-purple-50 rounded-lg p-4">
           <div className="flex items-center gap-3 mb-3">
-            <async className="w-5 h-5 animate-spin text-purple-600" />
+            <RefreshCw className="w-5 h-5 animate-spin text-purple-600" />
             <span className="font-medium">{demoSteps[demoStep]}</span>
           </div>
           <div className="w-full bg-purple-200 rounded-full h-2">
