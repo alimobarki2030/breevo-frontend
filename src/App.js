@@ -25,7 +25,7 @@ import KeywordResearch from './pages/KeywordResearch';
 import CompetitorAnalysis from './pages/CompetitorAnalysis';
 import DataForSEOTest from './components/DataForSEOTest';
 import AdminVideoUpload from './pages/AdminVideoUpload';
-
+import PaymentResult from './pages/PaymentResult';
 
 // 🧪 اختبار Supabase - مؤقت
 import SupabaseTest from './components/SupabaseTest';
@@ -69,6 +69,8 @@ function App() {
           <Route path="/competitor-analysis" element={<CompetitorAnalysis />} />
           <Route path="/api-test" element={<DataForSEOTest />} />
           <Route path="/admin/videos" element={<AdminVideoUpload />} />
+          <Route path="/payment/callback" element={<PaymentResult />} />
+          <Route path="/payment/result" element={<PaymentResult />} />
           
           {/* مسارات إضافية للتوافق مع الكود القديم */}
           <Route path="/manual-login" element={<ManualLogin />} />

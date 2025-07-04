@@ -27,7 +27,7 @@ const AuthNavbar = () => {
         {/* Logo */}
         <div className="flex items-center gap-3">
           <Link to="/" className="flex items-center gap-3">
-            <img src="/logo2.png" alt="Logo" className="h-9" />
+            <img src="/logo22.png" alt="Logo" className="h-9" />
           </Link>
         </div>
 

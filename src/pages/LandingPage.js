@@ -78,6 +78,8 @@ export default function LandingPage() {
           </div>
         </header>
 
+        
+
         {/* Features Section */}
         <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 bg-gray-900">
           <div className="max-w-screen-xl mx-auto text-center mb-8 sm:mb-12">

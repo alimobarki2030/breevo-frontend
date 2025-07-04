@@ -50,7 +50,7 @@ export default function About() {
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-white font-arabic">
       {/* Navigation */}
       <nav className="max-w-screen-xl mx-auto px-4 py-4 flex items-center justify-between relative">
-        <img src="/logo2.png" alt="Logo" className="h-8 md:h-12" />
+        <img src="/logo22.png" alt="Logo" className="h-8 md:h-12" />
         
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8 space-x-reverse">
