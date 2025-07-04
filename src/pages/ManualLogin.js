@@ -3,9 +3,10 @@ import { useNavigate, Link, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
 
-// ✅ إضافة النافبار الموحد
+// ✅ إضافة النافبار الموحد و useTheme
 import PublicNavbar from '../components/navbars/PublicNavbar';
 import Footer from "../components/Footer";
+import { useTheme } from '../contexts/ThemeContext';
 
 // ✅ استيراد Supabase
 import { auth, database } from "../config/supabase";
@@ -21,6 +22,9 @@ const PLAN_INFO = {
 };
 
 export default function ManualLogin() {
+  // ✅ استخدام useTheme
+  const { theme, isDark } = useTheme();
+  
   const navigate = useNavigate();
   const location = useLocation();
   const [isLogin, setIsLogin] = useState(true); // التبديل بين الدخول والتسجيل
@@ -387,7 +391,11 @@ export default function ManualLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col justify-between font-arabic">
+    <div className={`min-h-screen flex flex-col justify-between font-arabic transition-colors duration-500 ${
+      isDark 
+        ? 'bg-gray-950 text-white' 
+        : 'bg-gray-50 text-gray-900'
+    }`}>
       
       {/* ✅ إضافة النافبار الموحد */}
       <PublicNavbar />
@@ -398,39 +406,49 @@ export default function ManualLogin() {
           
           {/* الجانب الأيسر - المعلومات */}
           <div className="space-y-6 px-4">
-            <img src="/logo2.png" alt="Logo" className="max-h-20 object-contain" />
-            <h1 className="text-4xl font-bold leading-tight text-white">
+            <img 
+              src={isDark ? "/logo3.png" : "/logo22.png"} 
+              alt="Logo" 
+              className="max-h-20 object-contain transition-opacity duration-300" 
+            />
+            <h1 className={`text-4xl font-bold leading-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
               {isLogin ? 
                 "مرحباً بك مرة أخرى!" : 
                 selectedPlan ? `اختيار ممتاز! الخطة ${PLAN_INFO[selectedPlan].name}` : "أطلق نمو متجرك باستخدام تحليل السيو الذكي."
               }
             </h1>
-            <p className="text-gray-300 text-lg">
+            <p className={`text-lg ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
               {isLogin ? 
                 "سجل دخولك للوصول إلى لوحة التحكم وتحليلات السيو المتقدمة." :
                 selectedPlan ? `ستحصل على جميع مميزات الخطة ${PLAN_INFO[selectedPlan].name} فور إتمام التسجيل` : "أدخل عالم السيو باحتراف. نسخة مجانية، بدون بطاقة ائتمانية."
               }
             </p>
             
-            {/* عرض معلومات الخطة المختارة */}
+            {/* عرض معلومات الخطة المختارة - محدث للثيم */}
             {selectedPlan && (
-              <div className="bg-gray-800/50 rounded-xl p-4 border border-[#83dcc9]/30">
+              <div className={`rounded-xl p-4 border transition-colors duration-300 ${
+                isDark 
+                  ? 'bg-gray-800/50 border-[#83dcc9]/30' 
+                  : 'bg-blue-50 border-[#83dcc9]/30'
+              }`}>
                 <div className="flex items-center gap-3 mb-2">
                   <span className="text-2xl">{PLAN_INFO[selectedPlan].icon}</span>
                   <div>
                     <h3 className="font-bold text-[#83dcc9]">الخطة {PLAN_INFO[selectedPlan].name}</h3>
-                    <p className="text-sm text-gray-300">{PLAN_INFO[selectedPlan].price}</p>
+                    <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                      {PLAN_INFO[selectedPlan].price}
+                    </p>
                   </div>
                 </div>
                 {selectedPlan === 'free' && (
-                  <ul className="text-sm text-gray-300 space-y-1">
+                  <ul className={`text-sm space-y-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                     <li>✅ 3 منتجات شهرياً</li>
                     <li>✅ معاينة Google</li>
                     <li>✅ مؤشرات سيو أساسية</li>
                   </ul>
                 )}
                 {selectedPlan === 'pro' && (
-                  <ul className="text-sm text-gray-300 space-y-1">
+                  <ul className={`text-sm space-y-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                     <li>✅ 30 منتج شهرياً</li>
                     <li>✅ مؤشرات سيو متقدمة</li>
                     <li>✅ توليد تلقائي بالذكاء الاصطناعي</li>
@@ -438,7 +456,7 @@ export default function ManualLogin() {
                   </ul>
                 )}
                 {selectedPlan === 'enterprise' && (
-                  <ul className="text-sm text-gray-300 space-y-1">
+                  <ul className={`text-sm space-y-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                     <li>✅ منتجات غير محدودة</li>
                     <li>✅ تحليل شامل متقدم</li>
                     <li>✅ دعم خاص ومتابعة مخصصة</li>
@@ -455,17 +473,25 @@ export default function ManualLogin() {
             </div>
           </div>
 
-          {/* الجانب الأيمن - النموذج */}
-          <div className="bg-white text-gray-800 rounded-3xl p-10 md:p-12 w-full border border-gray-100 shadow-[0_20px_60px_rgba(131,220,201,0.25)]">
+          {/* الجانب الأيمن - النموذج - محدث للثيم */}
+          <div className={`rounded-3xl p-10 md:p-12 w-full border shadow-lg transition-colors duration-300 ${
+            isDark 
+              ? 'bg-gray-800 text-white border-gray-700 shadow-[0_20px_60px_rgba(0,0,0,0.3)]' 
+              : 'bg-white text-gray-800 border-gray-100 shadow-[0_20px_60px_rgba(131,220,201,0.25)]'
+          }`}>
             
-            {/* أزرار التبديل */}
-            <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
+            {/* أزرار التبديل - محدث للثيم */}
+            <div className={`flex rounded-xl p-1 mb-6 transition-colors duration-300 ${
+              isDark ? 'bg-gray-700' : 'bg-gray-100'
+            }`}>
               <button
                 onClick={() => setIsLogin(true)}
                 className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
                   isLogin 
                     ? 'bg-green-600 text-white shadow-md' 
-                    : 'text-gray-600 hover:text-gray-800'
+                    : isDark 
+                      ? 'text-gray-300 hover:text-white' 
+                      : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
                 تسجيل الدخول
@@ -475,27 +501,35 @@ export default function ManualLogin() {
                 className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
                   !isLogin 
                     ? 'bg-green-600 text-white shadow-md' 
-                    : 'text-gray-600 hover:text-gray-800'
+                    : isDark 
+                      ? 'text-gray-300 hover:text-white' 
+                      : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
                 إنشاء حساب
               </button>
             </div>
 
-            <h2 className="text-xl font-bold mb-6 text-center text-green-700">
+            <h2 className="text-xl font-bold mb-6 text-center text-green-600 dark:text-green-400">
               {isLogin ? "أهلاً بك من جديد" : selectedPlan ? `التسجيل في الخطة ${PLAN_INFO[selectedPlan].name}` : "سجّل الآن وابدأ مجاناً"}
             </h2>
 
-            {/* زر Google */}
+            {/* زر Google - محدث للثيم */}
             <button
               type="button"
               onClick={handleGoogleLogin}
               disabled={googleLoading}
-              className="w-full flex items-center justify-center px-4 py-3 mb-4 border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:border-green-300 transition-all duration-200 disabled:opacity-50"
+              className={`w-full flex items-center justify-center px-4 py-3 mb-4 border-2 rounded-xl transition-all duration-200 disabled:opacity-50 ${
+                isDark 
+                  ? 'border-gray-600 hover:bg-gray-700 hover:border-green-500 text-white' 
+                  : 'border-gray-300 hover:bg-gray-50 hover:border-green-300 text-gray-900'
+              }`}
             >
               {googleLoading ? (
                 <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600 ml-3"></div>
+                  <div className={`animate-spin rounded-full h-5 w-5 border-b-2 ml-3 ${
+                    isDark ? 'border-white' : 'border-gray-600'
+                  }`}></div>
                   <span>جاري تسجيل الدخول...</span>
                 </>
               ) : (
@@ -511,19 +545,23 @@ export default function ManualLogin() {
               )}
             </button>
 
-            {/* خط الفصل */}
+            {/* خط الفصل - محدث للثيم */}
             <div className="relative my-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
+                <div className={`w-full border-t ${isDark ? 'border-gray-600' : 'border-gray-300'}`}></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">أو</span>
+                <span className={`px-2 ${
+                  isDark 
+                    ? 'bg-gray-800 text-gray-400' 
+                    : 'bg-white text-gray-500'
+                }`}>أو</span>
               </div>
             </div>
 
             {/* نماذج الدخول/التسجيل */}
             {isLogin ? (
-              /* نموذج تسجيل الدخول */
+              /* نموذج تسجيل الدخول - محدث للثيم */
               <form onSubmit={handleLogin} className="space-y-4">
                 <input 
                   name="email" 
@@ -532,7 +570,11 @@ export default function ManualLogin() {
                   placeholder="البريد الإلكتروني" 
                   value={loginForm.email}
                   onChange={handleLoginChange} 
-                  className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" 
+                  className={`w-full border text-sm rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors duration-300 ${
+                    isDark 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder:text-gray-400' 
+                      : 'bg-gray-100 border-gray-300 text-gray-800 placeholder:text-gray-400'
+                  }`}
                 />
                 
                 <div className="relative">
@@ -543,12 +585,20 @@ export default function ManualLogin() {
                     placeholder="كلمة المرور" 
                     value={loginForm.password}
                     onChange={handleLoginChange} 
-                    className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 pr-4 pl-12 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" 
+                    className={`w-full border text-sm rounded-xl py-3 pr-4 pl-12 text-right focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors duration-300 ${
+                      isDark 
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder:text-gray-400' 
+                        : 'bg-gray-100 border-gray-300 text-gray-800 placeholder:text-gray-400'
+                    }`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className={`absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors ${
+                      isDark 
+                        ? 'text-gray-400 hover:text-gray-200' 
+                        : 'text-gray-400 hover:text-gray-600'
+                    }`}
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
@@ -563,12 +613,14 @@ export default function ManualLogin() {
                       onChange={handleLoginChange}
                       className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
                     />
-                    <span className="mr-2 text-sm text-gray-600">تذكرني</span>
+                    <span className={`mr-2 text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                      تذكرني
+                    </span>
                   </label>
                   <button
                     type="button"
                     onClick={handleForgotPassword}
-                    className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline"
                   >
                     نسيت كلمة المرور؟
                   </button>
@@ -585,7 +637,7 @@ export default function ManualLogin() {
                 </button>
               </form>
             ) : (
-              /* نموذج التسجيل */
+              /* نموذج التسجيل - محدث للثيم */
               <form onSubmit={handleRegister} className="space-y-4">
                 <input 
                   name="fullName" 
@@ -595,7 +647,11 @@ export default function ManualLogin() {
                   value={registerForm.fullName}
                   onChange={handleRegisterChange} 
                   minLength={2}
-                  className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" 
+                  className={`w-full border text-sm rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors duration-300 ${
+                    isDark 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder:text-gray-400' 
+                      : 'bg-gray-100 border-gray-300 text-gray-800 placeholder:text-gray-400'
+                  }`}
                 />
                 
                 <input 
@@ -605,7 +661,11 @@ export default function ManualLogin() {
                   placeholder="البريد الإلكتروني" 
                   value={registerForm.email}
                   onChange={handleRegisterChange} 
-                  className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" 
+                  className={`w-full border text-sm rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors duration-300 ${
+                    isDark 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder:text-gray-400' 
+                      : 'bg-gray-100 border-gray-300 text-gray-800 placeholder:text-gray-400'
+                  }`}
                 />
                 
                 <div className="relative">
@@ -617,19 +677,29 @@ export default function ManualLogin() {
                     value={registerForm.password}
                     onChange={handleRegisterChange} 
                     minLength={6}
-                    className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 pr-4 pl-12 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" 
+                    className={`w-full border text-sm rounded-xl py-3 pr-4 pl-12 text-right focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors duration-300 ${
+                      isDark 
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder:text-gray-400' 
+                        : 'bg-gray-100 border-gray-300 text-gray-800 placeholder:text-gray-400'
+                    }`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className={`absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors ${
+                      isDark 
+                        ? 'text-gray-400 hover:text-gray-200' 
+                        : 'text-gray-400 hover:text-gray-600'
+                    }`}
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
                 
                 <div className="relative">
-                  <div className="absolute top-1/2 right-4 transform -translate-y-1/2 text-sm text-gray-500 flex items-center gap-1">
+                  <div className={`absolute top-1/2 right-4 transform -translate-y-1/2 text-sm flex items-center gap-1 ${
+                    isDark ? 'text-gray-400' : 'text-gray-500'
+                  }`}>
                     <span>🇸🇦</span>
                     <span>+966</span>
                   </div>
@@ -642,10 +712,12 @@ export default function ManualLogin() {
                     onChange={handleRegisterChange} 
                     pattern="5[0-9]{8}"
                     maxLength={9}
-                    className={`w-full bg-gray-100 border text-sm text-gray-800 rounded-xl py-3 pr-24 pl-4 text-right focus:outline-none focus:ring-2 placeholder:text-gray-400 ${
+                    className={`w-full border text-sm rounded-xl py-3 pr-24 pl-4 text-right focus:outline-none focus:ring-2 transition-colors duration-300 ${
                       registerForm.phone && (registerForm.phone.length !== 9 || !registerForm.phone.startsWith('5'))
-                        ? 'border-red-300 focus:ring-red-600' 
-                        : 'border-gray-300 focus:ring-green-600'
+                        ? 'border-red-300 focus:ring-red-500' 
+                        : isDark 
+                          ? 'bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 focus:ring-green-500'
+                          : 'bg-gray-100 border-gray-300 text-gray-800 placeholder:text-gray-400 focus:ring-green-500'
                     }`}
                   />
                   {registerForm.phone && registerForm.phone.length > 0 && (
@@ -670,14 +742,22 @@ export default function ManualLogin() {
                   placeholder="رابط متجرك (مثال: mystore.salla.sa)" 
                   value={registerForm.storeUrl}
                   onChange={handleRegisterChange} 
-                  className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-gray-400" 
+                  className={`w-full border text-sm rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors duration-300 ${
+                    isDark 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder:text-gray-400' 
+                      : 'bg-gray-100 border-gray-300 text-gray-800 placeholder:text-gray-400'
+                  }`}
                 />
                 
                 <select 
                   name="plan" 
                   value={registerForm.plan} 
                   onChange={handleRegisterChange} 
-                  className="w-full bg-gray-100 border border-gray-300 text-sm text-gray-800 rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-600"
+                  className={`w-full border text-sm rounded-xl py-3 px-4 text-right focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors duration-300 ${
+                    isDark 
+                      ? 'bg-gray-700 border-gray-600 text-white' 
+                      : 'bg-gray-100 border-gray-300 text-gray-800'
+                  }`}
                   disabled={selectedPlan}
                 >
                   <option value="free">الخطة المجانية</option>
@@ -686,7 +766,7 @@ export default function ManualLogin() {
                 </select>
                 
                 {selectedPlan && (
-                  <p className="text-xs text-green-600 mt-1">
+                  <p className="text-xs text-green-600 dark:text-green-400 mt-1">
                     ✅ تم اختيار الخطة {PLAN_INFO[selectedPlan].name} مسبقاً
                   </p>
                 )}

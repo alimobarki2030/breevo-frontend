@@ -93,7 +93,7 @@ export default function ContactPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-white font-arabic">
       {/* Navigation */}
       <nav className="max-w-screen-xl mx-auto px-4 py-4 flex items-center justify-between relative">
-        <img src="/logo2.png" alt="Logo" className="h-8 md:h-12" />
+        <img src="/logo3.png" alt="Logo" className="h-8 md:h-12" />
         
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8 space-x-reverse">
@@ -508,7 +508,7 @@ export default function ContactPage() {
           
           <div className="flex flex-col sm:flex-row justify-between items-center pt-6 sm:pt-8 border-t border-gray-700 space-y-4 sm:space-y-0">
             <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 sm:space-x-reverse">
-              <img src="/logo2.png" alt="Logo" className="h-6 sm:h-8" />
+              <img src="/logo3.png" alt="Logo" className="h-6 sm:h-8" />
               <span className="text-gray-400 text-xs text-center sm:text-right">© 2025 مشروع السيو الذكي. جميع الحقوق محفوظة.</span>
             </div>
             <div className="flex space-x-3 sm:space-x-4 space-x-reverse">

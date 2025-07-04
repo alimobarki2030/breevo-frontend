@@ -13,7 +13,7 @@ import {
   Gem,
   Gift,
   Building2,
-  Search
+  Search,
 } from 'lucide-react';
 
 const UnifiedNavbar = () => {
@@ -210,7 +210,7 @@ const UnifiedNavbar = () => {
         {/* Logo */}
         <div className="flex items-center gap-3">
           <Link to="/" className="flex items-center gap-3">
-            <img src="/logo22.png" alt="Logo" className="h-9" />
+            <img src="/logo3.png" alt="Logo" className="h-9" />
           </Link>
           
           {/* عرض الموقع المختار إذا كان متوفراً */}

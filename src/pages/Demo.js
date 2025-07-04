@@ -18,7 +18,7 @@ import {
   Award,
   Smartphone,
   Monitor,
-  RefreshCw,
+  async,
   PlusCircle,
   Package,
   Edit,
@@ -473,7 +473,7 @@ export default function Demo() {
         >
           {isAnalyzing ? (
             <>
-              <RefreshCw className="w-4 h-4 animate-spin" />
+              <async className="w-4 h-4 animate-spin" />
               يحلل...
             </>
           ) : (
@@ -499,7 +499,7 @@ export default function Demo() {
         >
           {isAnalyzing ? (
             <>
-              <RefreshCw className="w-4 h-4 animate-spin" />
+              <async className="w-4 h-4 animate-spin" />
               يحلل...
             </>
           ) : (
@@ -525,7 +525,7 @@ export default function Demo() {
         >
           {isAnalyzing ? (
             <>
-              <RefreshCw className="w-4 h-4 animate-spin" />
+              <async className="w-4 h-4 animate-spin" />
               يحلل...
             </>
           ) : (
@@ -699,7 +699,7 @@ export default function Demo() {
           >
             {isAnalyzing ? (
               <>
-                <RefreshCw className="w-4 h-4 animate-spin" />
+                <async className="w-4 h-4 animate-spin" />
                 يحلل...
               </>
             ) : userAccess.isOwner ? (
@@ -739,7 +739,7 @@ export default function Demo() {
       {isAnalyzing && (
         <div className="mb-6 bg-purple-50 rounded-lg p-4">
           <div className="flex items-center gap-3 mb-3">
-            <RefreshCw className="w-5 h-5 animate-spin text-purple-600" />
+            <async className="w-5 h-5 animate-spin text-purple-600" />
             <span className="font-medium">{demoSteps[demoStep]}</span>
           </div>
           <div className="w-full bg-purple-200 rounded-full h-2">

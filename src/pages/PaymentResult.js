@@ -118,8 +118,7 @@ export default function PaymentResult() {
         console.error('❌ Error checking payment status:', error);
         setPaymentStatus('error');
         toast.error('حدث خطأ أثناء التحقق من حالة الدفع');
-      }
-    };
+      }};
 
     checkPaymentStatus();
   }, [location.search, navigate]);

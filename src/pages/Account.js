@@ -209,7 +209,7 @@ export default function Account() {
               <span>←</span> العودة إلى المنتجات
             </Link>
           </div>
-          <img src="/logo2.png" alt="Logo" className="h-8" />
+          <img src="/logo3.png" alt="Logo" className="h-8" />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

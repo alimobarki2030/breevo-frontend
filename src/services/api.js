@@ -17,7 +17,7 @@ export const API_ENDPOINTS = {
 };
 
 // Helper function for API calls
-export const apiCall = async (endpoint, options = {}) => {
+export const apiCall = aRefreshCw (endpoint, options = {}) => {
   const defaultOptions = {
     headers: {
       'Content-Type': 'application/json',

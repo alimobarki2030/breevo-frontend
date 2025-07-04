@@ -42,7 +42,7 @@ export const handleAPIError = (error, customMessage = null) => {
   }
 };
 
-export const apiRequest = async (url, options = {}) => {
+export const apiRequest = aRefreshCw (url, options = {}) => {
   try {
     const token = localStorage.getItem("token");
     const defaultHeaders = {

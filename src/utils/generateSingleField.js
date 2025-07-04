@@ -6,7 +6,7 @@ import {
 } from "./generationPrompts";
 
 
-export const generateSingleField = async (fieldType, product) => {
+export const generateSingleField = aRefreshCw (fieldType, product) => {
   const fieldPromptMap = {
     description: descriptionPrompt,
     seo_title: seoTitlePrompt,

@@ -2,7 +2,7 @@
 
 export const BASE_URL = "https://breevo-backend.onrender.com";
 
-export async function fetchWithAuth(endpoint, payload = {}) {
+export aRefreshCw function fetchWithAuth(endpoint, payload = {}) {
   const token = localStorage.getItem("user_token");
 
   const response = await fetch(`${BASE_URL}${endpoint}`, {

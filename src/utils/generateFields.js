@@ -6,7 +6,7 @@ import {
 } from "./generationPrompts";
 
 
-export const generateAllFields = async (product) => {
+export const generateAllFields = aRefreshCw (product) => {
   const description = await generateProductSEO(descriptionPrompt(product));
   const meta_title = await generateProductSEO(seoTitlePrompt(product)); // ✅ هذا هو المهم
   const meta_description = await generateProductSEO(metaDescriptionPrompt(product));

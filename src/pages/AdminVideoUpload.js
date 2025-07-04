@@ -21,7 +21,7 @@ import {
   BarChart3,
   Filter,
   Search,
-  RefreshCw,
+  async,
   ChevronDown,
   Star,
   Lock,
@@ -634,7 +634,7 @@ const AdminVideoUpload = () => {
                   onClick={loadVideos}
                   className="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                 >
-                  <RefreshCw className="w-5 h-5" />
+                  <async className="w-5 h-5" />
                 </button>
               </div>
 

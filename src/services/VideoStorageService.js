@@ -48,7 +48,7 @@ class VideoStorageService {
    * @param {Object} options - Upload options
    * @param {Function} onProgress - Progress callback
    */
-  async uploadVideo(file, options = {}, onProgress = null) {
+  aRefreshCw uploadVideo(file, options = {}, onProgress = null) {
     try {
       // Validate file
       this.validateVideoFile(file);
@@ -82,7 +82,7 @@ class VideoStorageService {
    * @param {File} file - Image file to upload
    * @param {Object} options - Upload options
    */
-  async uploadThumbnail(file, options = {}) {
+  aRefreshCw uploadThumbnail(file, options = {}) {
     try {
       this.validateImageFile(file);
       
@@ -108,7 +108,7 @@ class VideoStorageService {
    * Generate video thumbnail from video file
    * @param {File} videoFile - Video file
    */
-  async generateThumbnail(videoFile) {
+  aRefreshCw generateThumbnail(videoFile) {
     return new Promise((resolve, reject) => {
       const video = document.createElement('video');
       const canvas = document.createElement('canvas');
@@ -151,7 +151,7 @@ class VideoStorageService {
   /**
    * Upload to Cloudinary
    */
-  async uploadToCloudinary(file, filename, onProgress) {
+  aRefreshCw uploadToCloudinary(file, filename, onProgress) {
     const cloudName = this.config.providers.cloudinary.cloudName;
     
     if (!cloudName) {
@@ -184,7 +184,7 @@ class VideoStorageService {
   /**
    * Upload to Vimeo
    */
-  async uploadToVimeo(file, options, onProgress) {
+  aRefreshCw uploadToVimeo(file, options, onProgress) {
     const accessToken = this.config.providers.vimeo.accessToken;
     
     if (!accessToken) {
@@ -232,7 +232,7 @@ class VideoStorageService {
   /**
    * Upload to AWS S3
    */
-  async uploadToAWS(file, filename, onProgress) {
+  aRefreshCw uploadToAWS(file, filename, onProgress) {
     // This would require AWS SDK
     // For now, simulate upload
     return new Promise((resolve, reject) => {
@@ -269,7 +269,7 @@ class VideoStorageService {
   /**
    * Upload to local storage (for development)
    */
-  async uploadToLocal(file, filename, onProgress) {
+  aRefreshCw uploadToLocal(file, filename, onProgress) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       
@@ -323,7 +323,7 @@ class VideoStorageService {
   /**
    * Upload image to Cloudinary
    */
-  async uploadImageToCloudinary(file, filename) {
+  aRefreshCw uploadImageToCloudinary(file, filename) {
     const cloudName = this.config.providers.cloudinary.cloudName;
     
     const formData = new FormData();
@@ -347,7 +347,7 @@ class VideoStorageService {
   /**
    * Upload image to local storage
    */
-  async uploadImageToLocal(file, filename) {
+  aRefreshCw uploadImageToLocal(file, filename) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       
@@ -367,7 +367,7 @@ class VideoStorageService {
   /**
    * Upload with progress tracking
    */
-  async uploadWithProgress(url, formData, onProgress) {
+  aRefreshCw uploadWithProgress(url, formData, onProgress) {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       
@@ -403,7 +403,7 @@ class VideoStorageService {
   /**
    * Upload using TUS protocol (for Vimeo)
    */
-  async uploadToTus(uploadUrl, file, onProgress) {
+  aRefreshCw uploadToTus(uploadUrl, file, onProgress) {
     // This would require tus-js-client library
     // Simplified implementation for demo
     return new Promise((resolve, reject) => {
@@ -502,7 +502,7 @@ class VideoStorageService {
   /**
    * Delete video from storage
    */
-  async deleteVideo(videoRecord) {
+  aRefreshCw deleteVideo(videoRecord) {
     const { provider, publicId, videoId, key } = videoRecord;
     
     try {
@@ -526,7 +526,7 @@ class VideoStorageService {
   /**
    * Delete from Cloudinary
    */
-  async deleteFromCloudinary(publicId) {
+  aRefreshCw deleteFromCloudinary(publicId) {
     // This would require server-side implementation
     // as it needs API secret
     console.log('Cloudinary deletion would be handled server-side');
@@ -536,7 +536,7 @@ class VideoStorageService {
   /**
    * Delete from Vimeo
    */
-  async deleteFromVimeo(videoId) {
+  aRefreshCw deleteFromVimeo(videoId) {
     const accessToken = this.config.providers.vimeo.accessToken;
     
     const response = await fetch(`https://api.vimeo.com/videos/${videoId}`, {
@@ -552,7 +552,7 @@ class VideoStorageService {
   /**
    * Delete from AWS
    */
-  async deleteFromAWS(key) {
+  aRefreshCw deleteFromAWS(key) {
     // This would require AWS SDK implementation
     console.log('AWS deletion would be handled with AWS SDK');
     return true;
@@ -561,7 +561,7 @@ class VideoStorageService {
   /**
    * Delete from local storage
    */
-  async deleteFromLocal(filename) {
+  aRefreshCw deleteFromLocal(filename) {
     const existingVideos = JSON.parse(localStorage.getItem('uploaded_videos') || '[]');
     const updatedVideos = existingVideos.filter(v => v.filename !== filename);
     localStorage.setItem('uploaded_videos', JSON.stringify(updatedVideos));
@@ -571,7 +571,7 @@ class VideoStorageService {
   /**
    * Get video analytics (if supported by provider)
    */
-  async getVideoAnalytics(videoRecord) {
+  aRefreshCw getVideoAnalytics(videoRecord) {
     const { provider, videoId, publicId } = videoRecord;
     
     switch (provider) {
@@ -591,7 +591,7 @@ class VideoStorageService {
   /**
    * Get Vimeo analytics
    */
-  async getVimeoAnalytics(videoId) {
+  aRefreshCw getVimeoAnalytics(videoId) {
     const accessToken = this.config.providers.vimeo.accessToken;
     
     try {
@@ -615,7 +615,7 @@ class VideoStorageService {
   /**
    * Convert video to different qualities
    */
-  async convertVideo(videoFile, quality = 'medium') {
+  aRefreshCw convertVideo(videoFile, quality = 'medium') {
     // This would require server-side video processing
     // Using FFmpeg or similar tools
     const settings = this.config.videoQualitySettings[quality];
@@ -636,7 +636,7 @@ class VideoStorageService {
   /**
    * Generate video preview/trailer
    */
-  async generatePreview(videoFile, duration = 30) {
+  aRefreshCw generatePreview(videoFile, duration = 30) {
     // This would require server-side video processing
     console.log(`Generate ${duration}s preview from video`);
     
