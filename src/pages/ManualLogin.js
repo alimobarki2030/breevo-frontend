@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ShoppingBag, BarChart3 } from "lucide-react";
 
 // ✅ إضافة النافبار الموحد و useTheme
 import PublicNavbar from '../components/navbars/PublicNavbar';
@@ -33,6 +33,11 @@ export default function ManualLogin() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   
+  // ✅ إضافات جديدة لدعم سلة
+  const [sallaMode, setSallaMode] = useState(false);
+  const [sallaCredentials, setSallaCredentials] = useState(null);
+  const [analyticsMode, setAnalyticsMode] = useState(false);
+  
   // بيانات تسجيل الدخول
   const [loginForm, setLoginForm] = useState({
     email: "",
@@ -50,11 +55,46 @@ export default function ManualLogin() {
     plan: selectedPlan || "free"
   });
 
-  // ✅ تحميل الخطة من URL والبيانات المحفوظة
+  // ✅ تحميل الخطة من URL والبيانات المحفوظة + دعم سلة
   useEffect(() => {
     // قراءة معامل الخطة من URL
     const urlParams = new URLSearchParams(location.search);
     const planParam = urlParams.get('plan');
+    const analyticsParam = urlParams.get('analytics');
+    
+    // التحقق من وجود معاملات سلة في URL
+    const sallaToken = urlParams.get('salla_token');
+    const sallaEmail = urlParams.get('email');
+    const sallaPassword = urlParams.get('temp_password');
+    const storeId = urlParams.get('store_id');
+    
+    if (sallaToken || (sallaEmail && sallaPassword)) {
+      setSallaMode(true);
+      setSallaCredentials({
+        email: sallaEmail,
+        password: sallaPassword,
+        token: sallaToken,
+        storeId: storeId
+      });
+      
+      // إذا كان لدينا توكن سلة، نسجل دخول مباشرة
+      if (sallaToken) {
+        handleSallaAutoLogin(sallaToken, storeId);
+      } else if (sallaEmail && sallaPassword) {
+        // ملء النموذج تلقائياً
+        setLoginForm(prev => ({
+          ...prev,
+          email: sallaEmail,
+          password: sallaPassword
+        }));
+        setIsLogin(true);
+      }
+    }
+    
+    // التحقق من وضع Analytics
+    if (analyticsParam === 'true') {
+      setAnalyticsMode(true);
+    }
     
     if (planParam && PLAN_INFO[planParam]) {
       setSelectedPlan(planParam);
@@ -66,7 +106,7 @@ export default function ManualLogin() {
 
     // تحميل البيانات المحفوظة للدخول
     const savedEmail = localStorage.getItem("rememberedEmail");
-    if (savedEmail) {
+    if (savedEmail && !sallaEmail) {
       setLoginForm(prev => ({ ...prev, email: savedEmail, rememberMe: true }));
     }
 
@@ -81,12 +121,51 @@ export default function ManualLogin() {
     }
   }, [selectedPlan]);
 
+  // ✅ دالة تسجيل الدخول التلقائي لتجار سلة
+  const handleSallaAutoLogin = async (sallaToken, storeId) => {
+    try {
+      setLoading(true);
+      
+      // التحقق من صحة التوكن مع السيرفر
+      const response = await fetch('/api/salla/verify-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token: sallaToken, store_id: storeId })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        // حفظ بيانات المستخدم
+        localStorage.setItem("token", data.access_token);
+        localStorage.setItem("clientName", data.user.full_name || data.user.email);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        
+        toast.success(`🎉 مرحباً ${data.user.full_name || data.user.email}! تم تسجيل الدخول بنجاح`);
+        
+        // توجيه لصفحة الترحيب المخصصة لسلة
+        navigate(`/salla/welcome?store_id=${data.store.id}&store_name=${encodeURIComponent(data.store.name)}&action=تسجيل_تلقائي`);
+      } else {
+        toast.error('انتهت صلاحية الرابط، يرجى المحاولة مرة أخرى');
+        setSallaMode(false);
+      }
+    } catch (error) {
+      console.error('Salla auto login error:', error);
+      toast.error('حدث خطأ في تسجيل الدخول');
+      setSallaMode(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // ✅ فحص الجلسة الحالية
   const checkCurrentSession = async () => {
     try {
       const { session, error } = await auth.getSession();
       
-      if (session && session.user) {
+      if (session && session.user && !sallaMode) {
         // المستخدم مسجل دخول مسبقاً
         console.log('✅ User already logged in:', session.user.email);
         
@@ -99,7 +178,9 @@ export default function ManualLogin() {
         }));
         
         // توجيه للصفحة المناسبة
-        if (selectedPlan && selectedPlan !== 'free') {
+        if (analyticsMode) {
+          navigate("/dashboard/analytics");
+        } else if (selectedPlan && selectedPlan !== 'free') {
           navigate(`/checkout?plan=${selectedPlan}`);
         } else {
           navigate("/products");
@@ -143,11 +224,20 @@ export default function ManualLogin() {
           localStorage.removeItem("rememberedEmail");
         }
 
-        toast.success(`مرحباً ${data.user.user_metadata?.full_name || loginForm.email}، تم تسجيل الدخول بنجاح`);
+        // رسالة نجاح مخصصة حسب الوضع
+        if (sallaMode) {
+          toast.success(`🏪 مرحباً ${data.user.user_metadata?.full_name || loginForm.email}، تم ربط متجر سلة بنجاح`);
+        } else {
+          toast.success(`مرحباً ${data.user.user_metadata?.full_name || loginForm.email}، تم تسجيل الدخول بنجاح`);
+        }
         
         // توجيه مناسب
         setTimeout(() => {
-          if (selectedPlan && selectedPlan !== 'free') {
+          if (sallaMode && sallaCredentials?.storeId) {
+            navigate(`/salla/welcome?store_id=${sallaCredentials.storeId}&action=ربط_متجر`);
+          } else if (analyticsMode) {
+            navigate("/dashboard/analytics");
+          } else if (selectedPlan && selectedPlan !== 'free') {
             navigate(`/checkout?plan=${selectedPlan}`);
           } else {
             navigate("/products");
@@ -167,7 +257,6 @@ export default function ManualLogin() {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    toast.success("🧪 اختبار Toast - يعمل!");
     if (loading) return;
     
     // التحقق من صحة البيانات
@@ -213,7 +302,8 @@ export default function ManualLogin() {
           full_name: registerForm.fullName.trim(),
           phone: registerForm.phone,
           store_url: storeUrl,
-          plan: registerForm.plan
+          plan: registerForm.plan,
+          source: sallaMode ? 'salla' : 'manual'
         }
       );
 
@@ -233,7 +323,8 @@ export default function ManualLogin() {
           phone: registerForm.phone,
           company_name: storeUrl,
           plan: registerForm.plan,
-          subscription_status: 'trial'
+          subscription_status: 'trial',
+          source: sallaMode ? 'salla' : 'manual'
         };
 
         const { error: profileError } = await database.updateProfile(profileData);
@@ -254,19 +345,19 @@ export default function ManualLogin() {
           provider: 'supabase'
         }));
         
-        // رسالة نجاح مخصصة حسب الخطة
-        if (selectedPlan && selectedPlan !== 'free') {
+        // رسالة نجاح مخصصة حسب الوضع
+        if (sallaMode) {
+          toast.success(`🎉 تم إنشاء حساب سلة بنجاح! تحقق من بريدك الإلكتروني لتأكيد الحساب`, {
+            duration: 6000
+          });
+        } else if (selectedPlan && selectedPlan !== 'free') {
           toast.success(`🎉 تم إنشاء الحساب بنجاح! تحقق من بريدك الإلكتروني لتأكيد الحساب، ثم سيتم توجيهك لإتمام الدفع للخطة ${PLAN_INFO[selectedPlan].name}`, {
             duration: 6000
           });
-          // لا ننتقل مباشرة - ننتظر تأكيد الإيميل
         } else {
-          console.log("🧪 الكود وصل لهنا!");
           toast.success("🎉 تم إنشاء الحساب بنجاح! يرجى مراجعة بريدك الإلكتروني وتأكيد حسابك للمتابعة 📧", {
             duration: 6000
           });
-           console.log("🧪 تم استدعاء toast.success");
-          // لا ننتقل مباشرة - ننتظر تأكيد الإيميل
         }
       }
       
@@ -278,12 +369,31 @@ export default function ManualLogin() {
     }
   };
 
-  // ✅ Google Login مع Supabase
-  const handleGoogleLogin = async () => {
+  // ✅ Google Login مع Supabase + دعم Analytics
+  const handleGoogleLogin = async (forAnalytics = false) => {
     setGoogleLoading(true);
     
     try {
-      const { data, error } = await auth.signInWithGoogle();
+      let redirectTo = `${window.location.origin}/auth/callback`;
+      
+      // إضافة معاملات للتوجيه المناسب بعد النجاح
+      const params = new URLSearchParams();
+      
+      if (forAnalytics) {
+        params.append('analytics', 'true');
+      }
+      if (sallaMode && sallaCredentials?.storeId) {
+        params.append('salla_store', sallaCredentials.storeId);
+      }
+      if (selectedPlan) {
+        params.append('plan', selectedPlan);
+      }
+      
+      if (params.toString()) {
+        redirectTo += `?${params.toString()}`;
+      }
+      
+      const { data, error } = await auth.signInWithGoogle(redirectTo);
       
       if (error) {
         console.error('Google login error:', error);
@@ -411,21 +521,79 @@ export default function ManualLogin() {
               alt="Logo" 
               className="max-h-20 object-contain transition-opacity duration-300" 
             />
+            
+            {/* عنوان مخصص لوضع سلة */}
             <h1 className={`text-4xl font-bold leading-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
-              {isLogin ? 
-                "مرحباً بك مرة أخرى!" : 
-                selectedPlan ? `اختيار ممتاز! الخطة ${PLAN_INFO[selectedPlan].name}` : "أطلق نمو متجرك باستخدام تحليل السيو الذكي."
-              }
+              {sallaMode ? (
+                <>
+                  🏪 مرحباً تاجر سلة!
+                  <br />
+                  <span className="text-[#83dcc9]">متجرك في انتظارك</span>
+                </>
+              ) : analyticsMode ? (
+                <>
+                  📊 ربط Google Analytics
+                  <br />
+                  <span className="text-[#83dcc9]">للتحليل المتقدم</span>
+                </>
+              ) : isLogin ? (
+                "مرحباً بك مرة أخرى!"
+              ) : selectedPlan ? (
+                <>
+                  اختيار ممتاز! الخطة
+                  <br />
+                  <span className="text-[#83dcc9]">{PLAN_INFO[selectedPlan].name}</span>
+                </>
+              ) : (
+                <>
+                  أطلق نمو متجرك باستخدام
+                  <br />
+                  <span className="text-[#83dcc9]">تحليل السيو الذكي</span>
+                </>
+              )}
             </h1>
+            
+            {/* وصف مخصص لوضع سلة */}
             <p className={`text-lg ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-              {isLogin ? 
-                "سجل دخولك للوصول إلى لوحة التحكم وتحليلات السيو المتقدمة." :
-                selectedPlan ? `ستحصل على جميع مميزات الخطة ${PLAN_INFO[selectedPlan].name} فور إتمام التسجيل` : "أدخل عالم السيو باحتراف. نسخة مجانية، بدون بطاقة ائتمانية."
-              }
+              {sallaMode ? (
+                "تم ربط متجرك مع منصتنا بنجاح! سجل دخولك للوصول لأدوات SEO المتقدمة وتحليل منتجاتك."
+              ) : analyticsMode ? (
+                "سجل دخولك باستخدام حساب Google نفسه المرتبط بـ Google Analytics لنتمكن من جلب إحصائياتك."
+              ) : isLogin ? (
+                "سجل دخولك للوصول إلى لوحة التحكم وتحليلات السيو المتقدمة."
+              ) : selectedPlan ? (
+                `ستحصل على جميع مميزات الخطة ${PLAN_INFO[selectedPlan].name} فور إتمام التسجيل`
+              ) : (
+                "أدخل عالم السيو باحتراف. نسخة مجانية، بدون بطاقة ائتمانية."
+              )}
             </p>
             
+            {/* معلومات متجر سلة */}
+            {sallaMode && sallaCredentials && (
+              <div className={`rounded-xl p-4 border transition-colors duration-300 ${
+                isDark 
+                  ? 'bg-gray-800/50 border-[#83dcc9]/30' 
+                  : 'bg-blue-50 border-[#83dcc9]/30'
+              }`}>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-2xl">🏪</span>
+                  <div>
+                    <h3 className="font-bold text-[#83dcc9]">متجر سلة مرتبط</h3>
+                    <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                      جاهز للتحليل والتحسين
+                    </p>
+                  </div>
+                </div>
+                {sallaCredentials.email && (
+                  <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                    البريد الإلكتروني: {sallaCredentials.email}
+                  </p>
+                )}
+              </div>
+            )}
+            
             {/* عرض معلومات الخطة المختارة - محدث للثيم */}
-            {selectedPlan && (
+            {selectedPlan && !sallaMode && (
               <div className={`rounded-xl p-4 border transition-colors duration-300 ${
                 isDark 
                   ? 'bg-gray-800/50 border-[#83dcc9]/30' 
@@ -466,11 +634,22 @@ export default function ManualLogin() {
               </div>
             )}
             
-            <div className="flex flex-wrap gap-4">
-              <img src="/salla.png" alt="Salla" className="h-6 object-contain" />
-              <img src="/shopify.png" alt="Shopify" className="h-6 object-contain" />
-              <img src="/zid.png" alt="Zid" className="h-6 object-contain" />
-            </div>
+            {/* شعارات المنصات */}
+            {!analyticsMode && (
+              <div className="flex flex-wrap gap-4">
+                <img src="/salla.png" alt="Salla" className="h-6 object-contain" />
+                <img src="/shopify.png" alt="Shopify" className="h-6 object-contain" />
+                <img src="/zid.png" alt="Zid" className="h-6 object-contain" />
+              </div>
+            )}
+            
+            {/* معلومات Google Analytics */}
+            {analyticsMode && (
+              <div className="flex flex-wrap gap-4 items-center">
+                <img src="/google-analytics.png" alt="Google Analytics" className="h-8 object-contain" />
+                <img src="/search-console.png" alt="Search Console" className="h-8 object-contain" />
+              </div>
+            )}
           </div>
 
           {/* الجانب الأيمن - النموذج - محدث للثيم */}
@@ -481,43 +660,56 @@ export default function ManualLogin() {
           }`}>
             
             {/* أزرار التبديل - محدث للثيم */}
-            <div className={`flex rounded-xl p-1 mb-6 transition-colors duration-300 ${
-              isDark ? 'bg-gray-700' : 'bg-gray-100'
-            }`}>
-              <button
-                onClick={() => setIsLogin(true)}
-                className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
-                  isLogin 
-                    ? 'bg-green-600 text-white shadow-md' 
-                    : isDark 
-                      ? 'text-gray-300 hover:text-white' 
-                      : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                تسجيل الدخول
-              </button>
-              <button
-                onClick={() => setIsLogin(false)}
-                className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
-                  !isLogin 
-                    ? 'bg-green-600 text-white shadow-md' 
-                    : isDark 
-                      ? 'text-gray-300 hover:text-white' 
-                      : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                إنشاء حساب
-              </button>
-            </div>
+            {!sallaMode && !analyticsMode && (
+              <div className={`flex rounded-xl p-1 mb-6 transition-colors duration-300 ${
+                isDark ? 'bg-gray-700' : 'bg-gray-100'
+              }`}>
+                <button
+                  onClick={() => setIsLogin(true)}
+                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
+                    isLogin 
+                      ? 'bg-green-600 text-white shadow-md' 
+                      : isDark 
+                        ? 'text-gray-300 hover:text-white' 
+                        : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  تسجيل الدخول
+                </button>
+                <button
+                  onClick={() => setIsLogin(false)}
+                  className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
+                    !isLogin 
+                      ? 'bg-green-600 text-white shadow-md' 
+                      : isDark 
+                        ? 'text-gray-300 hover:text-white' 
+                        : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  إنشاء حساب
+                </button>
+              </div>
+            )}
 
+            {/* عنوان النموذج */}
             <h2 className="text-xl font-bold mb-6 text-center text-green-600 dark:text-green-400">
-              {isLogin ? "أهلاً بك من جديد" : selectedPlan ? `التسجيل في الخطة ${PLAN_INFO[selectedPlan].name}` : "سجّل الآن وابدأ مجاناً"}
+              {sallaMode ? (
+                "تسجيل دخول تاجر سلة 🏪"
+              ) : analyticsMode ? (
+                "ربط Google Analytics 📊"
+              ) : isLogin ? (
+                "أهلاً بك من جديد"
+              ) : selectedPlan ? (
+                `التسجيل في الخطة ${PLAN_INFO[selectedPlan].name}`
+              ) : (
+                "سجّل الآن وابدأ مجاناً"
+              )}
             </h2>
 
-            {/* زر Google - محدث للثيم */}
+            {/* زر Google - محدث للثيم + دعم Analytics */}
             <button
               type="button"
-              onClick={handleGoogleLogin}
+              onClick={() => handleGoogleLogin(analyticsMode)}
               disabled={googleLoading}
               className={`w-full flex items-center justify-center px-4 py-3 mb-4 border-2 rounded-xl transition-all duration-200 disabled:opacity-50 ${
                 isDark 
@@ -540,7 +732,19 @@ export default function ManualLogin() {
                     <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                     <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                   </svg>
-                  <span>{isLogin ? "تسجيل الدخول" : "التسجيل"} بـ Google</span>
+                  <span>
+                    {analyticsMode ? (
+                      "ربط Google Analytics"
+                    ) : sallaMode ? (
+                      "ربط متجر سلة مع Google"
+                    ) : isLogin ? (
+                      "تسجيل الدخول"
+                    ) : (
+                      "التسجيل"
+                    )} بـ Google
+                  </span>
+                  {analyticsMode && <BarChart3 className="w-4 h-4 mr-2" />}
+                  {sallaMode && <ShoppingBag className="w-4 h-4 mr-2" />}
                 </>
               )}
             </button>
@@ -560,7 +764,7 @@ export default function ManualLogin() {
             </div>
 
             {/* نماذج الدخول/التسجيل */}
-            {isLogin ? (
+            {(isLogin || sallaMode || analyticsMode) ? (
               /* نموذج تسجيل الدخول - محدث للثيم */
               <form onSubmit={handleLogin} className="space-y-4">
                 <input 
@@ -633,7 +837,15 @@ export default function ManualLogin() {
                     loading ? "bg-green-600 animate-pulse cursor-default" : "bg-green-600 hover:bg-green-700"
                   }`}
                 >
-                  {loading ? "جاري تسجيل الدخول..." : "🔐 تسجيل الدخول"}
+                  {loading ? (
+                    "جاري تسجيل الدخول..."
+                  ) : sallaMode ? (
+                    "🏪 دخول تاجر سلة"
+                  ) : analyticsMode ? (
+                    "📊 ربط Analytics"
+                  ) : (
+                    "🔐 تسجيل الدخول"
+                  )}
                 </button>
               </form>
             ) : (
@@ -785,6 +997,24 @@ export default function ManualLogin() {
                    "🚀 ابدأ الآن مجاناً"}
                 </button>
               </form>
+            )}
+            
+            {/* رسالة خاصة لتجار سلة */}
+            {sallaMode && (
+              <div className={`mt-4 p-3 rounded-lg text-center text-sm ${
+                isDark ? 'bg-blue-900/30 text-blue-300' : 'bg-blue-50 text-blue-700'
+              }`}>
+                💡 <strong>تلميح:</strong> استخدم نفس بيانات الدخول التي أرسلناها لك بالإيميل
+              </div>
+            )}
+            
+            {/* رسالة خاصة لـ Analytics */}
+            {analyticsMode && (
+              <div className={`mt-4 p-3 rounded-lg text-center text-sm ${
+                isDark ? 'bg-orange-900/30 text-orange-300' : 'bg-orange-50 text-orange-700'
+              }`}>
+                📊 <strong>مهم:</strong> تأكد من استخدام نفس حساب Google المرتبط بـ Analytics
+              </div>
             )}
           </div>
         </div>
