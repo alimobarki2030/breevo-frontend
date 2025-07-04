@@ -15,12 +15,7 @@ import {
   Package,
   AlertCircle,
   CheckCircle,
-  XCircle,
-  Store,
-  RefreshCw,
-  ExternalLink,
-  Globe,
-  Zap
+  XCircle
 } from "lucide-react";
 
 // معلومات الخطط
@@ -48,8 +43,6 @@ const PLAN_DETAILS = {
   }
 };
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
-
 export default function Account() {
   const navigate = useNavigate();
   const [userData, setUserData] = useState({ name: "", email: "", phone: "" });
@@ -59,18 +52,11 @@ export default function Account() {
   const [loading, setLoading] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
 
-  // ✨ حالات ربط سلة المبسطة - للعرض فقط
-  const [sallaStores, setSallaStores] = useState([]);
-  const [sallaLoading, setSallaLoading] = useState(true);
-  const [syncing, setSyncing] = useState({});
-
   useEffect(() => {
     loadUserData();
     loadSubscriptionData();
     loadUsageData();
     loadInvoicesData();
-    // ✨ تحميل المتاجر المربوطة تلقائياً
-    loadSallaStores();
   }, []);
 
   const loadUserData = () => {
@@ -91,6 +77,7 @@ export default function Account() {
     if (storedSubscription) {
       setSubscription(storedSubscription);
     } else {
+      // إعداد افتراضي للخطة المجانية
       setSubscription({
         plan: storedUser.plan || "free",
         status: "active",
@@ -102,6 +89,7 @@ export default function Account() {
   };
 
   const loadUsageData = () => {
+    // محاكاة بيانات الاستخدام
     const storedUsage = JSON.parse(localStorage.getItem("usage") || "{}");
     setUsage({
       productsUsed: storedUsage.productsUsed || Math.floor(Math.random() * 25),
@@ -110,6 +98,7 @@ export default function Account() {
   };
 
   const loadInvoicesData = () => {
+    // محاكاة تاريخ الفواتير
     const mockInvoices = [
       {
         id: "INV-2025-001",
@@ -140,107 +129,8 @@ export default function Account() {
     setInvoices(mockInvoices);
   };
 
-  // ✨ تحميل المتاجر المربوطة (تلقائياً من قاعدة البيانات)
-  const loadSallaStores = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setSallaLoading(false);
-        return;
-      }
-
-      const response = await fetch(`${API_BASE_URL}/api/salla/stores`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const stores = await response.json();
-        setSallaStores(stores);
-      } else {
-        console.log('No Salla stores found or not connected');
-        setSallaStores([]);
-      }
-    } catch (error) {
-      console.error('Failed to load Salla stores:', error);
-      setSallaStores([]);
-    } finally {
-      setSallaLoading(false);
-    }
-  };
-
-  // ✨ تزامن المنتجات يدوياً
-  const syncStoreProducts = async (storeId, storeName) => {
-    setSyncing(prev => ({ ...prev, [storeId]: true }));
-    
-    try {
-      const token = localStorage.getItem("token");
-      
-      const response = await fetch(`${API_BASE_URL}/api/salla/stores/${storeId}/sync`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        toast.success(`تم تزامن ${result.products_count} منتج من ${storeName}! 🎉`);
-        
-        // تحديث بيانات المتجر
-        setSallaStores(prev => prev.map(store => 
-          store.id === storeId 
-            ? { 
-                ...store, 
-                last_synced: new Date().toISOString(), 
-                products_count: result.products_count 
-              }
-            : store
-        ));
-      } else {
-        const error = await response.json();
-        toast.error(error.message || 'فشل في التزامن');
-      }
-    } catch (error) {
-      console.error('Sync error:', error);
-      toast.error('فشل في تزامن المنتجات');
-    } finally {
-      setSyncing(prev => ({ ...prev, [storeId]: false }));
-    }
-  };
-
-  // ✨ قطع ربط متجر
-  const disconnectStore = async (storeId, storeName) => {
-    if (!window.confirm(`هل تريد قطع ربط متجر "${storeName}"؟`)) {
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("token");
-      
-      const response = await fetch(`${API_BASE_URL}/api/salla/stores/${storeId}/disconnect`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        setSallaStores(prev => prev.filter(store => store.id !== storeId));
-        toast.success(`تم قطع ربط متجر ${storeName}`);
-      } else {
-        toast.error('فشل في قطع الربط');
-      }
-    } catch (error) {
-      toast.error('فشل في قطع الربط');
-    }
-  };
-
   const handleUpgrade = () => {
+    // توجيه المستخدم لاختيار خطة جديدة مع الاحتفاظ ببيانات الدخول
     navigate("/?upgrade=true");
   };
 
@@ -248,17 +138,20 @@ export default function Account() {
     setLoading(true);
     
     try {
+      // محاكاة إلغاء الاشتراك
       await new Promise(resolve => setTimeout(resolve, 1500));
       
+      // تحديث بيانات الاشتراك
       const updatedSubscription = {
         ...subscription,
         status: "cancelled",
-        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // ينتهي بعد 30 يوم
       };
       
       setSubscription(updatedSubscription);
       localStorage.setItem("subscription", JSON.stringify(updatedSubscription));
       
+      // تحديث بيانات المستخدم
       const user = JSON.parse(localStorage.getItem("user") || "{}");
       user.plan = "free";
       localStorage.setItem("user", JSON.stringify(user));
@@ -297,157 +190,13 @@ export default function Account() {
   };
 
   const getUsagePercentage = () => {
-    if (usage.productsLimit === -1) return 0;
+    if (usage.productsLimit === -1) return 0; // غير محدود
     return Math.min((usage.productsUsed / usage.productsLimit) * 100, 100);
   };
 
   const currentPlan = PLAN_DETAILS[subscription?.plan] || PLAN_DETAILS.free;
   const daysUntilExpiry = getDaysUntilExpiry();
   const usagePercentage = getUsagePercentage();
-
-  // ✨ واجهة ربط سلة التلقائية المبسطة
-  const renderSallaIntegration = () => (
-    <div className="bg-gray-900 rounded-2xl p-6">
-      <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-        <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-          <span className="text-white text-sm font-bold">S</span>
-        </div>
-        متاجر سلة المربوطة
-      </h2>
-      
-      {sallaLoading ? (
-        <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto mb-4"></div>
-          <p className="text-gray-400">جاري تحميل المتاجر...</p>
-        </div>
-      ) : sallaStores.length > 0 ? (
-        // عرض المتاجر المربوطة
-        <div className="space-y-4">
-          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3 mb-4">
-            <div className="flex items-center gap-2 text-green-400 text-sm">
-              <CheckCircle className="w-4 h-4" />
-              <span>لديك {sallaStores.length} متجر مربوط تلقائياً من سلة</span>
-            </div>
-          </div>
-
-          {sallaStores.map(store => (
-            <div key={store.id} className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center">
-                    <Store className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-white">{store.name || 'متجر سلة'}</h3>
-                    <p className="text-sm text-gray-400">{store.domain || `Store ID: ${store.merchant_id}`}</p>
-                    <p className="text-xs text-green-400 flex items-center gap-1">
-                      <CheckCircle className="w-3 h-3" />
-                      مثبت تلقائياً - آخر تزامن: {store.last_synced ? new Date(store.last_synced).toLocaleDateString('ar-SA') : 'لم يتم التزامن بعد'}
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => syncStoreProducts(store.id, store.name)}
-                    disabled={syncing[store.id]}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg text-sm transition flex items-center gap-2"
-                  >
-                    <RefreshCw className={`w-4 h-4 ${syncing[store.id] ? 'animate-spin' : ''}`} />
-                    {syncing[store.id] ? 'جاري التزامن...' : 'تزامن المنتجات'}
-                  </button>
-                  
-                  {store.domain && (
-                    <a
-                      href={store.domain}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg text-sm transition flex items-center gap-1"
-                      title="فتح المتجر"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
-                  )}
-                  
-                  <button
-                    onClick={() => disconnectStore(store.id, store.name)}
-                    className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition"
-                    title="قطع الربط"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-              
-              <div className="mt-3 grid grid-cols-3 gap-4 text-sm">
-                <div className="text-center">
-                  <p className="text-green-400 font-bold">{store.products_count || 0}</p>
-                  <p className="text-gray-400">منتج متزامن</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-blue-400 font-bold">{store.webhook_status || 'نشط'}</p>
-                  <p className="text-gray-400">Webhook</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-yellow-400 font-bold">{store.status || 'نشط'}</p>
-                  <p className="text-gray-400">الحالة</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        // لا توجد متاجر مربوطة
-        <div className="text-center py-12">
-          <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Store className="w-8 h-8 text-gray-600" />
-          </div>
-          <h3 className="text-lg font-semibold text-white mb-2">لا توجد متاجر مربوطة</h3>
-          <p className="text-gray-400 mb-6 max-w-md mx-auto">
-            لربط متجرك، قم بتثبيت التطبيق من متجر تطبيقات سلة وسيتم الربط تلقائياً
-          </p>
-          
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6 text-right">
-            <h4 className="font-semibold text-blue-400 mb-3 flex items-center gap-2">
-              <Zap className="w-4 h-4" />
-              خطوات الربط التلقائي:
-            </h4>
-            <ol className="text-sm text-gray-300 space-y-2 list-decimal list-inside">
-              <li>ادخل لوحة تحكم متجرك في سلة</li>
-              <li>اذهب لمتجر التطبيقات (App Store)</li>
-              <li>ابحث عن تطبيق <strong>"بريفو لتحسين السيو"</strong></li>
-              <li>اضغط <strong>"تثبيت"</strong> وأعطي الصلاحيات المطلوبة</li>
-              <li className="text-green-400 font-medium">✨ سيتم ربط المتجر وتزامن المنتجات تلقائياً!</li>
-            </ol>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a
-              href="https://apps.salla.sa"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition"
-            >
-              <ExternalLink className="w-4 h-4" />
-              فتح متجر تطبيقات سلة
-            </a>
-            
-            <button
-              onClick={loadSallaStores}
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition"
-            >
-              <RefreshCw className="w-4 h-4" />
-              تحديث الحالة
-            </button>
-          </div>
-          
-          <div className="mt-6 text-xs text-gray-500">
-            <p>💡 نصيحة: بعد تثبيت التطبيق، اضغط "تحديث الحالة" لرؤية المتجر المربوط</p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gray-950 text-white py-8 px-4">
@@ -510,9 +259,6 @@ export default function Account() {
               </div>
             </div>
 
-            {/* ✨ قسم ربط متاجر سلة التلقائي */}
-            {renderSallaIntegration()}
-
             {/* الاشتراك الحالي */}
             <div className="bg-gray-900 rounded-2xl p-6">
               <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
@@ -548,6 +294,7 @@ export default function Account() {
                   </div>
                 </div>
                 
+                {/* تنبيه انتهاء الاشتراك */}
                 {daysUntilExpiry && daysUntilExpiry <= 7 && (
                   <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-lg p-3 mb-4">
                     <div className="flex items-center gap-2 text-yellow-300">
@@ -578,6 +325,7 @@ export default function Account() {
                 </div>
               </div>
 
+              {/* الميزات */}
               <div className="mb-6">
                 <h4 className="font-semibold mb-3">الميزات المتاحة:</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -590,6 +338,7 @@ export default function Account() {
                 </div>
               </div>
 
+              {/* أزرار الإدارة */}
               <div className="flex flex-wrap gap-3">
                 {subscription?.plan !== 'enterprise' && (
                   <button
@@ -611,6 +360,7 @@ export default function Account() {
                   </button>
                 )}
                 
+                {/* زر ترقية مباشرة للخطط المدفوعة */}
                 <div className="flex gap-2 mt-3">
                   {subscription?.plan === 'free' && (
                     <>
@@ -748,14 +498,6 @@ export default function Account() {
                   <Mail className="w-4 h-4 text-[#83dcc9]" />
                   <span className="text-sm">تفضيلات التنبيهات</span>
                 </button>
-
-                <Link 
-                  to="/products"
-                  className="flex items-center gap-3 p-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition"
-                >
-                  <Package className="w-4 h-4 text-[#83dcc9]" />
-                  <span className="text-sm">إدارة المنتجات</span>
-                </Link>
               </div>
             </div>
 

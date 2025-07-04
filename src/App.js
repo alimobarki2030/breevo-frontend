@@ -30,6 +30,8 @@ import DataForSEOTest from './components/DataForSEOTest';
 import AdminVideoUpload from './pages/AdminVideoUpload';
 import PaymentResult from './pages/PaymentResult';
 import SupabaseTest from './components/SupabaseTest';
+import ConnectStore from './pages/ConnectStore';
+import SallaCallback from './pages/SallaCallback';
 
 import "./index.css";
 
@@ -67,6 +69,8 @@ function App() {
             <Route path="/payment/callback" element={<PaymentResult />} />
             <Route path="/payment/result" element={<PaymentResult />} />
             <Route path="/manual-login" element={<ManualLogin />} />
+            <Route path="/connect-store" element={<ConnectStore />} />
+            <Route path="/salla/callback" element={<SallaCallback />} />
           </Routes>
           
           <Toaster 
