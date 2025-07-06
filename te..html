@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار نظام الإيميلات</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            direction: rtl;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 اختبار نظام الإيميلات</h1>
+        
+        <div class="form-group">
+            <label for="token">رمز المصادقة (Token):</label>
+            <input type="text" id="token" placeholder="سيتم جلبه تلقائياً...">
+        </div>
+        
+        <div class="form-group">
+            <label for="emailType">نوع الإيميل:</label>
+            <select id="emailType">
+                <option value="welcome">إيميل الترحيب</option>
+                <option value="reminder">إيميل التذكير</option>
+                <option value="connected">إيميل تأكيد الربط</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="testEmail">البريد الإلكتروني للاختبار:</label>
+            <input type="email" id="testEmail" value="seo@seoraysa.com">
+        </div>
+        
+        <button onclick="testEmail()" id="testBtn">📧 إرسال إيميل تجريبي</button>
+        
+        <div id="result"></div>
+        
+        <div class="info" style="margin-top: 30px; font-size: 14px;">
+            <strong>ملاحظة:</strong><br>
+            • تأكد من تسجيل الدخول في نفس المتصفح<br>
+            • سيتم جلب رمز المصادقة تلقائياً<br>
+            • تحقق من صندوق البريد بعد الإرسال
+        </div>
+    </div>
+
+    <script>
+        // جلب Token تلقائياً
+        window.addEventListener('load', function() {
+            const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+            if (token) {
+                document.getElementById('token').value = token;
+                showResult('تم جلب رمز المصادقة بنجاح! ✅', 'success');
+            } else {
+                showResult('لم يتم العثور على رمز مصادقة. يرجى تسجيل الدخول أولاً.', 'error');
+            }
+        });
+
+        async function testEmail() {
+            const btn = document.getElementById('testBtn');
+            const token = document.getElementById('token').value;
+            const emailType = document.getElementById('emailType').value;
+            const testEmail = document.getElementById('testEmail').value;
+            
+            if (!token) {
+                showResult('يرجى إدخال رمز المصادقة', 'error');
+                return;
+            }
+            
+            if (!testEmail) {
+                showResult('يرجى إدخال بريد إلكتروني للاختبار', 'error');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.textContent = '📤 جاري الإرسال...';
+            showResult('جاري إرسال الإيميل...', 'info');
+            
+            try {
+                const response = await fetch('https://breevo-backend.onrender.com/api/salla/test-email', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        email_type: emailType,
+                        test_email: testEmail
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    showResult(`✅ تم إرسال الإيميل بنجاح!\nالنوع: ${emailType}\nإلى: ${testEmail}`, 'success');
+                } else {
+                    showResult(`❌ فشل في الإرسال: ${result.message || 'خطأ غير معروف'}`, 'error');
+                }
+                
+            } catch (error) {
+                showResult(`❌ خطأ في الاتصال: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📧 إرسال إيميل تجريبي';
+            }
+        }
+        
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = message.replace(/\n/g, '<br>');
+        }
+    </script>
+</body>
+</html>

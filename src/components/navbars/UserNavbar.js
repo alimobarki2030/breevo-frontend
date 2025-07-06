@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import ThemeToggle from '../ui/ThemeToggle';
+import PointsBalance from '../points/PointsBalance'; // إضافة استيراد مكون الرصيد
 import { 
   User, Settings, BarChart3, CreditCard, Bell, HelpCircle, LogOut,
-  Crown, Gem, Gift
+  Crown, Gem, Gift, Coins // إضافة أيقونة النقاط
 } from 'lucide-react';
 
 const UserNavbar = () => {
@@ -136,7 +137,8 @@ const UserNavbar = () => {
   // قائمة الروابط للمستخدمين المسجلين
   const getUserMenuItems = () => {
     const baseItems = [
-      { path: '/products', label: 'منتجاتي' }
+      { path: '/products', label: 'منتجاتي' },
+      { path: '/points', label: 'النقاط', icon: Coins } // إضافة رابط النقاط
     ];
 
     // ✅ إذا كان المالك - يرى كل شيء + لوحة الإدارة
@@ -197,15 +199,19 @@ const UserNavbar = () => {
             <Link 
               key={item.path}
               to={item.path} 
-              className={`transition-colors duration-300 ${
+              className={`flex items-center gap-2 transition-colors duration-300 ${
                 isActivePath(item.path) 
                   ? 'text-[#83dcc9] font-semibold' 
                   : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
               }`}
             >
+              {item.icon && <item.icon size={16} />}
               {item.label}
             </Link>
           ))}
+
+          {/* عرض رصيد النقاط */}
+          <PointsBalance />
 
           {/* Theme Toggle */}
           <ThemeToggle variant="navbar" size="md" className="ml-4" />
@@ -251,6 +257,15 @@ const UserNavbar = () => {
                 >
                   <User size={16} />
                   حسابي
+                </Link>
+
+                <Link
+                  to="/points"
+                  className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  onClick={() => setIsUserMenuOpen(false)}
+                >
+                  <Coins size={16} />
+                  نظام النقاط
                 </Link>
                 
                 <Link
@@ -326,6 +341,9 @@ const UserNavbar = () => {
 
         {/* Mobile Menu Button */}
         <div className="md:hidden flex items-center space-x-3 space-x-reverse">
+          {/* عرض رصيد النقاط للموبايل */}
+          <PointsBalance />
+          
           {/* Theme Toggle for Mobile */}
           <ThemeToggle variant="navbar" size="sm" />
           
@@ -368,13 +386,14 @@ const UserNavbar = () => {
                 <Link 
                   key={item.path}
                   to={item.path} 
-                  className={`transition-colors duration-300 py-2 ${
+                  className={`flex items-center gap-2 transition-colors duration-300 py-2 ${
                     isActivePath(item.path) 
                       ? 'text-[#83dcc9] font-semibold' 
                       : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
+                  {item.icon && <item.icon size={16} />}
                   {item.label}
                 </Link>
               ))}

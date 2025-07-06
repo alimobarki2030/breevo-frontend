@@ -5,138 +5,161 @@ import PublicNavbar from '../components/navbars/PublicNavbar';
 import { useTheme } from '../contexts/ThemeContext';
 
 export default function PricingPage() {
-  // ✅ استخدام useTheme
   const { theme, isDark } = useTheme();
-  const [billingCycle, setBillingCycle] = useState('monthly'); // monthly or annual
+  const [billingCycle, setBillingCycle] = useState('monthly');
 
   const plans = [
     {
-      id: 'free',
-      name: 'المجانية',
-      subtitle: 'للتجربة والاستكشاف',
-      monthlyPrice: 0,
-      annualPrice: 0,
+      id: 'starter',
+      name: 'البداية',
+      subtitle: 'للمتاجر الناشئة',
+      monthlyPrice: 99,
+      annualPrice: 79,
+      monthlyPoints: 1000,
       badge: '',
-      description: 'ابدأ رحلتك مع SEO مجاناً',
+      description: 'ابدأ رحلتك مع 1,000 نقطة شهرياً',
       features: [
-        'توليد 3 منتجات شهرياً',
-        'جميع مميزات المنصة',
-        'توليد أوصاف محسّنة بالذكاء الاصطناعي',
-        'تحليل SEO فوري لكل منتج',
-        'اختيار الكلمات المفتاحية المناسبة',
+        '1,000 نقطة شهرياً',
+        '7 أيام تجربة مع استرداد 100%',
+        'توليد أوصاف بالذكاء الاصطناعي',
+        'تحليل SEO أساسي لكل منتج',
+        'اختيار الكلمات المفتاحية',
         'معاينة Google للمنتجات',
         'محتوى باللغة العربية والإنجليزية',
-        'دعم عبر البريد الإلكتروني'
+        'تقارير شهرية',
+        'دعم عبر البريد الإلكتروني (48 ساعة)'
       ],
-      limitations: [],
-      cta: 'ابدأ مجاناً',
-      ctaLink: '/checkout?plan=free',
+      cta: 'ابدأ التجربة',
+      ctaLink: '/checkout?plan=starter',
       popular: false
     },
     {
-      id: 'pro',
-      name: 'الاحترافية',
-      subtitle: 'للمتاجر الجادة في النمو',
-      monthlyPrice: 49,
-      annualPrice: 39,
+      id: 'advanced',
+      name: 'المتقدمة',
+      subtitle: 'للمتاجر المتوسطة',
+      monthlyPrice: 199,
+      annualPrice: 159,
+      monthlyPoints: 3000,
       badge: 'الأكثر شعبية',
-      description: 'نفس المميزات مع حد أعلى للمنتجات',
+      description: 'قوة أكبر مع 3,000 نقطة شهرياً',
       features: [
-        'توليد 30 منتج شهرياً',
-        'جميع مميزات المنصة',
-        'توليد أوصاف محسّنة بالذكاء الاصطناعي',
-        'تحليل SEO فوري لكل منتج',
-        'اختيار الكلمات المفتاحية المناسبة',
-        'معاينة Google للمنتجات',
-        'محتوى باللغة العربية والإنجليزية',
-        'دعم فني ذو أولوية (24 ساعة)',
-        'إشعارات التحديثات والمميزات الجديدة'
+        '3,000 نقطة شهرياً',
+        '7 أيام تجربة مع استرداد 100%',
+        'كل مميزات باقة البداية +',
+        'تحليل SEO متقدم بالذكاء الاصطناعي',
+        'تحليل المنافسين الأساسي',
+        'تحسين جماعي للمنتجات',
+        'معاينة Google محسّنة',
+        'تقارير أسبوعية مفصلة',
+        'دعم ذو أولوية (24 ساعة)',
+        'إشعارات التحديثات الجديدة'
       ],
-      limitations: [],
-      cta: 'اشترك الآن',
-      ctaLink: '/checkout?plan=pro',
+      cta: 'ابدأ التجربة',
+      ctaLink: '/checkout?plan=advanced',
       popular: true
     },
     {
-      id: 'business',
-      name: 'الأعمال',
-      subtitle: 'للشركات والوكالات',
-      monthlyPrice: 129,
-      annualPrice: 99,
+      id: 'professional',
+      name: 'الاحترافية',
+      subtitle: 'للمتاجر الكبيرة والوكالات',
+      monthlyPrice: 399,
+      annualPrice: 319,
+      monthlyPoints: 10000,
       badge: 'للمؤسسات',
-      description: 'نفس المميزات بدون حدود',
+      description: 'نقاط غير محدودة لنمو غير محدود',
       features: [
-        'توليد غير محدود للمنتجات',
-        'جميع مميزات المنصة',
-        'توليد أوصاف محسّنة بالذكاء الاصطناعي',
-        'تحليل SEO فوري لكل منتج',
-        'اختيار الكلمات المفتاحية المناسبة',
-        'معاينة Google للمنتجات',
-        'محتوى باللغة العربية والإنجليزية',
-        'دعم مخصص ومتابعة شخصية',
-        'أولوية في الدعم الفني (4 ساعات)',
-        'إشعارات مبكرة بالمميزات الجديدة',
-        'مناسب لإدارة عدة متاجر'
+        '10,000 نقطة شهرياً',
+        '7 أيام تجربة مع استرداد 100%',
+        'كل مميزات الباقة المتقدمة +',
+        'خيار النقاط غير المحدودة',
+        'تحليل AI متقدم + تحليل المنافسين',
+        'API Access للتكامل',
+        'تقارير يومية + تقارير مخصصة',
+        'مدير حساب مخصص',
+        'دعم 24/7 (4 ساعات استجابة)',
+        'وصول مبكر للمميزات الجديدة',
+        'تدريب الفريق مجاناً'
       ],
-      limitations: [],
-      cta: 'للشركات',
-      ctaLink: '/checkout?plan=business',
+      cta: 'ابدأ التجربة',
+      ctaLink: '/checkout?plan=professional',
       popular: false
     }
+  ];
+
+  const pointsUsage = [
+    { service: 'توليد وصف بسيط', points: 10 },
+    { service: 'توليد وصف متقدم', points: 30 },
+    { service: 'تحليل SEO أساسي', points: 20 },
+    { service: 'تحليل SEO عميق', points: 50 },
+    { service: 'تحليل المنافسين', points: 75 },
+    { service: 'باقة كاملة (وصف + SEO + كلمات)', points: 100 },
+    { service: 'توليد صور AI للمنتج', points: 150 }
+  ];
+
+  const additionalPoints = [
+    { name: 'حزمة صغيرة', points: 500, price: 29 },
+    { name: 'حزمة متوسطة', points: 1000, price: 49 },
+    { name: 'حزمة كبيرة', points: 3000, price: 99, popular: true },
+    { name: 'حزمة ضخمة', points: 10000, price: 299 }
   ];
 
   const featureComparison = [
     {
       category: 'المميزات الأساسية',
       features: [
-        { name: 'عدد المنتجات شهرياً', free: '3', pro: '30', business: 'غير محدود' },
-        { name: 'توليد المحتوى بالذكاء الاصطناعي', free: '✅', pro: '✅', business: '✅' },
-        { name: 'تحليل SEO فوري', free: '✅', pro: '✅', business: '✅' },
-        { name: 'اختيار الكلمات المفتاحية', free: '✅', pro: '✅', business: '✅' },
-        { name: 'معاينة Google', free: '✅', pro: '✅', business: '✅' },
-        { name: 'محتوى عربي وإنجليزي', free: '✅', pro: '✅', business: '✅' }
+        { name: 'عدد النقاط الشهرية', starter: '1,000 نقطة', advanced: '3,000 نقطة', professional: '10,000 نقطة' },
+        { name: 'تحليل SEO', starter: 'أساسي', advanced: 'متقدم', professional: 'متقدم + المنافسين' },
+        { name: 'توليد المحتوى بـ AI', starter: '✅', advanced: '✅ محسّن', professional: '✅ احترافي' },
+        { name: 'تحسين جماعي', starter: '❌', advanced: '✅', professional: '✅ متقدم' },
+        { name: 'API Access', starter: '❌', advanced: '❌', professional: '✅' },
+        { name: 'اللغات المدعومة', starter: 'عربي + إنجليزي', advanced: 'عربي + إنجليزي', professional: 'عربي + إنجليزي' }
+      ]
+    },
+    {
+      category: 'التقارير والتحليلات',
+      features: [
+        { name: 'تقارير الأداء', starter: 'شهرية', advanced: 'أسبوعية', professional: 'يومية + مخصصة' },
+        { name: 'تحليل المنافسين', starter: '❌', advanced: 'أساسي', professional: '✅ متقدم' },
+        { name: 'تحليل الكلمات المفتاحية', starter: 'أساسي', advanced: 'متقدم', professional: 'احترافي' },
+        { name: 'تصدير التقارير', starter: '❌', advanced: 'PDF', professional: 'PDF + Excel + API' }
       ]
     },
     {
       category: 'الدعم والخدمات',
       features: [
-        { name: 'دعم عبر البريد الإلكتروني', free: '✅', pro: '✅', business: '✅' },
-        { name: 'وقت الاستجابة', free: '48 ساعة', pro: '24 ساعة', business: '4 ساعات' },
-        { name: 'دعم ذو أولوية', free: '❌', pro: '✅', business: '✅ متقدم' },
-        { name: 'متابعة شخصية', free: '❌', pro: '❌', business: '✅' }
-      ]
-    },
-    {
-      category: 'التحديثات والمميزات الجديدة',
-      features: [
-        { name: 'إشعارات التحديثات', free: 'عادية', pro: 'أولوية', business: 'مبكرة' },
-        { name: 'الوصول للمميزات الجديدة', free: 'عند الإطلاق', pro: 'عند الإطلاق', business: 'وصول مبكر' },
-        { name: 'طلب مميزات مخصصة', free: '❌', pro: '❌', business: '✅' },
-        { name: 'إدارة عدة متاجر', free: 'محدود', pro: 'محدود', business: 'مناسب' }
+        { name: 'دعم البريد الإلكتروني', starter: '48 ساعة', advanced: '24 ساعة', professional: '4 ساعات' },
+        { name: 'دعم الهاتف/واتساب', starter: '❌', advanced: '❌', professional: '✅' },
+        { name: 'مدير حساب مخصص', starter: '❌', advanced: '❌', professional: '✅' },
+        { name: 'تدريب الفريق', starter: '❌', advanced: 'فيديو', professional: 'جلسات مباشرة' },
+        { name: 'وصول للمميزات الجديدة', starter: 'عادي', advanced: 'أولوية', professional: 'وصول مبكر' }
       ]
     }
   ];
 
   const pricingFAQs = [
     {
-      question: 'هل يمكنني تغيير خطتي في أي وقت؟',
-      answer: 'نعم، يمكنك الترقية أو التخفيض في أي وقت. عند الترقية ستدفع الفرق المتبقي للشهر الحالي، وعند التخفيض سيطبق التغيير في الدورة القادمة.'
+      question: 'كيف يعمل نظام النقاط؟',
+      answer: 'عند الاشتراك تحصل على رصيد نقاط شهري حسب باقتك. كل خدمة تستهلك عدد معين من النقاط. النقاط غير المستخدمة تنتقل للشهر التالي (بحد أقصى رصيد شهرين). يمكنك شراء نقاط إضافية في أي وقت.'
+    },
+    {
+      question: 'ما هي سياسة الاسترداد؟',
+      answer: 'نوفر ضمان استرداد 100% خلال فترة التجربة. للباقات الشهرية 7 أيام، وللباقات السنوية 30 يوم. بدون أي أسئلة أو شروط معقدة. فقط اطلب الاسترداد وسنعيد لك المبلغ كاملاً خلال 24-48 ساعة.'
+    },
+    {
+      question: 'هل يمكنني تغيير الباقة في أي وقت؟',
+      answer: 'نعم، يمكنك الترقية في أي وقت وستدفع الفرق المتبقي فقط، مع تحويل نقاطك المتبقية. للتخفيض، سيطبق التغيير من بداية دورة الفوترة التالية.'
+    },
+    {
+      question: 'ماذا يحدث إذا نفدت نقاطي؟',
+      answer: 'ستتلقى تنبيهات عند وصول رصيدك لـ 20% و 10%. يمكنك شراء حزم نقاط إضافية فوراً، أو الانتظار لتجديد الباقة الشهرية، أو الترقية لباقة أعلى.'
+    },
+    {
+      question: 'هل النقاط لها صلاحية؟',
+      answer: 'النقاط الشهرية صالحة لمدة 90 يوم من تاريخ الحصول عليها. النقاط المشتراة صالحة لمدة 6 أشهر. نرسل تذكيرات قبل انتهاء الصلاحية.'
     },
     {
       question: 'ما الفرق بين الدفع الشهري والسنوي؟',
-      answer: 'الدفع السنوي يوفر خصم 20-23% على إجمالي التكلفة. مثلاً الباقة الاحترافية تصبح 39 ريال شهرياً بدلاً من 49 ريال عند الدفع السنوي.'
-    },
-    {
-      question: 'هل جميع الخطط تحصل على نفس المميزات؟',
-      answer: 'نعم، جميع الخطط تحصل على نفس مميزات المنصة تماماً. الفرق الوحيد هو عدد المنتجات شهرياً ومستوى الدعم الفني المقدم.'
-    },
-    {
-      question: 'ماذا يحدث إذا تجاوزت حد المنتجات؟',
-      answer: 'في الباقة المجانية ستحتاج للترقية. في الباقات المدفوعة، سنتواصل معك لمناقشة الترقية أو إضافة منتجات إضافية بسعر مخفض.'
-    },
-    {
-      question: 'متى سأحصل على المميزات الجديدة؟',
-      answer: 'جميع العملاء يحصلون على المميزات الجديدة عند إطلاقها. عملاء الأعمال قد يحصلون على وصول مبكر لبعض المميزات قبل الإطلاق العام.'
+      answer: 'الدفع السنوي يوفر 20% + فترة تجربة 30 يوم بدلاً من 7 أيام. مثلاً باقة البداية تصبح 79 ريال شهرياً بدلاً من 99 ريال.'
     }
   ];
 
@@ -145,7 +168,6 @@ export default function PricingPage() {
   };
 
   const getSavingPercentage = (plan) => {
-    if (plan.monthlyPrice === 0) return 0;
     return Math.round(((plan.monthlyPrice - plan.annualPrice) / plan.monthlyPrice) * 100);
   };
 
@@ -156,10 +178,8 @@ export default function PricingPage() {
         : 'bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900'
     }`}>
       
-      {/* استخدام النافبار الموحد */}
       <PublicNavbar />
       
-      {/* مساحة للنافبار الثابت */}
       <div className="pt-20">
         
         {/* Hero Section */}
@@ -171,24 +191,27 @@ export default function PricingPage() {
               transition={{ duration: 0.8 }}
             >
               <h1 className="text-3xl md:text-5xl font-extrabold mb-6 leading-tight">
-                اختر الباقة المناسبة لطموحك
+                نظام نقاط مرن يتكيف مع احتياجاتك
               </h1>
               <p className={`text-xl mb-8 leading-relaxed ${
                 isDark ? 'text-gray-300' : 'text-gray-600'
               }`}>
-                خطط مرنة تنمو معك، من التجربة المجانية إلى الحلول المؤسسية الشاملة
+                ادفع مقابل ما تستخدمه فقط، مع ضمان استرداد كامل خلال فترة التجربة
               </p>
               <div className={`border rounded-2xl p-6 transition-colors duration-300 ${
                 isDark 
-                  ? 'bg-[#83dcc9]/10 border-[#83dcc9]/30' 
-                  : 'bg-[#83dcc9]/5 border-[#83dcc9]/20'
+                  ? 'bg-green-500/10 border-green-500/30' 
+                  : 'bg-green-50 border-green-200'
               }`}>
-                <div className="flex items-center justify-center space-x-4 space-x-reverse text-[#83dcc9]">
-                  <span className="text-2xl">💰</span>
+                <div className="flex items-center justify-center space-x-4 space-x-reverse text-green-500 dark:text-green-400">
+                  <span className="text-3xl">💯</span>
                   <p className="text-lg font-semibold">
-                    ضمان استرداد كامل خلال 30 يوم - جرب بدون مخاطر
+                    ضمان استرداد 100% خلال فترة التجربة - جرب بدون أي مخاطر
                   </p>
                 </div>
+                <p className={`text-sm mt-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                  7 أيام للباقات الشهرية | 30 يوم للباقات السنوية
+                </p>
               </div>
             </motion.div>
           </div>
@@ -217,6 +240,7 @@ export default function PricingPage() {
                   }`}
                 >
                   شهري
+                  <span className="block text-xs mt-1">تجربة 7 أيام</span>
                 </button>
                 <button
                   onClick={() => setBillingCycle('annual')}
@@ -229,6 +253,7 @@ export default function PricingPage() {
                   }`}
                 >
                   سنوي
+                  <span className="block text-xs mt-1">تجربة 30 يوم</span>
                   <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full">
                     وفر 20%
                   </span>
@@ -250,7 +275,7 @@ export default function PricingPage() {
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   className={`relative p-8 rounded-2xl border-2 transition-all hover:shadow-2xl ${
                     plan.popular
-                      ? 'bg-[#83dcc9] text-gray-900 border-white scale-105'
+                      ? 'bg-[#83dcc9] text-gray-900 border-white scale-105 shadow-xl'
                       : isDark 
                         ? 'bg-gray-800 border-gray-700 hover:border-[#83dcc9]/50'
                         : 'bg-white border-gray-200 hover:border-[#83dcc9]/50 shadow-lg'
@@ -279,42 +304,61 @@ export default function PricingPage() {
                       {plan.subtitle}
                     </p>
                     
-                    <div className="mb-4">
-                      <span className="text-4xl font-extrabold">
-                        {getCurrentPrice(plan)} ريال
+                    {/* Points Display */}
+                    <div className={`mb-4 p-3 rounded-lg ${
+                      plan.popular 
+                        ? 'bg-gray-800/10' 
+                        : isDark 
+                          ? 'bg-gray-700' 
+                          : 'bg-gray-100'
+                    }`}>
+                      <span className="text-3xl font-bold">
+                        {plan.monthlyPoints.toLocaleString()}
                       </span>
-                      {plan.monthlyPrice > 0 && (
-                        <>
-                          <span className={`text-lg ${
-                            plan.popular 
-                              ? 'text-gray-700' 
-                              : isDark 
-                                ? 'text-gray-400' 
-                                : 'text-gray-600'
-                          }`}>
-                            /شهرياً
-                          </span>
-                          {billingCycle === 'annual' && getSavingPercentage(plan) > 0 && (
-                            <div className="mt-2">
-                              <span className={`text-sm line-through ${
-                                plan.popular 
-                                  ? 'text-gray-600' 
-                                  : isDark 
-                                    ? 'text-gray-500' 
-                                    : 'text-gray-500'
-                              }`}>
-                                {plan.monthlyPrice} ريال/شهرياً
-                              </span>
-                              <span className="text-sm text-green-500 font-semibold mr-2">
-                                وفر {getSavingPercentage(plan)}%
-                              </span>
-                            </div>
-                          )}
-                        </>
-                      )}
+                      <span className={`text-lg ${
+                        plan.popular 
+                          ? 'text-gray-700' 
+                          : isDark 
+                            ? 'text-gray-400' 
+                            : 'text-gray-600'
+                      }`}>
+                        {' '}نقطة/شهرياً
+                      </span>
                     </div>
                     
-                    <p className={`text-sm ${
+                    <div className="mb-2">
+                      <span className="text-4xl font-extrabold">
+                        {getCurrentPrice(plan)}
+                      </span>
+                      <span className={`text-lg ${
+                        plan.popular 
+                          ? 'text-gray-700' 
+                          : isDark 
+                            ? 'text-gray-400' 
+                            : 'text-gray-600'
+                      }`}>
+                        {' '}ريال/شهر
+                      </span>
+                    </div>
+
+                    {billingCycle === 'annual' && getSavingPercentage(plan) > 0 && (
+                      <div className="mt-2">
+                        <span className={`text-sm line-through ${
+                          plan.popular 
+                            ? 'text-gray-600' 
+                            : isDark 
+                              ? 'text-gray-500' 
+                              : 'text-gray-500'
+                        }`}>
+                          {plan.monthlyPrice} ريال
+                        </span>
+                        <span className="text-sm text-green-500 font-semibold mr-2">
+                          وفر {getSavingPercentage(plan)}%
+                        </span>
+                      </div>
+                    )}
+                    
+                    <p className={`text-sm mt-2 ${
                       plan.popular 
                         ? 'text-gray-700' 
                         : isDark 
@@ -347,29 +391,6 @@ export default function PricingPage() {
                         </span>
                       </div>
                     ))}
-                    
-                    {plan.limitations.map((limitation, idx) => (
-                      <div key={idx} className="flex items-center space-x-3 space-x-reverse">
-                        <span className={`text-lg ${
-                          plan.popular 
-                            ? 'text-gray-600' 
-                            : isDark 
-                              ? 'text-gray-600' 
-                              : 'text-gray-500'
-                        }`}>
-                          ❌
-                        </span>
-                        <span className={`text-sm ${
-                          plan.popular 
-                            ? 'text-gray-600' 
-                            : isDark 
-                              ? 'text-gray-500' 
-                              : 'text-gray-500'
-                        }`}>
-                          {limitation}
-                        </span>
-                      </div>
-                    ))}
                   </div>
 
                   {/* CTA */}
@@ -388,6 +409,112 @@ export default function PricingPage() {
           </div>
         </section>
 
+        {/* Points Usage Section */}
+        <section className={`w-full px-4 py-16 transition-colors duration-300 ${
+          isDark ? 'bg-gray-900' : 'bg-gray-50'
+        }`}>
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">كيف تُستخدم النقاط؟</h2>
+              <p className={`text-xl ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                كل خدمة تستهلك عدد معين من النقاط حسب مستوى التعقيد
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {pointsUsage.map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className={`p-6 rounded-xl border transition-all hover:shadow-lg ${
+                    isDark 
+                      ? 'bg-gray-800 border-gray-700 hover:border-[#83dcc9]' 
+                      : 'bg-white border-gray-200 hover:border-[#83dcc9]'
+                  }`}
+                >
+                  <h3 className="font-bold text-lg mb-2">{item.service}</h3>
+                  <div className="flex items-center justify-between">
+                    <span className="text-3xl font-bold text-[#83dcc9]">{item.points}</span>
+                    <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>نقطة</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Additional Points Packages */}
+        <section className="w-full px-4 py-16">
+          <div className="max-w-6xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">تحتاج نقاط إضافية؟</h2>
+              <p className={`text-xl ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                اشترِ حزم نقاط إضافية في أي وقت
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {additionalPoints.map((pack, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className={`relative p-6 rounded-xl border-2 transition-all hover:shadow-lg ${
+                    pack.popular 
+                      ? isDark 
+                        ? 'bg-gray-800 border-[#83dcc9] scale-105' 
+                        : 'bg-white border-[#83dcc9] shadow-lg scale-105'
+                      : isDark 
+                        ? 'bg-gray-800 border-gray-700 hover:border-[#83dcc9]/50' 
+                        : 'bg-white border-gray-200 hover:border-[#83dcc9]/50'
+                  }`}
+                >
+                  {pack.popular && (
+                    <span className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-orange-500 text-white text-xs px-3 py-1 rounded-full">
+                      الأكثر توفيراً
+                    </span>
+                  )}
+                  <h3 className="font-bold text-lg mb-4 text-center">{pack.name}</h3>
+                  <div className="text-center mb-4">
+                    <span className="text-3xl font-bold text-[#83dcc9]">{pack.points.toLocaleString()}</span>
+                    <span className={`block text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>نقطة</span>
+                  </div>
+                  <div className="text-center mb-4">
+                    <span className="text-2xl font-bold">{pack.price}</span>
+                    <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}> ريال</span>
+                  </div>
+                  <button className={`w-full py-2 px-4 rounded-lg font-medium transition-all ${
+                    pack.popular 
+                      ? 'bg-[#83dcc9] text-gray-900 hover:bg-[#6cc9b9]' 
+                      : isDark 
+                        ? 'bg-gray-700 text-white hover:bg-gray-600' 
+                        : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                  }`}>
+                    شراء
+                  </button>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Feature Comparison Table */}
         <section className={`w-full px-4 py-16 transition-colors duration-300 ${
           isDark ? 'bg-gray-900' : 'bg-gray-50'
@@ -400,9 +527,9 @@ export default function PricingPage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">مقارنة مفصلة للمميزات</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">مقارنة تفصيلية بين الباقات</h2>
               <p className={`text-xl ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                اكتشف الفروق بين الباقات بالتفصيل
+                اختر الباقة المناسبة لاحتياجاتك
               </p>
             </motion.div>
 
@@ -414,9 +541,9 @@ export default function PricingPage() {
                 isDark ? 'bg-gray-700' : 'bg-gray-100'
               }`}>
                 <div></div>
-                <div className={isDark ? 'text-gray-300' : 'text-gray-700'}>المجانية</div>
-                <div className="text-[#83dcc9]">الاحترافية</div>
-                <div className="text-yellow-500 dark:text-yellow-400">الأعمال</div>
+                <div>البداية</div>
+                <div className="text-[#83dcc9]">المتقدمة</div>
+                <div className="text-yellow-500 dark:text-yellow-400">الاحترافية</div>
               </div>
               
               {featureComparison.map((category, categoryIndex) => (
@@ -452,10 +579,10 @@ export default function PricingPage() {
                       <div className={`text-center ${
                         isDark ? 'text-gray-400' : 'text-gray-600'
                       }`}>
-                        {feature.free}
+                        {feature.starter}
                       </div>
-                      <div className="text-center text-[#83dcc9] font-medium">{feature.pro}</div>
-                      <div className="text-center text-yellow-500 dark:text-yellow-400 font-medium">{feature.business}</div>
+                      <div className="text-center text-[#83dcc9] font-medium">{feature.advanced}</div>
+                      <div className="text-center text-yellow-500 dark:text-yellow-400 font-medium">{feature.professional}</div>
                     </motion.div>
                   ))}
                 </div>
@@ -474,9 +601,9 @@ export default function PricingPage() {
               viewport={{ once: true }}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">أسئلة شائعة حول الأسعار</h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-6">أسئلة شائعة</h2>
               <p className={`text-xl ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                إجابات واضحة لاستفساراتك المالية
+                كل ما تحتاج معرفته عن نظام النقاط والأسعار
               </p>
             </motion.div>
 
@@ -520,28 +647,28 @@ export default function PricingPage() {
                   : 'bg-gradient-to-r from-green-50 to-transparent border-green-200'
               }`}
             >
-              <div className="text-6xl mb-6">💰</div>
+              <div className="text-6xl mb-6">🛡️</div>
               <h2 className="text-3xl md:text-4xl font-bold mb-6 text-green-500 dark:text-green-400">
-                ضمان استرداد كامل لمدة 30 يوم
+                ضمان استرداد 100% خلال فترة التجربة
               </h2>
               <p className={`text-xl mb-6 leading-relaxed ${
                 isDark ? 'text-gray-300' : 'text-gray-700'
               }`}>
-                جرب منصتنا بدون أي مخاطر. إذا لم تكن راضياً عن النتائج خلال 30 يوم، 
-                سنرد لك كامل المبلغ دون أسئلة أو شروط معقدة.
+                نثق في جودة خدماتنا. جرب أي باقة واحصل على كامل مميزاتها،
+                وإذا لم تكن راضياً تماماً، سنرد لك المبلغ كاملاً بدون أي أسئلة.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-                <div className="flex items-center space-x-3 space-x-reverse">
+                <div className="flex items-center justify-center space-x-3 space-x-reverse">
                   <span className="text-green-500 dark:text-green-400 text-2xl">✓</span>
-                  <span>استرداد فوري خلال 30 يوم</span>
+                  <span>7 أيام للباقات الشهرية</span>
                 </div>
-                <div className="flex items-center space-x-3 space-x-reverse">
+                <div className="flex items-center justify-center space-x-3 space-x-reverse">
                   <span className="text-green-500 dark:text-green-400 text-2xl">✓</span>
-                  <span>بدون أسئلة أو شروط</span>
+                  <span>30 يوم للباقات السنوية</span>
                 </div>
-                <div className="flex items-center space-x-3 space-x-reverse">
+                <div className="flex items-center justify-center space-x-3 space-x-reverse">
                   <span className="text-green-500 dark:text-green-400 text-2xl">✓</span>
-                  <span>احتفظ بالمحتوى المولد</span>
+                  <span>استرداد خلال 24-48 ساعة</span>
                 </div>
               </div>
             </motion.div>
@@ -558,15 +685,15 @@ export default function PricingPage() {
               viewport={{ once: true }}
             >
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                ابدأ رحلة نجاحك اليوم
+                ابدأ تجربتك اليوم
               </h2>
               <p className={`text-xl mb-8 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                انضم لآلاف التجار الذين حققوا نتائج استثنائية مع منصتنا
+                انضم لآلاف التجار الذين يحققون نتائج استثنائية مع منصتنا
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-                <Link to="/checkout?plan=free" className="w-full sm:w-auto">
+                <Link to="/checkout?plan=starter" className="w-full sm:w-auto">
                   <button className="w-full bg-[#83dcc9] text-gray-900 font-bold py-4 px-8 rounded-xl hover:bg-[#6cc9b9] transition text-lg shadow-lg hover:shadow-xl transform hover:scale-105">
-                    جرب مجاناً الآن
+                    ابدأ التجربة - 99 ريال/شهر
                   </button>
                 </Link>
                 <Link to="/contact" className="w-full sm:w-auto">
@@ -575,6 +702,9 @@ export default function PricingPage() {
                   </button>
                 </Link>
               </div>
+              <p className={`text-sm mt-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                ضمان استرداد 100% • دفع آمن • إلغاء في أي وقت
+              </p>
             </motion.div>
           </div>
         </section>
@@ -601,11 +731,6 @@ export default function PricingPage() {
                       ? 'text-gray-400 hover:text-white' 
                       : 'text-gray-600 hover:text-gray-900'
                   }`}>كيف يعمل</Link>
-                  <Link to="/demo" className={`block transition ${
-                    isDark 
-                      ? 'text-gray-400 hover:text-white' 
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}>تجربة تفاعلية</Link>
                 </div>
               </div>
               <div>
@@ -621,11 +746,6 @@ export default function PricingPage() {
                       ? 'text-gray-400 hover:text-white' 
                       : 'text-gray-600 hover:text-gray-900'
                   }`}>اتصل بنا</Link>
-                  <Link to="/careers" className={`block transition ${
-                    isDark 
-                      ? 'text-gray-400 hover:text-white' 
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}>الوظائف</Link>
                   <Link to="/blog" className={`block transition ${
                     isDark 
                       ? 'text-gray-400 hover:text-white' 
@@ -646,11 +766,6 @@ export default function PricingPage() {
                       ? 'text-gray-400 hover:text-white' 
                       : 'text-gray-600 hover:text-gray-900'
                   }`}>مركز المساعدة</Link>
-                  <Link to="/tutorials" className={`block transition ${
-                    isDark 
-                      ? 'text-gray-400 hover:text-white' 
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}>الدروس التعليمية</Link>
                   <Link to="/support" className={`block transition ${
                     isDark 
                       ? 'text-gray-400 hover:text-white' 
@@ -671,11 +786,6 @@ export default function PricingPage() {
                       ? 'text-gray-400 hover:text-white' 
                       : 'text-gray-600 hover:text-gray-900'
                   }`}>شروط الخدمة</Link>
-                  <Link to="/cookies" className={`block transition ${
-                    isDark 
-                      ? 'text-gray-400 hover:text-white' 
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}>سياسة ملفات تعريف الارتباط</Link>
                   <Link to="/refund" className={`block transition ${
                     isDark 
                       ? 'text-gray-400 hover:text-white' 
@@ -689,33 +799,28 @@ export default function PricingPage() {
               isDark ? 'border-gray-700' : 'border-gray-200'
             }`}>
               <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 sm:space-x-reverse">
-                <img 
-                  src={isDark ? "/logo1.png" : "/logo3.png"} 
-                  alt="Logo" 
-                  className="h-6 sm:h-8 transition-opacity duration-300" 
-                />
                 <span className={`text-xs text-center sm:text-right transition-colors duration-300 ${
                   isDark ? 'text-gray-400' : 'text-gray-500'
                 }`}>
-                  © 2025 مشروع السيو الذكي. جميع الحقوق محفوظة.
+                  © 2025 SEO Raysa. جميع الحقوق محفوظة.
                 </span>
               </div>
               <div className="flex space-x-3 sm:space-x-4 space-x-reverse">
-                <Link to="/social/twitter" className={`transition text-xs sm:text-sm ${
+                <a href="https://twitter.com/seoraysa" className={`transition text-xs sm:text-sm ${
                   isDark 
                     ? 'text-gray-400 hover:text-[#83dcc9]' 
                     : 'text-gray-500 hover:text-[#83dcc9]'
-                }`}>تويتر</Link>
-                <Link to="/social/linkedin" className={`transition text-xs sm:text-sm ${
+                }`}>تويتر</a>
+                <a href="https://linkedin.com/company/seoraysa" className={`transition text-xs sm:text-sm ${
                   isDark 
                     ? 'text-gray-400 hover:text-[#83dcc9]' 
                     : 'text-gray-500 hover:text-[#83dcc9]'
-                }`}>لينكد إن</Link>
-                <Link to="/social/instagram" className={`transition text-xs sm:text-sm ${
+                }`}>لينكد إن</a>
+                <a href="https://instagram.com/seoraysa" className={`transition text-xs sm:text-sm ${
                   isDark 
                     ? 'text-gray-400 hover:text-[#83dcc9]' 
                     : 'text-gray-500 hover:text-[#83dcc9]'
-                }`}>إنستجرام</Link>
+                }`}>إنستجرام</a>
               </div>
             </div>
           </div>

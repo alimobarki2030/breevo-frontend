@@ -32,6 +32,7 @@ import PaymentResult from './pages/PaymentResult';
 import SupabaseTest from './components/SupabaseTest';
 import ConnectStore from './pages/ConnectStore';
 import SallaCallback from './pages/SallaCallback';
+import PointsDashboard from './components/points/PointsDashboard';
 
 import "./index.css";
 
@@ -71,6 +72,7 @@ function App() {
             <Route path="/manual-login" element={<ManualLogin />} />
             <Route path="/connect-store" element={<ConnectStore />} />
             <Route path="/salla/callback" element={<SallaCallback />} />
+            <Route path="/points" element={<PointsDashboard />} />
           </Routes>
           
           <Toaster 
