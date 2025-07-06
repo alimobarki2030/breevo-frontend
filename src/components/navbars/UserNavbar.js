@@ -2,17 +2,20 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import ThemeToggle from '../ui/ThemeToggle';
-import PointsBalance from '../points/PointsBalance'; // إضافة استيراد مكون الرصيد
+import PointsBalance from '../points/PointsBalance';
 import { 
   User, Settings, BarChart3, CreditCard, Bell, HelpCircle, LogOut,
-  Crown, Gem, Gift, Coins // إضافة أيقونة النقاط
+  Crown, Gem, Gift, Coins, ChevronDown, Search, Target, Video, MessageSquare,
+  Grid3X3, Package
 } from 'lucide-react';
 
 const UserNavbar = () => {
   const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isServicesMenuOpen, setIsServicesMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const servicesRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -22,15 +25,19 @@ const UserNavbar = () => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setIsUserMenuOpen(false);
       }
+      if (servicesRef.current && !servicesRef.current.contains(e.target)) {
+        setIsServicesMenuOpen(false);
+      }
     };
     document.addEventListener("mousedown", handleOutsideClick);
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
-  // إغلاق القائمة المحمولة عند تغيير المسار
+  // إغلاق القوائم عند تغيير المسار
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsUserMenuOpen(false);
+    setIsServicesMenuOpen(false);
   }, [location.pathname]);
 
   const handleLogout = async () => {
@@ -86,12 +93,12 @@ const UserNavbar = () => {
     return "مستخدم";
   };
 
-  // ✅ الحصول على معلومات المستخدم أولاً
+  // الحصول على معلومات المستخدم أولاً
   const userInfo = getUserInfo();
   const userPlan = userInfo?.plan || localStorage.getItem('userPlan') || 'free';
   const selectedSite = localStorage.getItem("selected_site");
 
-  // ✅ التحقق من كون المستخدم هو المالك
+  // التحقق من كون المستخدم هو المالك
   const checkIfOwner = () => {
     const ownerEmail = "alimobarki.ad@gmail.com";
     return userInfo?.email === ownerEmail || 
@@ -134,43 +141,33 @@ const UserNavbar = () => {
   const displayPlan = isOwnerUser ? 'owner' : userPlan;
   const CurrentPlanIcon = planInfo[displayPlan]?.icon || Gift;
 
-  // قائمة الروابط للمستخدمين المسجلين
-  const getUserMenuItems = () => {
-    const baseItems = [
-      { path: '/products', label: 'منتجاتي' },
-      { path: '/points', label: 'النقاط', icon: Coins } // إضافة رابط النقاط
-    ];
+  // قائمة الخدمات المنظمة
+  const getServicesMenuItems = () => {
+    const services = [];
 
-    // ✅ إذا كان المالك - يرى كل شيء + لوحة الإدارة
+    // إذا كان المالك - يرى كل الخدمات
     if (isOwnerUser) {
-      baseItems.push(
-        { path: '/keyword-research', label: 'بحث الكلمات المفتاحية' },
-        { path: '/competitor-analysis', label: 'تحليل المنافسين' },
-        { path: '/admin-promo', label: '🔧 لوحة الإدارة' },
-        { path: '/contact', label: 'التواصل' },
-        { path: '/videos', label: 'شروحات الفيديو' }
+      services.push(
+        { path: '/keyword-research', label: 'بحث الكلمات المفتاحية', icon: Search },
+        { path: '/competitor-analysis', label: 'تحليل المنافسين', icon: Target },
+        { path: '/admin-promo', label: 'لوحة الإدارة', icon: Grid3X3 }
       );
     } else {
-      // ✅ للعملاء العاديين - حسب الباقة
+      // للعملاء العاديين - حسب الباقة
       if (userPlan === 'pro' || userPlan === 'enterprise') {
-        baseItems.push(
-          { path: '/keyword-research', label: 'بحث الكلمات المفتاحية' }
+        services.push(
+          { path: '/keyword-research', label: 'بحث الكلمات المفتاحية', icon: Search }
         );
       }
       
       if (userPlan === 'enterprise') {
-        baseItems.push(
-          { path: '/competitor-analysis', label: 'تحليل المنافسين' }
+        services.push(
+          { path: '/competitor-analysis', label: 'تحليل المنافسين', icon: Target }
         );
       }
-
-      baseItems.push(
-        { path: '/contact', label: 'التواصل' },
-        { path: '/videos', label: 'شروحات الفيديو' }
-      );
     }
 
-    return baseItems;
+    return services;
   };
 
   return (
@@ -194,21 +191,82 @@ const UserNavbar = () => {
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8 space-x-reverse">
           
-          {/* روابط المستخدم */}
-          {getUserMenuItems().map((item) => (
-            <Link 
-              key={item.path}
-              to={item.path} 
-              className={`flex items-center gap-2 transition-colors duration-300 ${
-                isActivePath(item.path) 
-                  ? 'text-[#83dcc9] font-semibold' 
-                  : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
-              }`}
-            >
-              {item.icon && <item.icon size={16} />}
-              {item.label}
-            </Link>
-          ))}
+          {/* منتجاتي */}
+          <Link 
+            to="/products" 
+            className={`flex items-center gap-2 transition-colors duration-300 ${
+              isActivePath('/products') 
+                ? 'text-[#83dcc9] font-semibold' 
+                : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+            }`}
+          >
+            <Package size={16} />
+            منتجاتي
+          </Link>
+
+          {/* قائمة الخدمات المنسدلة */}
+          {getServicesMenuItems().length > 0 && (
+            <div className="relative" ref={servicesRef}>
+              <button
+                onClick={() => setIsServicesMenuOpen(!isServicesMenuOpen)}
+                className={`flex items-center gap-2 transition-colors duration-300 ${
+                  getServicesMenuItems().some(item => isActivePath(item.path))
+                    ? 'text-[#83dcc9] font-semibold' 
+                    : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+                }`}
+              >
+                <Grid3X3 size={16} />
+                خدماتي
+                <ChevronDown size={14} className={`transition-transform duration-200 ${isServicesMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {isServicesMenuOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-md shadow-lg py-2 z-50 border border-gray-200 dark:border-gray-600 transition-colors duration-300">
+                  {getServicesMenuItems().map((item) => (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={`flex items-center gap-3 px-4 py-2 text-sm transition-colors ${
+                        isActivePath(item.path)
+                          ? 'bg-[#83dcc9]/10 text-[#83dcc9] border-r-2 border-[#83dcc9]'
+                          : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
+                      onClick={() => setIsServicesMenuOpen(false)}
+                    >
+                      <item.icon size={16} />
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* التواصل */}
+          <Link 
+            to="/contact" 
+            className={`flex items-center gap-2 transition-colors duration-300 ${
+              isActivePath('/contact') 
+                ? 'text-[#83dcc9] font-semibold' 
+                : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+            }`}
+          >
+            <MessageSquare size={16} />
+            التواصل
+          </Link>
+
+          {/* شروحات الفيديو */}
+          <Link 
+            to="/videos" 
+            className={`flex items-center gap-2 transition-colors duration-300 ${
+              isActivePath('/videos') 
+                ? 'text-[#83dcc9] font-semibold' 
+                : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+            }`}
+          >
+            <Video size={16} />
+            شروحات الفيديو
+          </Link>
 
           {/* عرض رصيد النقاط */}
           <PointsBalance />
@@ -381,22 +439,71 @@ const UserNavbar = () => {
                 )}
               </div>
 
-              {/* روابط المستخدم */}
-              {getUserMenuItems().map((item) => (
-                <Link 
-                  key={item.path}
-                  to={item.path} 
-                  className={`flex items-center gap-2 transition-colors duration-300 py-2 ${
-                    isActivePath(item.path) 
-                      ? 'text-[#83dcc9] font-semibold' 
-                      : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
-                  }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {item.icon && <item.icon size={16} />}
-                  {item.label}
-                </Link>
-              ))}
+              {/* منتجاتي */}
+              <Link 
+                to="/products" 
+                className={`flex items-center gap-2 transition-colors duration-300 py-2 ${
+                  isActivePath('/products') 
+                    ? 'text-[#83dcc9] font-semibold' 
+                    : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+                }`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Package size={16} />
+                منتجاتي
+              </Link>
+
+              {/* الخدمات */}
+              {getServicesMenuItems().length > 0 && (
+                <>
+                  <div className="text-xs text-gray-400 font-semibold uppercase tracking-wider">
+                    خدماتي
+                  </div>
+                  {getServicesMenuItems().map((item) => (
+                    <Link 
+                      key={item.path}
+                      to={item.path} 
+                      className={`flex items-center gap-2 transition-colors duration-300 py-2 pl-4 ${
+                        isActivePath(item.path) 
+                          ? 'text-[#83dcc9] font-semibold' 
+                          : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+                      }`}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <item.icon size={16} />
+                      {item.label}
+                    </Link>
+                  ))}
+                </>
+              )}
+
+              {/* التواصل */}
+              <Link 
+                to="/contact" 
+                className={`flex items-center gap-2 transition-colors duration-300 py-2 ${
+                  isActivePath('/contact') 
+                    ? 'text-[#83dcc9] font-semibold' 
+                    : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+                }`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <MessageSquare size={16} />
+                التواصل
+              </Link>
+
+              {/* شروحات الفيديو */}
+              <Link 
+                to="/videos" 
+                className={`flex items-center gap-2 transition-colors duration-300 py-2 ${
+                  isActivePath('/videos') 
+                    ? 'text-[#83dcc9] font-semibold' 
+                    : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+                }`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Video size={16} />
+                شروحات الفيديو
+              </Link>
 
               <hr className="border-gray-600 dark:border-gray-500" />
               
@@ -408,6 +515,15 @@ const UserNavbar = () => {
               >
                 <User size={16} />
                 حسابي
+              </Link>
+
+              <Link
+                to="/points"
+                className="flex items-center gap-3 py-2 text-sm text-gray-300 dark:text-gray-400 hover:text-[#83dcc9] transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <Coins size={16} />
+                نظام النقاط
               </Link>
 
               {!isOwnerUser && userPlan !== 'enterprise' && (
