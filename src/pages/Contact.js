@@ -97,12 +97,12 @@ export default function ContactPage() {
         
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8 space-x-reverse">
-          <Link to="/features" className="hover:text-[#83dcc9] transition-colors">المميزات</Link>
-          <Link to="/pricing" className="hover:text-[#83dcc9] transition-colors">الأسعار</Link>
-          <Link to="/how-it-works" className="hover:text-[#83dcc9] transition-colors">كيف يعمل</Link>
-          <Link to="/about" className="hover:text-[#83dcc9] transition-colors">من نحن</Link>
-          <Link to="/contact" className="text-[#83dcc9] font-semibold">اتصل بنا</Link>
-          <Link to="/login" className="bg-[#83dcc9] text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-[#6cc9b9] transition">
+          <Link to="/features" className="hover:text-[#4BB8A9] transition-colors">المميزات</Link>
+          <Link to="/pricing" className="hover:text-[#4BB8A9] transition-colors">الأسعار</Link>
+          <Link to="/how-it-works" className="hover:text-[#4BB8A9] transition-colors">كيف يعمل</Link>
+          <Link to="/about" className="hover:text-[#4BB8A9] transition-colors">من نحن</Link>
+          <Link to="/contact" className="text-[#4BB8A9] font-semibold">اتصل بنا</Link>
+          <Link to="/login" className="bg-[#4BB8A9] text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-[#6cc9b9] transition">
             دخول
           </Link>
         </div>
@@ -137,42 +137,42 @@ export default function ContactPage() {
             <div className="flex flex-col space-y-4">
               <Link 
                 to="/features" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 المميزات
               </Link>
               <Link 
                 to="/pricing" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 الأسعار
               </Link>
               <Link 
                 to="/how-it-works" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 كيف يعمل
               </Link>
               <Link 
                 to="/about" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 من نحن
               </Link>
               <Link 
                 to="/contact" 
-                className="text-[#83dcc9] font-semibold py-2 border-b border-gray-700"
+                className="text-[#4BB8A9] font-semibold py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 اتصل بنا
               </Link>
               <Link 
                 to="/login" 
-                className="bg-[#83dcc9] text-gray-900 font-bold py-3 px-4 rounded-lg hover:bg-[#6cc9b9] transition text-center mt-4"
+                className="bg-[#4BB8A9] text-gray-900 font-bold py-3 px-4 rounded-lg hover:bg-[#6cc9b9] transition text-center mt-4"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 دخول
@@ -196,8 +196,8 @@ export default function ContactPage() {
             <p className="text-xl text-gray-300 mb-8 leading-relaxed">
               فريق دعم متخصص جاهز للإجابة على استفساراتك ومساعدتك في تحقيق أهدافك
             </p>
-            <div className="bg-[#83dcc9]/10 border border-[#83dcc9]/30 rounded-2xl p-6">
-              <div className="flex items-center justify-center space-x-4 space-x-reverse text-[#83dcc9]">
+            <div className="bg-[#4BB8A9]/10 border border-[#4BB8A9]/30 rounded-2xl p-6">
+              <div className="flex items-center justify-center space-x-4 space-x-reverse text-[#4BB8A9]">
                 <span className="text-2xl">⚡</span>
                 <p className="text-lg font-semibold">
                   نرد على جميع الاستفسارات خلال 24 ساعة
@@ -233,10 +233,10 @@ export default function ContactPage() {
                 className="bg-gray-800 p-8 rounded-2xl text-center hover:shadow-xl transition-all hover:-translate-y-1"
               >
                 <div className="text-5xl mb-4">{method.icon}</div>
-                <h3 className="text-xl font-bold mb-3 text-[#83dcc9]">{method.title}</h3>
+                <h3 className="text-xl font-bold mb-3 text-[#4BB8A9]">{method.title}</h3>
                 <p className="text-gray-400 mb-4">{method.description}</p>
                 <p className="text-lg font-semibold mb-2">{method.contact}</p>
-                <p className="text-sm text-[#83dcc9]">{method.responseTime}</p>
+                <p className="text-sm text-[#4BB8A9]">{method.responseTime}</p>
               </motion.div>
             ))}
           </div>
@@ -267,7 +267,7 @@ export default function ContactPage() {
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-semibold mb-2 text-[#83dcc9]">
+                <label className="block text-sm font-semibold mb-2 text-[#4BB8A9]">
                   الاسم الكامل *
                 </label>
                 <input
@@ -276,13 +276,13 @@ export default function ContactPage() {
                   value={formData.name}
                   onChange={handleInputChange}
                   required
-                  className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-[#83dcc9] focus:outline-none transition"
+                  className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-[#4BB8A9] focus:outline-none transition"
                   placeholder="أدخل اسمك الكامل"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-semibold mb-2 text-[#83dcc9]">
+                <label className="block text-sm font-semibold mb-2 text-[#4BB8A9]">
                   البريد الإلكتروني *
                 </label>
                 <input
@@ -291,21 +291,21 @@ export default function ContactPage() {
                   value={formData.email}
                   onChange={handleInputChange}
                   required
-                  className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-[#83dcc9] focus:outline-none transition"
+                  className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-[#4BB8A9] focus:outline-none transition"
                   placeholder="example@email.com"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-2 text-[#83dcc9]">
+              <label className="block text-sm font-semibold mb-2 text-[#4BB8A9]">
                 نوع الاستفسار
               </label>
               <select
                 name="inquiryType"
                 value={formData.inquiryType}
                 onChange={handleInputChange}
-                className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-[#83dcc9] focus:outline-none transition"
+                className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-[#4BB8A9] focus:outline-none transition"
               >
                 <option value="general">استفسار عام</option>
                 <option value="technical">مشكلة تقنية</option>
@@ -316,7 +316,7 @@ export default function ContactPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-2 text-[#83dcc9]">
+              <label className="block text-sm font-semibold mb-2 text-[#4BB8A9]">
                 الموضوع *
               </label>
               <input
@@ -325,13 +325,13 @@ export default function ContactPage() {
                 value={formData.subject}
                 onChange={handleInputChange}
                 required
-                className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-[#83dcc9] focus:outline-none transition"
+                className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-[#4BB8A9] focus:outline-none transition"
                 placeholder="موضوع رسالتك"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-2 text-[#83dcc9]">
+              <label className="block text-sm font-semibold mb-2 text-[#4BB8A9]">
                 الرسالة *
               </label>
               <textarea
@@ -340,7 +340,7 @@ export default function ContactPage() {
                 onChange={handleInputChange}
                 required
                 rows="6"
-                className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-[#83dcc9] focus:outline-none transition resize-none"
+                className="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-[#4BB8A9] focus:outline-none transition resize-none"
                 placeholder="اكتب رسالتك هنا..."
               ></textarea>
             </div>
@@ -348,7 +348,7 @@ export default function ContactPage() {
             <div className="text-center">
               <button
                 type="submit"
-                className="bg-[#83dcc9] text-gray-900 font-bold py-4 px-8 rounded-xl hover:bg-[#6cc9b9] transition text-lg"
+                className="bg-[#4BB8A9] text-gray-900 font-bold py-4 px-8 rounded-xl hover:bg-[#6cc9b9] transition text-lg"
               >
                 إرسال الرسالة
               </button>
@@ -384,7 +384,7 @@ export default function ContactPage() {
                 <div className="flex items-center space-x-4 space-x-reverse">
                   <div className="text-4xl">{support.icon}</div>
                   <div>
-                    <h3 className="text-xl font-bold text-[#83dcc9] mb-2">{support.title}</h3>
+                    <h3 className="text-xl font-bold text-[#4BB8A9] mb-2">{support.title}</h3>
                     <p className="text-gray-300">{support.description}</p>
                   </div>
                 </div>
@@ -418,7 +418,7 @@ export default function ContactPage() {
                 viewport={{ once: true }}
                 className="bg-gray-800 p-6 rounded-xl"
               >
-                <h3 className="text-lg font-bold text-[#83dcc9] mb-3">{faq.question}</h3>
+                <h3 className="text-lg font-bold text-[#4BB8A9] mb-3">{faq.question}</h3>
                 <p className="text-gray-300">{faq.answer}</p>
               </motion.div>
             ))}
@@ -426,7 +426,7 @@ export default function ContactPage() {
 
           <div className="text-center mt-12">
             <Link to="/faq">
-              <button className="border border-[#83dcc9] text-[#83dcc9] font-bold py-3 px-6 rounded-xl hover:bg-[#83dcc9] hover:text-gray-900 transition">
+              <button className="border border-[#4BB8A9] text-[#4BB8A9] font-bold py-3 px-6 rounded-xl hover:bg-[#4BB8A9] hover:text-gray-900 transition">
                 عرض جميع الأسئلة الشائعة
               </button>
             </Link>
@@ -442,17 +442,17 @@ export default function ContactPage() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-r from-[#83dcc9]/20 to-transparent border border-[#83dcc9]/30 rounded-2xl p-8"
+            className="bg-gradient-to-r from-[#4BB8A9]/20 to-transparent border border-[#4BB8A9]/30 rounded-2xl p-8"
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-6">ساعات العمل</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-lg">
               <div>
-                <h3 className="font-bold text-[#83dcc9] mb-2">الدعم الفني</h3>
+                <h3 className="font-bold text-[#4BB8A9] mb-2">الدعم الفني</h3>
                 <p className="text-gray-300">الأحد - الخميس: 9:00 ص - 6:00 م</p>
                 <p className="text-gray-300">الجمعة - السبت: 10:00 ص - 4:00 م</p>
               </div>
               <div>
-                <h3 className="font-bold text-[#83dcc9] mb-2">الرد على الإيميل</h3>
+                <h3 className="font-bold text-[#4BB8A9] mb-2">الرد على الإيميل</h3>
                 <p className="text-gray-300">24/7 - نرد خلال 24 ساعة</p>
                 <p className="text-gray-300">طوارئ: استجابة فورية</p>
               </div>
@@ -469,7 +469,7 @@ export default function ContactPage() {
         <div className="max-w-screen-xl mx-auto">
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 text-xs sm:text-sm mb-6 sm:mb-8">
             <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">المنصة</h4>
+              <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">المنصة</h4>
               <div className="space-y-1 sm:space-y-2">
                 <Link to="/features" className="block text-gray-400 hover:text-white transition">المميزات</Link>
                 <Link to="/pricing" className="block text-gray-400 hover:text-white transition">الأسعار</Link>
@@ -478,16 +478,16 @@ export default function ContactPage() {
               </div>
             </div>
             <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">الشركة</h4>
+              <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">الشركة</h4>
               <div className="space-y-1 sm:space-y-2">
                 <Link to="/about" className="block text-gray-400 hover:text-white transition">من نحن</Link>
-                <Link to="/contact" className="block text-[#83dcc9] font-semibold">اتصل بنا</Link>
+                <Link to="/contact" className="block text-[#4BB8A9] font-semibold">اتصل بنا</Link>
                 <Link to="/careers" className="block text-gray-400 hover:text-white transition">الوظائف</Link>
                 <Link to="/blog" className="block text-gray-400 hover:text-white transition">المدونة</Link>
               </div>
             </div>
             <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">الدعم</h4>
+              <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">الدعم</h4>
               <div className="space-y-1 sm:space-y-2">
                 <Link to="/faq" className="block text-gray-400 hover:text-white transition">الأسئلة الشائعة</Link>
                 <Link to="/help" className="block text-gray-400 hover:text-white transition">مركز المساعدة</Link>
@@ -496,7 +496,7 @@ export default function ContactPage() {
               </div>
             </div>
             <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">قانوني</h4>
+              <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">قانوني</h4>
               <div className="space-y-1 sm:space-y-2">
                 <Link to="/privacy" className="block text-gray-400 hover:text-white transition">سياسة الخصوصية</Link>
                 <Link to="/terms" className="block text-gray-400 hover:text-white transition">شروط الخدمة</Link>
@@ -512,9 +512,9 @@ export default function ContactPage() {
               <span className="text-gray-400 text-xs text-center sm:text-right">© 2025 مشروع السيو الذكي. جميع الحقوق محفوظة.</span>
             </div>
             <div className="flex space-x-3 sm:space-x-4 space-x-reverse">
-              <Link to="/social/twitter" className="text-gray-400 hover:text-[#83dcc9] transition text-xs sm:text-sm">تويتر</Link>
-              <Link to="/social/linkedin" className="text-gray-400 hover:text-[#83dcc9] transition text-xs sm:text-sm">لينكد إن</Link>
-              <Link to="/social/instagram" className="text-gray-400 hover:text-[#83dcc9] transition text-xs sm:text-sm">إنستجرام</Link>
+              <Link to="/social/twitter" className="text-gray-400 hover:text-[#4BB8A9] transition text-xs sm:text-sm">تويتر</Link>
+              <Link to="/social/linkedin" className="text-gray-400 hover:text-[#4BB8A9] transition text-xs sm:text-sm">لينكد إن</Link>
+              <Link to="/social/instagram" className="text-gray-400 hover:text-[#4BB8A9] transition text-xs sm:text-sm">إنستجرام</Link>
             </div>
           </div>
         </div>

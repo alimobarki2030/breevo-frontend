@@ -157,7 +157,7 @@ export default function PaymentResult() {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
         <div className="text-center text-white">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#83dcc9] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4BB8A9] mx-auto mb-4"></div>
           <h2 className="text-xl font-bold mb-2">جاري التحقق من حالة الدفع...</h2>
           <p className="text-gray-400">يرجى الانتظار، لا تقم بإغلاق هذه الصفحة</p>
         </div>
@@ -208,7 +208,7 @@ export default function PaymentResult() {
               
               <button
                 onClick={handleGoToProducts}
-                className="w-full bg-[#83dcc9] text-gray-900 py-3 rounded-lg font-bold hover:bg-[#6cc9b9] transition-all flex items-center justify-center gap-2"
+                className="w-full bg-[#4BB8A9] text-gray-900 py-3 rounded-lg font-bold hover:bg-[#6cc9b9] transition-all flex items-center justify-center gap-2"
               >
                 <span>ابدأ استخدام منتجاتك</span>
                 <ArrowRight className="w-5 h-5" />

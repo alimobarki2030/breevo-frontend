@@ -196,8 +196,8 @@ const UserNavbar = () => {
             to="/products" 
             className={`flex items-center gap-2 transition-colors duration-300 ${
               isActivePath('/products') 
-                ? 'text-[#83dcc9] font-semibold' 
-                : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+                ? 'text-[#4BB8A9] font-semibold' 
+                : 'text-gray-300 dark:text-gray-400 hover:text-[#4BB8A9]'
             }`}
           >
             <Package size={16} />
@@ -211,8 +211,8 @@ const UserNavbar = () => {
                 onClick={() => setIsServicesMenuOpen(!isServicesMenuOpen)}
                 className={`flex items-center gap-2 transition-colors duration-300 ${
                   getServicesMenuItems().some(item => isActivePath(item.path))
-                    ? 'text-[#83dcc9] font-semibold' 
-                    : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+                    ? 'text-[#4BB8A9] font-semibold' 
+                    : 'text-gray-300 dark:text-gray-400 hover:text-[#4BB8A9]'
                 }`}
               >
                 <Grid3X3 size={16} />
@@ -228,7 +228,7 @@ const UserNavbar = () => {
                       to={item.path}
                       className={`flex items-center gap-3 px-4 py-2 text-sm transition-colors ${
                         isActivePath(item.path)
-                          ? 'bg-[#83dcc9]/10 text-[#83dcc9] border-r-2 border-[#83dcc9]'
+                          ? 'bg-[#4BB8A9]/10 text-[#4BB8A9] border-r-2 border-[#4BB8A9]'
                           : 'hover:bg-gray-100 dark:hover:bg-gray-700'
                       }`}
                       onClick={() => setIsServicesMenuOpen(false)}
@@ -247,8 +247,8 @@ const UserNavbar = () => {
             to="/contact" 
             className={`flex items-center gap-2 transition-colors duration-300 ${
               isActivePath('/contact') 
-                ? 'text-[#83dcc9] font-semibold' 
-                : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+                ? 'text-[#4BB8A9] font-semibold' 
+                : 'text-gray-300 dark:text-gray-400 hover:text-[#4BB8A9]'
             }`}
           >
             <MessageSquare size={16} />
@@ -260,8 +260,8 @@ const UserNavbar = () => {
             to="/videos" 
             className={`flex items-center gap-2 transition-colors duration-300 ${
               isActivePath('/videos') 
-                ? 'text-[#83dcc9] font-semibold' 
-                : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+                ? 'text-[#4BB8A9] font-semibold' 
+                : 'text-gray-300 dark:text-gray-400 hover:text-[#4BB8A9]'
             }`}
           >
             <Video size={16} />
@@ -281,7 +281,7 @@ const UserNavbar = () => {
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
               className="flex items-center gap-2 hover:opacity-90 transition-opacity"
             >
-              <div className="w-9 h-9 rounded-full bg-[#83dcc9] text-gray-900 flex items-center justify-center font-bold">
+              <div className="w-9 h-9 rounded-full bg-[#4BB8A9] text-gray-900 flex items-center justify-center font-bold">
                 {getUserInitial()}
               </div>
               
@@ -444,8 +444,8 @@ const UserNavbar = () => {
                 to="/products" 
                 className={`flex items-center gap-2 transition-colors duration-300 py-2 ${
                   isActivePath('/products') 
-                    ? 'text-[#83dcc9] font-semibold' 
-                    : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+                    ? 'text-[#4BB8A9] font-semibold' 
+                    : 'text-gray-300 dark:text-gray-400 hover:text-[#4BB8A9]'
                 }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
@@ -465,8 +465,8 @@ const UserNavbar = () => {
                       to={item.path} 
                       className={`flex items-center gap-2 transition-colors duration-300 py-2 pl-4 ${
                         isActivePath(item.path) 
-                          ? 'text-[#83dcc9] font-semibold' 
-                          : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+                          ? 'text-[#4BB8A9] font-semibold' 
+                          : 'text-gray-300 dark:text-gray-400 hover:text-[#4BB8A9]'
                       }`}
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
@@ -482,8 +482,8 @@ const UserNavbar = () => {
                 to="/contact" 
                 className={`flex items-center gap-2 transition-colors duration-300 py-2 ${
                   isActivePath('/contact') 
-                    ? 'text-[#83dcc9] font-semibold' 
-                    : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+                    ? 'text-[#4BB8A9] font-semibold' 
+                    : 'text-gray-300 dark:text-gray-400 hover:text-[#4BB8A9]'
                 }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
@@ -496,8 +496,8 @@ const UserNavbar = () => {
                 to="/videos" 
                 className={`flex items-center gap-2 transition-colors duration-300 py-2 ${
                   isActivePath('/videos') 
-                    ? 'text-[#83dcc9] font-semibold' 
-                    : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+                    ? 'text-[#4BB8A9] font-semibold' 
+                    : 'text-gray-300 dark:text-gray-400 hover:text-[#4BB8A9]'
                 }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
@@ -510,7 +510,7 @@ const UserNavbar = () => {
               {/* روابط الحساب */}
               <Link
                 to="/account"
-                className="flex items-center gap-3 py-2 text-sm text-gray-300 dark:text-gray-400 hover:text-[#83dcc9] transition-colors"
+                className="flex items-center gap-3 py-2 text-sm text-gray-300 dark:text-gray-400 hover:text-[#4BB8A9] transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 <User size={16} />
@@ -519,7 +519,7 @@ const UserNavbar = () => {
 
               <Link
                 to="/points"
-                className="flex items-center gap-3 py-2 text-sm text-gray-300 dark:text-gray-400 hover:text-[#83dcc9] transition-colors"
+                className="flex items-center gap-3 py-2 text-sm text-gray-300 dark:text-gray-400 hover:text-[#4BB8A9] transition-colors"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 <Coins size={16} />

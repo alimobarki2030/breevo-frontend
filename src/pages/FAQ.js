@@ -197,12 +197,12 @@ export default function FAQPage() {
         
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8 space-x-reverse">
-          <Link to="/features" className="hover:text-[#83dcc9] transition-colors">المميزات</Link>
-          <Link to="/pricing" className="hover:text-[#83dcc9] transition-colors">الأسعار</Link>
-          <Link to="/how-it-works" className="hover:text-[#83dcc9] transition-colors">كيف يعمل</Link>
-          <Link to="/about" className="hover:text-[#83dcc9] transition-colors">من نحن</Link>
-          <Link to="/contact" className="hover:text-[#83dcc9] transition-colors">اتصل بنا</Link>
-          <Link to="/login" className="bg-[#83dcc9] text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-[#6cc9b9] transition">
+          <Link to="/features" className="hover:text-[#4BB8A9] transition-colors">المميزات</Link>
+          <Link to="/pricing" className="hover:text-[#4BB8A9] transition-colors">الأسعار</Link>
+          <Link to="/how-it-works" className="hover:text-[#4BB8A9] transition-colors">كيف يعمل</Link>
+          <Link to="/about" className="hover:text-[#4BB8A9] transition-colors">من نحن</Link>
+          <Link to="/contact" className="hover:text-[#4BB8A9] transition-colors">اتصل بنا</Link>
+          <Link to="/login" className="bg-[#4BB8A9] text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-[#6cc9b9] transition">
             دخول
           </Link>
         </div>
@@ -237,42 +237,42 @@ export default function FAQPage() {
             <div className="flex flex-col space-y-4">
               <Link 
                 to="/features" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 المميزات
               </Link>
               <Link 
                 to="/pricing" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 الأسعار
               </Link>
               <Link 
                 to="/how-it-works" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 كيف يعمل
               </Link>
               <Link 
                 to="/about" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 من نحن
               </Link>
               <Link 
                 to="/contact" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 اتصل بنا
               </Link>
               <Link 
                 to="/login" 
-                className="bg-[#83dcc9] text-gray-900 font-bold py-3 px-4 rounded-lg hover:bg-[#6cc9b9] transition text-center mt-4"
+                className="bg-[#4BB8A9] text-gray-900 font-bold py-3 px-4 rounded-lg hover:bg-[#6cc9b9] transition text-center mt-4"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 دخول
@@ -296,8 +296,8 @@ export default function FAQPage() {
             <p className="text-xl text-gray-300 mb-8 leading-relaxed">
               إجابات شاملة لجميع استفساراتك حول المنصة وكيفية استخدامها
             </p>
-            <div className="bg-[#83dcc9]/10 border border-[#83dcc9]/30 rounded-2xl p-6">
-              <div className="flex items-center justify-center space-x-4 space-x-reverse text-[#83dcc9]">
+            <div className="bg-[#4BB8A9]/10 border border-[#4BB8A9]/30 rounded-2xl p-6">
+              <div className="flex items-center justify-center space-x-4 space-x-reverse text-[#4BB8A9]">
                 <span className="text-2xl">💡</span>
                 <p className="text-lg font-semibold">
                   لم تجد إجابة لسؤالك؟ تواصل معنا وسنساعدك فوراً
@@ -329,7 +329,7 @@ export default function FAQPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4 space-x-reverse">
                       <span className="text-3xl">{category.icon}</span>
-                      <h2 className="text-xl md:text-2xl font-bold text-[#83dcc9]">
+                      <h2 className="text-xl md:text-2xl font-bold text-[#4BB8A9]">
                         {category.title}
                       </h2>
                     </div>
@@ -426,19 +426,19 @@ export default function FAQPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <Link to="/contact" className="bg-gray-800 p-6 rounded-xl hover:shadow-xl transition-all hover:-translate-y-1">
                 <div className="text-4xl mb-3">📧</div>
-                <h3 className="text-lg font-bold text-[#83dcc9] mb-2">راسلنا</h3>
+                <h3 className="text-lg font-bold text-[#4BB8A9] mb-2">راسلنا</h3>
                 <p className="text-gray-400 text-sm">نرد خلال 24 ساعة</p>
               </Link>
               
               <Link to="/how-it-works" className="bg-gray-800 p-6 rounded-xl hover:shadow-xl transition-all hover:-translate-y-1">
                 <div className="text-4xl mb-3">📚</div>
-                <h3 className="text-lg font-bold text-[#83dcc9] mb-2">دليل الاستخدام</h3>
+                <h3 className="text-lg font-bold text-[#4BB8A9] mb-2">دليل الاستخدام</h3>
                 <p className="text-gray-400 text-sm">تعلم كيف تستخدم المنصة</p>
               </Link>
               
               <Link to="/login?plan=free" className="bg-gray-800 p-6 rounded-xl hover:shadow-xl transition-all hover:-translate-y-1">
                 <div className="text-4xl mb-3">🚀</div>
-                <h3 className="text-lg font-bold text-[#83dcc9] mb-2">جرب مجاناً</h3>
+                <h3 className="text-lg font-bold text-[#4BB8A9] mb-2">جرب مجاناً</h3>
                 <p className="text-gray-400 text-sm">ابدأ بـ 3 منتجات مجانية</p>
               </Link>
             </div>
@@ -454,7 +454,7 @@ export default function FAQPage() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-r from-[#83dcc9]/20 to-transparent border border-[#83dcc9]/30 rounded-2xl p-8"
+            className="bg-gradient-to-r from-[#4BB8A9]/20 to-transparent border border-[#4BB8A9]/30 rounded-2xl p-8"
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
               جاهز لتحسين منتجاتك؟
@@ -464,12 +464,12 @@ export default function FAQPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
               <Link to="/login?plan=free" className="w-full sm:w-auto">
-                <button className="w-full bg-[#83dcc9] text-gray-900 font-bold py-4 px-8 rounded-xl hover:bg-[#6cc9b9] transition text-lg">
+                <button className="w-full bg-[#4BB8A9] text-gray-900 font-bold py-4 px-8 rounded-xl hover:bg-[#6cc9b9] transition text-lg">
                   ابدأ مجاناً الآن
                 </button>
               </Link>
               <Link to="/contact" className="w-full sm:w-auto">
-                <button className="w-full border border-[#83dcc9] text-[#83dcc9] font-bold py-4 px-8 rounded-xl hover:bg-[#83dcc9] hover:text-gray-900 transition text-lg">
+                <button className="w-full border border-[#4BB8A9] text-[#4BB8A9] font-bold py-4 px-8 rounded-xl hover:bg-[#4BB8A9] hover:text-gray-900 transition text-lg">
                   تحدث مع الخبراء
                 </button>
               </Link>
@@ -483,7 +483,7 @@ export default function FAQPage() {
         <div className="max-w-screen-xl mx-auto">
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 text-xs sm:text-sm mb-6 sm:mb-8">
             <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">المنصة</h4>
+              <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">المنصة</h4>
               <div className="space-y-1 sm:space-y-2">
                 <Link to="/features" className="block text-gray-400 hover:text-white transition">المميزات</Link>
                 <Link to="/pricing" className="block text-gray-400 hover:text-white transition">الأسعار</Link>
@@ -492,7 +492,7 @@ export default function FAQPage() {
               </div>
             </div>
             <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">الشركة</h4>
+              <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">الشركة</h4>
               <div className="space-y-1 sm:space-y-2">
                 <Link to="/about" className="block text-gray-400 hover:text-white transition">من نحن</Link>
                 <Link to="/contact" className="block text-gray-400 hover:text-white transition">اتصل بنا</Link>
@@ -501,16 +501,16 @@ export default function FAQPage() {
               </div>
             </div>
             <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">الدعم</h4>
+              <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">الدعم</h4>
               <div className="space-y-1 sm:space-y-2">
-                <Link to="/faq" className="block text-[#83dcc9] font-semibold">الأسئلة الشائعة</Link>
+                <Link to="/faq" className="block text-[#4BB8A9] font-semibold">الأسئلة الشائعة</Link>
                 <Link to="/help" className="block text-gray-400 hover:text-white transition">مركز المساعدة</Link>
                 <Link to="/tutorials" className="block text-gray-400 hover:text-white transition">الدروس التعليمية</Link>
                 <Link to="/support" className="block text-gray-400 hover:text-white transition">الدعم الفني</Link>
               </div>
             </div>
             <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">قانوني</h4>
+              <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">قانوني</h4>
               <div className="space-y-1 sm:space-y-2">
                 <Link to="/privacy" className="block text-gray-400 hover:text-white transition">سياسة الخصوصية</Link>
                 <Link to="/terms" className="block text-gray-400 hover:text-white transition">شروط الخدمة</Link>
@@ -526,9 +526,9 @@ export default function FAQPage() {
               <span className="text-gray-400 text-xs text-center sm:text-right">© 2025 مشروع السيو الذكي. جميع الحقوق محفوظة.</span>
             </div>
             <div className="flex space-x-3 sm:space-x-4 space-x-reverse">
-              <Link to="/social/twitter" className="text-gray-400 hover:text-[#83dcc9] transition text-xs sm:text-sm">تويتر</Link>
-              <Link to="/social/linkedin" className="text-gray-400 hover:text-[#83dcc9] transition text-xs sm:text-sm">لينكد إن</Link>
-              <Link to="/social/instagram" className="text-gray-400 hover:text-[#83dcc9] transition text-xs sm:text-sm">إنستجرام</Link>
+              <Link to="/social/twitter" className="text-gray-400 hover:text-[#4BB8A9] transition text-xs sm:text-sm">تويتر</Link>
+              <Link to="/social/linkedin" className="text-gray-400 hover:text-[#4BB8A9] transition text-xs sm:text-sm">لينكد إن</Link>
+              <Link to="/social/instagram" className="text-gray-400 hover:text-[#4BB8A9] transition text-xs sm:text-sm">إنستجرام</Link>
             </div>
           </div>
         </div>

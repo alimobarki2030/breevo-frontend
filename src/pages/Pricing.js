@@ -233,7 +233,7 @@ export default function PricingPage() {
                   onClick={() => setBillingCycle('monthly')}
                   className={`px-6 py-3 rounded-xl font-semibold transition-all ${
                     billingCycle === 'monthly'
-                      ? 'bg-[#83dcc9] text-gray-900'
+                      ? 'bg-[#4BB8A9] text-gray-900'
                       : isDark 
                         ? 'text-gray-300 hover:text-white' 
                         : 'text-gray-600 hover:text-gray-900'
@@ -246,7 +246,7 @@ export default function PricingPage() {
                   onClick={() => setBillingCycle('annual')}
                   className={`px-6 py-3 rounded-xl font-semibold transition-all relative ${
                     billingCycle === 'annual'
-                      ? 'bg-[#83dcc9] text-gray-900'
+                      ? 'bg-[#4BB8A9] text-gray-900'
                       : isDark 
                         ? 'text-gray-300 hover:text-white' 
                         : 'text-gray-600 hover:text-gray-900'
@@ -275,17 +275,17 @@ export default function PricingPage() {
                   transition={{ duration: 0.6, delay: index * 0.1 }}
                   className={`relative p-8 rounded-2xl border-2 transition-all hover:shadow-2xl ${
                     plan.popular
-                      ? 'bg-[#83dcc9] text-gray-900 border-white scale-105 shadow-xl'
+                      ? 'bg-[#4BB8A9] text-gray-900 border-white scale-105 shadow-xl'
                       : isDark 
-                        ? 'bg-gray-800 border-gray-700 hover:border-[#83dcc9]/50'
-                        : 'bg-white border-gray-200 hover:border-[#83dcc9]/50 shadow-lg'
+                        ? 'bg-gray-800 border-gray-700 hover:border-[#4BB8A9]/50'
+                        : 'bg-white border-gray-200 hover:border-[#4BB8A9]/50 shadow-lg'
                   }`}
                 >
                   {/* Badge */}
                   {plan.badge && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                       <span className={`px-4 py-2 rounded-full text-sm font-bold ${
-                        plan.popular ? 'bg-orange-500 text-white' : 'bg-[#83dcc9] text-gray-900'
+                        plan.popular ? 'bg-orange-500 text-white' : 'bg-[#4BB8A9] text-gray-900'
                       }`}>
                         {plan.badge}
                       </span>
@@ -376,7 +376,7 @@ export default function PricingPage() {
                         <span className={`text-lg ${
                           plan.popular 
                             ? 'text-gray-900' 
-                            : 'text-[#83dcc9]'
+                            : 'text-[#4BB8A9]'
                         }`}>
                           ✓
                         </span>
@@ -398,7 +398,7 @@ export default function PricingPage() {
                     <button className={`w-full font-bold py-4 px-6 rounded-xl transition-all ${
                       plan.popular
                         ? 'bg-gray-900 text-white hover:bg-gray-800'
-                        : 'bg-[#83dcc9] text-gray-900 hover:bg-[#6cc9b9]'
+                        : 'bg-[#4BB8A9] text-gray-900 hover:bg-[#6cc9b9]'
                     }`}>
                       {plan.cta}
                     </button>
@@ -437,13 +437,13 @@ export default function PricingPage() {
                   viewport={{ once: true }}
                   className={`p-6 rounded-xl border transition-all hover:shadow-lg ${
                     isDark 
-                      ? 'bg-gray-800 border-gray-700 hover:border-[#83dcc9]' 
-                      : 'bg-white border-gray-200 hover:border-[#83dcc9]'
+                      ? 'bg-gray-800 border-gray-700 hover:border-[#4BB8A9]' 
+                      : 'bg-white border-gray-200 hover:border-[#4BB8A9]'
                   }`}
                 >
                   <h3 className="font-bold text-lg mb-2">{item.service}</h3>
                   <div className="flex items-center justify-between">
-                    <span className="text-3xl font-bold text-[#83dcc9]">{item.points}</span>
+                    <span className="text-3xl font-bold text-[#4BB8A9]">{item.points}</span>
                     <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>نقطة</span>
                   </div>
                 </motion.div>
@@ -479,11 +479,11 @@ export default function PricingPage() {
                   className={`relative p-6 rounded-xl border-2 transition-all hover:shadow-lg ${
                     pack.popular 
                       ? isDark 
-                        ? 'bg-gray-800 border-[#83dcc9] scale-105' 
-                        : 'bg-white border-[#83dcc9] shadow-lg scale-105'
+                        ? 'bg-gray-800 border-[#4BB8A9] scale-105' 
+                        : 'bg-white border-[#4BB8A9] shadow-lg scale-105'
                       : isDark 
-                        ? 'bg-gray-800 border-gray-700 hover:border-[#83dcc9]/50' 
-                        : 'bg-white border-gray-200 hover:border-[#83dcc9]/50'
+                        ? 'bg-gray-800 border-gray-700 hover:border-[#4BB8A9]/50' 
+                        : 'bg-white border-gray-200 hover:border-[#4BB8A9]/50'
                   }`}
                 >
                   {pack.popular && (
@@ -493,7 +493,7 @@ export default function PricingPage() {
                   )}
                   <h3 className="font-bold text-lg mb-4 text-center">{pack.name}</h3>
                   <div className="text-center mb-4">
-                    <span className="text-3xl font-bold text-[#83dcc9]">{pack.points.toLocaleString()}</span>
+                    <span className="text-3xl font-bold text-[#4BB8A9]">{pack.points.toLocaleString()}</span>
                     <span className={`block text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>نقطة</span>
                   </div>
                   <div className="text-center mb-4">
@@ -502,7 +502,7 @@ export default function PricingPage() {
                   </div>
                   <button className={`w-full py-2 px-4 rounded-lg font-medium transition-all ${
                     pack.popular 
-                      ? 'bg-[#83dcc9] text-gray-900 hover:bg-[#6cc9b9]' 
+                      ? 'bg-[#4BB8A9] text-gray-900 hover:bg-[#6cc9b9]' 
                       : isDark 
                         ? 'bg-gray-700 text-white hover:bg-gray-600' 
                         : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
@@ -542,7 +542,7 @@ export default function PricingPage() {
               }`}>
                 <div></div>
                 <div>البداية</div>
-                <div className="text-[#83dcc9]">المتقدمة</div>
+                <div className="text-[#4BB8A9]">المتقدمة</div>
                 <div className="text-yellow-500 dark:text-yellow-400">الاحترافية</div>
               </div>
               
@@ -554,7 +554,7 @@ export default function PricingPage() {
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.6, delay: categoryIndex * 0.1 }}
                     viewport={{ once: true }}
-                    className="bg-[#83dcc9] text-gray-900 p-4 font-bold text-lg"
+                    className="bg-[#4BB8A9] text-gray-900 p-4 font-bold text-lg"
                   >
                     {category.category}
                   </motion.div>
@@ -581,7 +581,7 @@ export default function PricingPage() {
                       }`}>
                         {feature.starter}
                       </div>
-                      <div className="text-center text-[#83dcc9] font-medium">{feature.advanced}</div>
+                      <div className="text-center text-[#4BB8A9] font-medium">{feature.advanced}</div>
                       <div className="text-center text-yellow-500 dark:text-yellow-400 font-medium">{feature.professional}</div>
                     </motion.div>
                   ))}
@@ -619,7 +619,7 @@ export default function PricingPage() {
                     isDark ? 'bg-gray-800' : 'bg-white shadow-lg'
                   }`}
                 >
-                  <h3 className="text-lg font-bold text-[#83dcc9] mb-3">{faq.question}</h3>
+                  <h3 className="text-lg font-bold text-[#4BB8A9] mb-3">{faq.question}</h3>
                   <p className={`leading-relaxed ${
                     isDark ? 'text-gray-300' : 'text-gray-700'
                   }`}>
@@ -692,12 +692,12 @@ export default function PricingPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
                 <Link to="/checkout?plan=starter" className="w-full sm:w-auto">
-                  <button className="w-full bg-[#83dcc9] text-gray-900 font-bold py-4 px-8 rounded-xl hover:bg-[#6cc9b9] transition text-lg shadow-lg hover:shadow-xl transform hover:scale-105">
+                  <button className="w-full bg-[#4BB8A9] text-gray-900 font-bold py-4 px-8 rounded-xl hover:bg-[#6cc9b9] transition text-lg shadow-lg hover:shadow-xl transform hover:scale-105">
                     ابدأ التجربة - 99 ريال/شهر
                   </button>
                 </Link>
                 <Link to="/contact" className="w-full sm:w-auto">
-                  <button className="w-full border-2 border-[#83dcc9] text-[#83dcc9] font-bold py-4 px-8 rounded-xl hover:bg-[#83dcc9] hover:text-gray-900 transition text-lg">
+                  <button className="w-full border-2 border-[#4BB8A9] text-[#4BB8A9] font-bold py-4 px-8 rounded-xl hover:bg-[#4BB8A9] hover:text-gray-900 transition text-lg">
                     تحدث مع المبيعات
                   </button>
                 </Link>
@@ -718,14 +718,14 @@ export default function PricingPage() {
           <div className="max-w-screen-xl mx-auto">
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 text-xs sm:text-sm mb-6 sm:mb-8">
               <div>
-                <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">المنصة</h4>
+                <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">المنصة</h4>
                 <div className="space-y-1 sm:space-y-2">
                   <Link to="/features" className={`block transition ${
                     isDark 
                       ? 'text-gray-400 hover:text-white' 
                       : 'text-gray-600 hover:text-gray-900'
                   }`}>المميزات</Link>
-                  <Link to="/pricing" className="block text-[#83dcc9] font-semibold">الأسعار</Link>
+                  <Link to="/pricing" className="block text-[#4BB8A9] font-semibold">الأسعار</Link>
                   <Link to="/how-it-works" className={`block transition ${
                     isDark 
                       ? 'text-gray-400 hover:text-white' 
@@ -734,7 +734,7 @@ export default function PricingPage() {
                 </div>
               </div>
               <div>
-                <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">الشركة</h4>
+                <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">الشركة</h4>
                 <div className="space-y-1 sm:space-y-2">
                   <Link to="/about" className={`block transition ${
                     isDark 
@@ -754,7 +754,7 @@ export default function PricingPage() {
                 </div>
               </div>
               <div>
-                <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">الدعم</h4>
+                <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">الدعم</h4>
                 <div className="space-y-1 sm:space-y-2">
                   <Link to="/faq" className={`block transition ${
                     isDark 
@@ -774,7 +774,7 @@ export default function PricingPage() {
                 </div>
               </div>
               <div>
-                <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">قانوني</h4>
+                <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">قانوني</h4>
                 <div className="space-y-1 sm:space-y-2">
                   <Link to="/privacy" className={`block transition ${
                     isDark 
@@ -808,18 +808,18 @@ export default function PricingPage() {
               <div className="flex space-x-3 sm:space-x-4 space-x-reverse">
                 <a href="https://twitter.com/seoraysa" className={`transition text-xs sm:text-sm ${
                   isDark 
-                    ? 'text-gray-400 hover:text-[#83dcc9]' 
-                    : 'text-gray-500 hover:text-[#83dcc9]'
+                    ? 'text-gray-400 hover:text-[#4BB8A9]' 
+                    : 'text-gray-500 hover:text-[#4BB8A9]'
                 }`}>تويتر</a>
                 <a href="https://linkedin.com/company/seoraysa" className={`transition text-xs sm:text-sm ${
                   isDark 
-                    ? 'text-gray-400 hover:text-[#83dcc9]' 
-                    : 'text-gray-500 hover:text-[#83dcc9]'
+                    ? 'text-gray-400 hover:text-[#4BB8A9]' 
+                    : 'text-gray-500 hover:text-[#4BB8A9]'
                 }`}>لينكد إن</a>
                 <a href="https://instagram.com/seoraysa" className={`transition text-xs sm:text-sm ${
                   isDark 
-                    ? 'text-gray-400 hover:text-[#83dcc9]' 
-                    : 'text-gray-500 hover:text-[#83dcc9]'
+                    ? 'text-gray-400 hover:text-[#4BB8A9]' 
+                    : 'text-gray-500 hover:text-[#4BB8A9]'
                 }`}>إنستجرام</a>
               </div>
             </div>

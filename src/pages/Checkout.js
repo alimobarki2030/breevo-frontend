@@ -504,7 +504,7 @@ export default function Checkout() {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center">
         <div className="text-center text-white">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#83dcc9] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4BB8A9] mx-auto mb-4"></div>
           <p>جاري تحميل بيانات الخطط...</p>
         </div>
       </div>
@@ -518,7 +518,7 @@ export default function Checkout() {
         <div className="text-center text-white">
           <div className="text-red-400 mb-4">❌</div>
           <p>خطة غير موجودة</p>
-          <Link to="/pricing" className="text-[#83dcc9] underline mt-2 block">
+          <Link to="/pricing" className="text-[#4BB8A9] underline mt-2 block">
             العودة للأسعار
           </Link>
         </div>
@@ -539,7 +539,7 @@ export default function Checkout() {
         {/* Header */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-block mb-4">
-            <div className="text-2xl font-bold text-[#83dcc9]">SEO Rayca</div>
+            <div className="text-2xl font-bold text-[#4BB8A9]">SEO Rayca</div>
           </Link>
           <h1 className="text-3xl font-bold mb-2">
             {isFree ? 'تفعيل الحساب المجاني' : 'إتمام عملية الشراء'}
@@ -560,7 +560,7 @@ export default function Checkout() {
             {/* معلومات الفوترة */}
             <div className="bg-gray-900 rounded-2xl p-6">
               <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                <CreditCard className="w-6 h-6 text-[#83dcc9]" />
+                <CreditCard className="w-6 h-6 text-[#4BB8A9]" />
                 {isFree ? 'معلومات الحساب' : 'معلومات الفوترة'}
               </h2>
               
@@ -570,7 +570,7 @@ export default function Checkout() {
                   placeholder={isFree ? "الاسم (اختياري)" : "الاسم الكامل *"}
                   value={billingInfo.fullName}
                   onChange={(e) => setBillingInfo(prev => ({ ...prev, fullName: e.target.value }))}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#83dcc9] transition"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4BB8A9] transition"
                   required={!isFree}
                 />
                 <input
@@ -578,7 +578,7 @@ export default function Checkout() {
                   placeholder="البريد الإلكتروني *"
                   value={billingInfo.email}
                   onChange={(e) => setBillingInfo(prev => ({ ...prev, email: e.target.value }))}
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#83dcc9] transition"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4BB8A9] transition"
                   required
                 />
                 {!isFree && (
@@ -588,7 +588,7 @@ export default function Checkout() {
                       placeholder="رقم الجوال *"
                       value={billingInfo.phone}
                       onChange={(e) => setBillingInfo(prev => ({ ...prev, phone: e.target.value }))}
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#83dcc9] transition"
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4BB8A9] transition"
                       required
                     />
                     <input
@@ -596,7 +596,7 @@ export default function Checkout() {
                       placeholder="اسم الشركة (اختياري)"
                       value={billingInfo.company}
                       onChange={(e) => setBillingInfo(prev => ({ ...prev, company: e.target.value }))}
-                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#83dcc9] transition"
+                      className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#4BB8A9] transition"
                     />
                   </>
                 )}
@@ -636,7 +636,7 @@ export default function Checkout() {
                   className={`w-full py-4 rounded-lg font-bold transition-all flex items-center justify-center gap-2 text-lg ${
                     loading || (!isFree && !moyasarLoaded) || (!isFree && !MOYASAR_CONFIG.publishableKey)
                       ? 'bg-gray-600 cursor-not-allowed' 
-                      : 'bg-[#83dcc9] hover:bg-[#6cc9b9] text-gray-900'
+                      : 'bg-[#4BB8A9] hover:bg-[#6cc9b9] text-gray-900'
                   }`}
                 >
                   {loading ? (
@@ -668,7 +668,7 @@ export default function Checkout() {
             {moyasarInitialized && !isFree && (
               <div className="bg-gray-900 rounded-2xl p-6">
                 <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                  <Shield className="w-6 h-6 text-[#83dcc9]" />
+                  <Shield className="w-6 h-6 text-[#4BB8A9]" />
                   بيانات البطاقة الائتمانية
                 </h2>
                 
@@ -720,7 +720,7 @@ export default function Checkout() {
                   <label className="block text-sm font-medium mb-3">دورة الفوترة</label>
                   <div className="space-y-2">
                     <label className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition ${
-                      billingCycle === 'monthly' ? 'border-[#83dcc9] bg-[#83dcc9]/10' : 'border-gray-700 hover:border-gray-600'
+                      billingCycle === 'monthly' ? 'border-[#4BB8A9] bg-[#4BB8A9]/10' : 'border-gray-700 hover:border-gray-600'
                     }`}>
                       <div className="flex items-center gap-2">
                         <input
@@ -738,7 +738,7 @@ export default function Checkout() {
                     </label>
                     
                     <label className={`flex items-center justify-between p-3 rounded-lg border-2 cursor-pointer transition ${
-                      billingCycle === 'yearly' ? 'border-[#83dcc9] bg-[#83dcc9]/10' : 'border-gray-700 hover:border-gray-600'
+                      billingCycle === 'yearly' ? 'border-[#4BB8A9] bg-[#4BB8A9]/10' : 'border-gray-700 hover:border-gray-600'
                     }`}>
                       <div className="flex items-center gap-2">
                         <input
@@ -781,13 +781,13 @@ export default function Checkout() {
                           value={promoCode}
                           onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
                           disabled={moyasarInitialized || loading}
-                          className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#83dcc9] transition disabled:opacity-50"
+                          className="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4BB8A9] transition disabled:opacity-50"
                         />
                         <button
                           type="button"
                           onClick={() => applyPromoCode()}
                           disabled={!promoCode.trim() || moyasarInitialized || loading}
-                          className="bg-[#83dcc9] text-gray-900 px-4 py-2 rounded-lg font-medium hover:bg-[#6cc9b9] transition text-sm disabled:opacity-50 flex items-center"
+                          className="bg-[#4BB8A9] text-gray-900 px-4 py-2 rounded-lg font-medium hover:bg-[#6cc9b9] transition text-sm disabled:opacity-50 flex items-center"
                         >
                           {loading ? (
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
@@ -847,7 +847,7 @@ export default function Checkout() {
                     
                     <div className="border-t border-gray-700 pt-2 flex justify-between font-bold text-lg">
                       <span>المجموع</span>
-                      <span className="text-[#83dcc9]">{Math.round(total * 1.15)} ريال</span>
+                      <span className="text-[#4BB8A9]">{Math.round(total * 1.15)} ريال</span>
                     </div>
                   </>
                 )}

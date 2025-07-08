@@ -54,12 +54,12 @@ export default function About() {
         
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8 space-x-reverse">
-          <Link to="/features" className="hover:text-[#83dcc9] transition-colors">المميزات</Link>
-          <Link to="/pricing" className="hover:text-[#83dcc9] transition-colors">الأسعار</Link>
-          <Link to="/how-it-works" className="hover:text-[#83dcc9] transition-colors">كيف يعمل</Link>
-          <Link to="/about" className="text-[#83dcc9] font-semibold">من نحن</Link>
-          <Link to="/contact" className="hover:text-[#83dcc9] transition-colors">اتصل بنا</Link>
-          <Link to="/login" className="bg-[#83dcc9] text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-[#6cc9b9] transition">
+          <Link to="/features" className="hover:text-[#4BB8A9] transition-colors">المميزات</Link>
+          <Link to="/pricing" className="hover:text-[#4BB8A9] transition-colors">الأسعار</Link>
+          <Link to="/how-it-works" className="hover:text-[#4BB8A9] transition-colors">كيف يعمل</Link>
+          <Link to="/about" className="text-[#4BB8A9] font-semibold">من نحن</Link>
+          <Link to="/contact" className="hover:text-[#4BB8A9] transition-colors">اتصل بنا</Link>
+          <Link to="/login" className="bg-[#4BB8A9] text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-[#6cc9b9] transition">
             دخول
           </Link>
         </div>
@@ -94,42 +94,42 @@ export default function About() {
             <div className="flex flex-col space-y-4">
               <Link 
                 to="/features" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 المميزات
               </Link>
               <Link 
                 to="/pricing" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 الأسعار
               </Link>
               <Link 
                 to="/how-it-works" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 كيف يعمل
               </Link>
               <Link 
                 to="/about" 
-                className="text-[#83dcc9] font-semibold py-2 border-b border-gray-700"
+                className="text-[#4BB8A9] font-semibold py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 من نحن
               </Link>
               <Link 
                 to="/contact" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 اتصل بنا
               </Link>
               <Link 
                 to="/login" 
-                className="bg-[#83dcc9] text-gray-900 font-bold py-3 px-4 rounded-lg hover:bg-[#6cc9b9] transition text-center mt-4"
+                className="bg-[#4BB8A9] text-gray-900 font-bold py-3 px-4 rounded-lg hover:bg-[#6cc9b9] transition text-center mt-4"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 دخول
@@ -169,7 +169,7 @@ export default function About() {
               className="text-center md:text-right"
             >
               <div className="text-6xl mb-6">🎯</div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-[#83dcc9]">رسالتنا</h2>
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-[#4BB8A9]">رسالتنا</h2>
               <p className="text-lg text-gray-300 leading-relaxed">
                 تمكين التجار العرب من الوصول إلى صدارة Google وتحقيق مبيعات استثنائية من خلال تقنيات الذكاء الاصطناعي المتطورة وفهم عميق للسوق المحلي.
               </p>
@@ -183,7 +183,7 @@ export default function About() {
               className="text-center md:text-right"
             >
               <div className="text-6xl mb-6">🚀</div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-[#83dcc9]">رؤيتنا</h2>
+              <h2 className="text-2xl md:text-3xl font-bold mb-6 text-[#4BB8A9]">رؤيتنا</h2>
               <p className="text-lg text-gray-300 leading-relaxed">
                 أن نكون المنصة الرائدة في المنطقة العربية لتحسين التجارة الإلكترونية، ونساهم في بناء اقتصاد رقمي عربي قوي ومزدهر.
               </p>
@@ -217,7 +217,7 @@ export default function About() {
                 className="bg-gray-800 p-8 rounded-2xl hover:shadow-xl transition-shadow"
               >
                 <div className="text-5xl mb-4">{value.icon}</div>
-                <h3 className="text-xl font-bold mb-4 text-[#83dcc9]">{value.title}</h3>
+                <h3 className="text-xl font-bold mb-4 text-[#4BB8A9]">{value.title}</h3>
                 <p className="text-gray-300 leading-relaxed">{value.description}</p>
               </motion.div>
             ))}
@@ -250,11 +250,11 @@ export default function About() {
                 className={`flex flex-col md:flex-row items-center gap-8 ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}
               >
                 <div className="flex-1 text-center md:text-right">
-                  <div className="text-4xl font-bold text-[#83dcc9] mb-2">{milestone.year}</div>
+                  <div className="text-4xl font-bold text-[#4BB8A9] mb-2">{milestone.year}</div>
                   <h3 className="text-xl font-bold mb-3">{milestone.title}</h3>
                   <p className="text-gray-300 leading-relaxed">{milestone.description}</p>
                 </div>
-                <div className="w-4 h-4 bg-[#83dcc9] rounded-full flex-shrink-0"></div>
+                <div className="w-4 h-4 bg-[#4BB8A9] rounded-full flex-shrink-0"></div>
                 <div className="flex-1"></div>
               </motion.div>
             ))}
@@ -274,10 +274,10 @@ export default function About() {
             <h2 className="text-3xl md:text-4xl font-bold mb-12">فريق العمل</h2>
             
             <div className="bg-gradient-to-r from-gray-800 to-gray-700 p-8 rounded-2xl">
-              <div className="w-24 h-24 bg-gradient-to-r from-[#83dcc9] to-[#6cc9b9] rounded-full mx-auto mb-6 flex items-center justify-center">
+              <div className="w-24 h-24 bg-gradient-to-r from-[#4BB8A9] to-[#6cc9b9] rounded-full mx-auto mb-6 flex items-center justify-center">
                 <span className="text-3xl text-gray-900 font-bold">ع</span>
               </div>
-              <h3 className="text-2xl font-bold mb-2 text-[#83dcc9]">علي مبارك</h3>
+              <h3 className="text-2xl font-bold mb-2 text-[#4BB8A9]">علي مبارك</h3>
               <p className="text-lg text-gray-300 mb-4">مؤسس ومطور المنصة</p>
               <p className="text-gray-400 leading-relaxed max-w-2xl mx-auto">
                 متخصص في نمو المتاجر الإلكترونية مع خبرة واسعة في التسويق الرقمي وتحسين محركات البحث. 
@@ -296,7 +296,7 @@ export default function About() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-r from-[#83dcc9]/20 to-transparent border border-[#83dcc9]/30 rounded-2xl p-8"
+            className="bg-gradient-to-r from-[#4BB8A9]/20 to-transparent border border-[#4BB8A9]/30 rounded-2xl p-8"
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
               انضم إلى رحلة النجاح
@@ -306,12 +306,12 @@ export default function About() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
               <Link to="/login?plan=free" className="w-full sm:w-auto">
-                <button className="w-full bg-[#83dcc9] text-gray-900 font-bold py-4 px-8 rounded-xl hover:bg-[#6cc9b9] transition text-lg">
+                <button className="w-full bg-[#4BB8A9] text-gray-900 font-bold py-4 px-8 rounded-xl hover:bg-[#6cc9b9] transition text-lg">
                   ابدأ رحلتك مجاناً
                 </button>
               </Link>
               <Link to="/contact" className="w-full sm:w-auto">
-                <button className="w-full border border-[#83dcc9] text-[#83dcc9] font-bold py-4 px-8 rounded-xl hover:bg-[#83dcc9] hover:text-gray-900 transition text-lg">
+                <button className="w-full border border-[#4BB8A9] text-[#4BB8A9] font-bold py-4 px-8 rounded-xl hover:bg-[#4BB8A9] hover:text-gray-900 transition text-lg">
                   تواصل معنا
                 </button>
               </Link>
@@ -325,7 +325,7 @@ export default function About() {
         <div className="max-w-screen-xl mx-auto">
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 text-xs sm:text-sm mb-6 sm:mb-8">
             <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">المنصة</h4>
+              <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">المنصة</h4>
               <div className="space-y-1 sm:space-y-2">
                 <Link to="/features" className="block text-gray-400 hover:text-white transition">المميزات</Link>
                 <Link to="/pricing" className="block text-gray-400 hover:text-white transition">الأسعار</Link>
@@ -334,16 +334,16 @@ export default function About() {
               </div>
             </div>
             <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">الشركة</h4>
+              <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">الشركة</h4>
               <div className="space-y-1 sm:space-y-2">
-                <Link to="/about" className="block text-[#83dcc9] font-semibold">من نحن</Link>
+                <Link to="/about" className="block text-[#4BB8A9] font-semibold">من نحن</Link>
                 <Link to="/contact" className="block text-gray-400 hover:text-white transition">اتصل بنا</Link>
                 <Link to="/careers" className="block text-gray-400 hover:text-white transition">الوظائف</Link>
                 <Link to="/blog" className="block text-gray-400 hover:text-white transition">المدونة</Link>
               </div>
             </div>
             <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">الدعم</h4>
+              <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">الدعم</h4>
               <div className="space-y-1 sm:space-y-2">
                 <Link to="/faq" className="block text-gray-400 hover:text-white transition">الأسئلة الشائعة</Link>
                 <Link to="/help" className="block text-gray-400 hover:text-white transition">مركز المساعدة</Link>
@@ -352,7 +352,7 @@ export default function About() {
               </div>
             </div>
             <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">قانوني</h4>
+              <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">قانوني</h4>
               <div className="space-y-1 sm:space-y-2">
                 <Link to="/privacy" className="block text-gray-400 hover:text-white transition">سياسة الخصوصية</Link>
                 <Link to="/terms" className="block text-gray-400 hover:text-white transition">شروط الخدمة</Link>
@@ -368,9 +368,9 @@ export default function About() {
               <span className="text-gray-400 text-xs text-center sm:text-right">© 2025 مشروع السيو الذكي. جميع الحقوق محفوظة.</span>
             </div>
             <div className="flex space-x-3 sm:space-x-4 space-x-reverse">
-              <Link to="/social/twitter" className="text-gray-400 hover:text-[#83dcc9] transition text-xs sm:text-sm">تويتر</Link>
-              <Link to="/social/linkedin" className="text-gray-400 hover:text-[#83dcc9] transition text-xs sm:text-sm">لينكد إن</Link>
-              <Link to="/social/instagram" className="text-gray-400 hover:text-[#83dcc9] transition text-xs sm:text-sm">إنستجرام</Link>
+              <Link to="/social/twitter" className="text-gray-400 hover:text-[#4BB8A9] transition text-xs sm:text-sm">تويتر</Link>
+              <Link to="/social/linkedin" className="text-gray-400 hover:text-[#4BB8A9] transition text-xs sm:text-sm">لينكد إن</Link>
+              <Link to="/social/instagram" className="text-gray-400 hover:text-[#4BB8A9] transition text-xs sm:text-sm">إنستجرام</Link>
             </div>
           </div>
         </div>

@@ -231,8 +231,8 @@ const UnifiedNavbar = () => {
               to={item.path} 
               className={`transition-colors ${
                 isActivePath(item.path) 
-                  ? 'text-[#83dcc9] font-semibold' 
-                  : 'hover:text-[#83dcc9]'
+                  ? 'text-[#4BB8A9] font-semibold' 
+                  : 'hover:text-[#4BB8A9]'
               }`}
             >
               {item.label}
@@ -247,7 +247,7 @@ const UnifiedNavbar = () => {
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                 className="flex items-center gap-2 hover:opacity-90 transition-opacity"
               >
-                <div className="w-9 h-9 rounded-full bg-[#83dcc9] text-gray-900 flex items-center justify-center font-bold">
+                <div className="w-9 h-9 rounded-full bg-[#4BB8A9] text-gray-900 flex items-center justify-center font-bold">
                   {getUserInitial()}
                 </div>
                 
@@ -355,7 +355,7 @@ const UnifiedNavbar = () => {
           ) : (
             <Link
               to="/login"
-              className="bg-[#83dcc9] text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-[#6cc9b9] transition"
+              className="bg-[#4BB8A9] text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-[#6cc9b9] transition"
             >
               دخول
             </Link>
@@ -405,8 +405,8 @@ const UnifiedNavbar = () => {
                   to={item.path} 
                   className={`transition-colors py-2 ${
                     isActivePath(item.path) 
-                      ? 'text-[#83dcc9] font-semibold' 
-                      : 'hover:text-[#83dcc9]'
+                      ? 'text-[#4BB8A9] font-semibold' 
+                      : 'hover:text-[#4BB8A9]'
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -421,7 +421,7 @@ const UnifiedNavbar = () => {
                   
                   <Link
                     to="/account"
-                    className="flex items-center gap-3 py-2 text-sm hover:text-[#83dcc9] transition-colors"
+                    className="flex items-center gap-3 py-2 text-sm hover:text-[#4BB8A9] transition-colors"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <User size={16} />
@@ -456,7 +456,7 @@ const UnifiedNavbar = () => {
               ) : (
                 <Link 
                   to="/login" 
-                  className="bg-[#83dcc9] text-gray-900 font-bold py-3 px-4 rounded-lg hover:bg-[#6cc9b9] transition text-center mt-4"
+                  className="bg-[#4BB8A9] text-gray-900 font-bold py-3 px-4 rounded-lg hover:bg-[#6cc9b9] transition text-center mt-4"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   دخول

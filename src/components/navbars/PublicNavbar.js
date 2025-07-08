@@ -45,8 +45,8 @@ const PublicNavbar = () => {
               to={item.path} 
               className={`transition-colors duration-300 ${
                 isActivePath(item.path) 
-                  ? 'text-[#83dcc9] font-semibold' 
-                  : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+                  ? 'text-[#4BB8A9] font-semibold' 
+                  : 'text-gray-300 dark:text-gray-400 hover:text-[#4BB8A9]'
               }`}
             >
               {item.label}
@@ -59,7 +59,7 @@ const PublicNavbar = () => {
           {/* زر الدخول */}
           <Link
             to="/login"
-            className="bg-[#83dcc9] text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-[#6cc9b9] transition-colors duration-300 shadow-lg hover:shadow-xl"
+            className="bg-[#4BB8A9] text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-[#6cc9b9] transition-colors duration-300 shadow-lg hover:shadow-xl"
           >
             دخول
           </Link>
@@ -96,8 +96,8 @@ const PublicNavbar = () => {
                   to={item.path} 
                   className={`transition-colors duration-300 py-2 ${
                     isActivePath(item.path) 
-                      ? 'text-[#83dcc9] font-semibold' 
-                      : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+                      ? 'text-[#4BB8A9] font-semibold' 
+                      : 'text-gray-300 dark:text-gray-400 hover:text-[#4BB8A9]'
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -108,7 +108,7 @@ const PublicNavbar = () => {
               {/* زر الدخول */}
               <Link 
                 to="/login" 
-                className="bg-[#83dcc9] text-gray-900 font-bold py-3 px-4 rounded-lg hover:bg-[#6cc9b9] transition-colors duration-300 text-center mt-4 shadow-lg"
+                className="bg-[#4BB8A9] text-gray-900 font-bold py-3 px-4 rounded-lg hover:bg-[#6cc9b9] transition-colors duration-300 text-center mt-4 shadow-lg"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 دخول

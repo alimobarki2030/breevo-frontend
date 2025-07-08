@@ -75,7 +75,7 @@ const DataForSEOTest = () => {
       <button
         onClick={testAPIConnection}
         disabled={loading}
-        className="bg-[#83dcc9] text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-[#6cc9b9] transition disabled:opacity-50"
+        className="bg-[#4BB8A9] text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-[#6cc9b9] transition disabled:opacity-50"
       >
         {loading ? 'جاري الاختبار...' : 'اختبار الاتصال'}
       </button>

@@ -10,7 +10,7 @@ const ProductPerformanceChart = () => {
       fontFamily: "inherit",
     },
     labels: ["ممتاز", "يحتاج تحسين", "ضعيف"],
-    colors: ["#83dcc9", "#facc15", "#f87171"],
+    colors: ["#4BB8A9", "#facc15", "#f87171"],
     dataLabels: {
       enabled: true,
       formatter: (val) => `${val.toFixed(0)}%`,

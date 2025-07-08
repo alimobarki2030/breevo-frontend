@@ -56,12 +56,12 @@ export default function HowItWorksPage() {
         
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center space-x-8 space-x-reverse">
-          <Link to="/features" className="hover:text-[#83dcc9] transition-colors">المميزات</Link>
-          <Link to="/pricing" className="hover:text-[#83dcc9] transition-colors">الأسعار</Link>
-          <Link to="/how-it-works" className="text-[#83dcc9] font-semibold">كيف يعمل</Link>
-          <Link to="/about" className="hover:text-[#83dcc9] transition-colors">من نحن</Link>
-          <Link to="/contact" className="hover:text-[#83dcc9] transition-colors">اتصل بنا</Link>
-          <Link to="/login" className="bg-[#83dcc9] text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-[#6cc9b9] transition">
+          <Link to="/features" className="hover:text-[#4BB8A9] transition-colors">المميزات</Link>
+          <Link to="/pricing" className="hover:text-[#4BB8A9] transition-colors">الأسعار</Link>
+          <Link to="/how-it-works" className="text-[#4BB8A9] font-semibold">كيف يعمل</Link>
+          <Link to="/about" className="hover:text-[#4BB8A9] transition-colors">من نحن</Link>
+          <Link to="/contact" className="hover:text-[#4BB8A9] transition-colors">اتصل بنا</Link>
+          <Link to="/login" className="bg-[#4BB8A9] text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-[#6cc9b9] transition">
             دخول
           </Link>
         </div>
@@ -96,42 +96,42 @@ export default function HowItWorksPage() {
             <div className="flex flex-col space-y-4">
               <Link 
                 to="/features" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 المميزات
               </Link>
               <Link 
                 to="/pricing" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 الأسعار
               </Link>
               <Link 
                 to="/how-it-works" 
-                className="text-[#83dcc9] font-semibold py-2 border-b border-gray-700"
+                className="text-[#4BB8A9] font-semibold py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 كيف يعمل
               </Link>
               <Link 
                 to="/about" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 من نحن
               </Link>
               <Link 
                 to="/contact" 
-                className="hover:text-[#83dcc9] transition-colors py-2 border-b border-gray-700"
+                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 اتصل بنا
               </Link>
               <Link 
                 to="/login" 
-                className="bg-[#83dcc9] text-gray-900 font-bold py-3 px-4 rounded-lg hover:bg-[#6cc9b9] transition text-center mt-4"
+                className="bg-[#4BB8A9] text-gray-900 font-bold py-3 px-4 rounded-lg hover:bg-[#6cc9b9] transition text-center mt-4"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 دخول
@@ -155,8 +155,8 @@ export default function HowItWorksPage() {
             <p className="text-xl text-gray-300 mb-8 leading-relaxed">
               عملية بسيطة من 5 خطوات تجعل منتجاتك تتصدر نتائج البحث وتزيد مبيعاتك
             </p>
-            <div className="bg-[#83dcc9]/10 border border-[#83dcc9]/30 rounded-2xl p-6 mb-12">
-              <div className="flex items-center justify-center space-x-4 space-x-reverse text-[#83dcc9]">
+            <div className="bg-[#4BB8A9]/10 border border-[#4BB8A9]/30 rounded-2xl p-6 mb-12">
+              <div className="flex items-center justify-center space-x-4 space-x-reverse text-[#4BB8A9]">
                 <span className="text-2xl">⚡</span>
                 <p className="text-lg font-semibold">
                   لا يتطلب خبرة تقنية - عملية بسيطة وسريعة
@@ -184,10 +184,10 @@ export default function HowItWorksPage() {
                 <div className="flex-1 space-y-6">
                   <div className="flex items-center space-x-4 space-x-reverse">
                     <div className="text-4xl">{step.icon}</div>
-                    <div className="text-6xl font-bold text-[#83dcc9]/30">{step.number}</div>
+                    <div className="text-6xl font-bold text-[#4BB8A9]/30">{step.number}</div>
                   </div>
                   
-                  <h3 className="text-2xl md:text-3xl font-bold text-[#83dcc9]">
+                  <h3 className="text-2xl md:text-3xl font-bold text-[#4BB8A9]">
                     {step.title}
                   </h3>
                   
@@ -202,7 +202,7 @@ export default function HowItWorksPage() {
                   <div className="space-y-2">
                     {step.features.map((feature, idx) => (
                       <div key={idx} className="flex items-center space-x-3 space-x-reverse">
-                        <span className="text-[#83dcc9]">✓</span>
+                        <span className="text-[#4BB8A9]">✓</span>
                         <span className="text-gray-300">{feature}</span>
                       </div>
                     ))}
@@ -211,7 +211,7 @@ export default function HowItWorksPage() {
 
                 {/* Visual */}
                 <div className="flex-1 flex justify-center">
-                  <div className="w-full max-w-md h-64 bg-gradient-to-tr from-[#83dcc9]/20 to-transparent rounded-3xl shadow-[0_20px_60px_rgba(131,220,201,0.15)] flex items-center justify-center">
+                  <div className="w-full max-w-md h-64 bg-gradient-to-tr from-[#4BB8A9]/20 to-transparent rounded-3xl shadow-[0_20px_60px_rgba(131,220,201,0.15)] flex items-center justify-center">
                     <div className="text-8xl opacity-50">{step.icon}</div>
                   </div>
                 </div>
@@ -229,9 +229,9 @@ export default function HowItWorksPage() {
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-r from-[#83dcc9]/20 to-transparent border border-[#83dcc9]/30 rounded-2xl p-8"
+            className="bg-gradient-to-r from-[#4BB8A9]/20 to-transparent border border-[#4BB8A9]/30 rounded-2xl p-8"
           >
-            <h3 className="text-2xl md:text-3xl font-bold mb-4 text-[#83dcc9]">
+            <h3 className="text-2xl md:text-3xl font-bold mb-4 text-[#4BB8A9]">
               🚀 التكامل التلقائي قريباً
             </h3>
             <p className="text-lg text-gray-300 mb-6">
@@ -258,7 +258,7 @@ export default function HowItWorksPage() {
               className="bg-gray-800 p-6 rounded-xl"
             >
               <div className="text-4xl mb-4">🎯</div>
-              <h4 className="text-xl font-bold mb-3 text-[#83dcc9]">مخصص لمنطقتك</h4>
+              <h4 className="text-xl font-bold mb-3 text-[#4BB8A9]">مخصص لمنطقتك</h4>
               <p className="text-gray-300 text-sm">
                 ذكاء اصطناعي مدرب على السوق العربي والكلمات المفتاحية المحلية
               </p>
@@ -272,7 +272,7 @@ export default function HowItWorksPage() {
               className="bg-gray-800 p-6 rounded-xl"
             >
               <div className="text-4xl mb-4">⚡</div>
-              <h4 className="text-xl font-bold mb-3 text-[#83dcc9]">سرعة مذهلة</h4>
+              <h4 className="text-xl font-bold mb-3 text-[#4BB8A9]">سرعة مذهلة</h4>
               <p className="text-gray-300 text-sm">
                 ما يأخذ أسابيع من العمل اليدوي يتم في دقائق معدودة
               </p>
@@ -286,7 +286,7 @@ export default function HowItWorksPage() {
               className="bg-gray-800 p-6 rounded-xl"
             >
               <div className="text-4xl mb-4">📊</div>
-              <h4 className="text-xl font-bold mb-3 text-[#83dcc9]">نتائج مثبتة</h4>
+              <h4 className="text-xl font-bold mb-3 text-[#4BB8A9]">نتائج مثبتة</h4>
               <p className="text-gray-300 text-sm">
                 تحسن ملحوظ في ترتيب Google خلال أسابيع من التطبيق
               </p>
@@ -312,12 +312,12 @@ export default function HowItWorksPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
               <Link to="/login?plan=free" className="w-full sm:w-auto">
-                <button className="w-full bg-[#83dcc9] text-gray-900 font-bold py-4 px-8 rounded-xl hover:bg-[#6cc9b9] transition text-lg">
+                <button className="w-full bg-[#4BB8A9] text-gray-900 font-bold py-4 px-8 rounded-xl hover:bg-[#6cc9b9] transition text-lg">
                   ابدأ مجاناً الآن
                 </button>
               </Link>
               <Link to="/pricing" className="w-full sm:w-auto">
-                <button className="w-full border border-[#83dcc9] text-[#83dcc9] font-bold py-4 px-8 rounded-xl hover:bg-[#83dcc9] hover:text-gray-900 transition text-lg">
+                <button className="w-full border border-[#4BB8A9] text-[#4BB8A9] font-bold py-4 px-8 rounded-xl hover:bg-[#4BB8A9] hover:text-gray-900 transition text-lg">
                   عرض الأسعار
                 </button>
               </Link>
@@ -331,16 +331,16 @@ export default function HowItWorksPage() {
         <div className="max-w-screen-xl mx-auto">
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 text-xs sm:text-sm mb-6 sm:mb-8">
             <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">المنصة</h4>
+              <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">المنصة</h4>
               <div className="space-y-1 sm:space-y-2">
                 <Link to="/features" className="block text-gray-400 hover:text-white transition">المميزات</Link>
                 <Link to="/pricing" className="block text-gray-400 hover:text-white transition">الأسعار</Link>
-                <Link to="/how-it-works" className="block text-[#83dcc9] font-semibold">كيف يعمل</Link>
+                <Link to="/how-it-works" className="block text-[#4BB8A9] font-semibold">كيف يعمل</Link>
                 <Link to="/demo" className="block text-gray-400 hover:text-white transition">تجربة تفاعلية</Link>
               </div>
             </div>
             <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">الشركة</h4>
+              <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">الشركة</h4>
               <div className="space-y-1 sm:space-y-2">
                 <Link to="/about" className="block text-gray-400 hover:text-white transition">من نحن</Link>
                 <Link to="/contact" className="block text-gray-400 hover:text-white transition">اتصل بنا</Link>
@@ -349,7 +349,7 @@ export default function HowItWorksPage() {
               </div>
             </div>
             <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">الدعم</h4>
+              <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">الدعم</h4>
               <div className="space-y-1 sm:space-y-2">
                 <Link to="/faq" className="block text-gray-400 hover:text-white transition">الأسئلة الشائعة</Link>
                 <Link to="/help" className="block text-gray-400 hover:text-white transition">مركز المساعدة</Link>
@@ -358,7 +358,7 @@ export default function HowItWorksPage() {
               </div>
             </div>
             <div>
-              <h4 className="font-bold mb-3 sm:mb-4 text-[#83dcc9]">قانوني</h4>
+              <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">قانوني</h4>
               <div className="space-y-1 sm:space-y-2">
                 <Link to="/privacy" className="block text-gray-400 hover:text-white transition">سياسة الخصوصية</Link>
                 <Link to="/terms" className="block text-gray-400 hover:text-white transition">شروط الخدمة</Link>
@@ -374,9 +374,9 @@ export default function HowItWorksPage() {
               <span className="text-gray-400 text-xs text-center sm:text-right">© 2025 مشروع السيو الذكي. جميع الحقوق محفوظة.</span>
             </div>
             <div className="flex space-x-3 sm:space-x-4 space-x-reverse">
-              <Link to="/social/twitter" className="text-gray-400 hover:text-[#83dcc9] transition text-xs sm:text-sm">تويتر</Link>
-              <Link to="/social/linkedin" className="text-gray-400 hover:text-[#83dcc9] transition text-xs sm:text-sm">لينكد إن</Link>
-              <Link to="/social/instagram" className="text-gray-400 hover:text-[#83dcc9] transition text-xs sm:text-sm">إنستجرام</Link>
+              <Link to="/social/twitter" className="text-gray-400 hover:text-[#4BB8A9] transition text-xs sm:text-sm">تويتر</Link>
+              <Link to="/social/linkedin" className="text-gray-400 hover:text-[#4BB8A9] transition text-xs sm:text-sm">لينكد إن</Link>
+              <Link to="/social/instagram" className="text-gray-400 hover:text-[#4BB8A9] transition text-xs sm:text-sm">إنستجرام</Link>
             </div>
           </div>
         </div>

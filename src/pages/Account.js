@@ -205,7 +205,7 @@ export default function Account() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
-            <Link to="/products" className="text-[#83dcc9] hover:underline flex items-center gap-2">
+            <Link to="/products" className="text-[#4BB8A9] hover:underline flex items-center gap-2">
               <span>←</span> العودة إلى المنتجات
             </Link>
           </div>
@@ -226,7 +226,7 @@ export default function Account() {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex items-center gap-3 p-4 bg-gray-800 rounded-lg">
-                  <User className="w-5 h-5 text-[#83dcc9]" />
+                  <User className="w-5 h-5 text-[#4BB8A9]" />
                   <div>
                     <p className="text-sm text-gray-400">الاسم</p>
                     <p className="font-medium">{userData.name}</p>
@@ -234,7 +234,7 @@ export default function Account() {
                 </div>
                 
                 <div className="flex items-center gap-3 p-4 bg-gray-800 rounded-lg">
-                  <Mail className="w-5 h-5 text-[#83dcc9]" />
+                  <Mail className="w-5 h-5 text-[#4BB8A9]" />
                   <div>
                     <p className="text-sm text-gray-400">البريد الإلكتروني</p>
                     <p className="font-medium">{userData.email}</p>
@@ -242,7 +242,7 @@ export default function Account() {
                 </div>
                 
                 <div className="flex items-center gap-3 p-4 bg-gray-800 rounded-lg">
-                  <Phone className="w-5 h-5 text-[#83dcc9]" />
+                  <Phone className="w-5 h-5 text-[#4BB8A9]" />
                   <div>
                     <p className="text-sm text-gray-400">رقم الجوال</p>
                     <p className="font-medium">{userData.phone}</p>
@@ -250,7 +250,7 @@ export default function Account() {
                 </div>
                 
                 <div className="flex items-center gap-3 p-4 bg-gray-800 rounded-lg">
-                  <Calendar className="w-5 h-5 text-[#83dcc9]" />
+                  <Calendar className="w-5 h-5 text-[#4BB8A9]" />
                   <div>
                     <p className="text-sm text-gray-400">تاريخ التسجيل</p>
                     <p className="font-medium">{formatDate(subscription?.startDate || new Date())}</p>
@@ -343,7 +343,7 @@ export default function Account() {
                 {subscription?.plan !== 'enterprise' && (
                   <button
                     onClick={handleUpgrade}
-                    className="bg-[#83dcc9] text-gray-900 px-4 py-2 rounded-lg font-medium hover:bg-[#6cc9b9] transition flex items-center gap-2"
+                    className="bg-[#4BB8A9] text-gray-900 px-4 py-2 rounded-lg font-medium hover:bg-[#6cc9b9] transition flex items-center gap-2"
                   >
                     <TrendingUp className="w-4 h-4" />
                     ترقية الخطة
@@ -422,7 +422,7 @@ export default function Account() {
                 
                 <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-800">
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-[#83dcc9]">{usage.productsUsed}</p>
+                    <p className="text-2xl font-bold text-[#4BB8A9]">{usage.productsUsed}</p>
                     <p className="text-xs text-gray-400">منتجات محسنة</p>
                   </div>
                   <div className="text-center">
@@ -453,7 +453,7 @@ export default function Account() {
                   <div key={invoice.id} className="bg-gray-800 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium">{invoice.period}</span>
-                      <span className="text-sm text-[#83dcc9] font-bold">{invoice.amount} ريال</span>
+                      <span className="text-sm text-[#4BB8A9] font-bold">{invoice.amount} ريال</span>
                     </div>
                     <div className="flex items-center justify-between text-xs text-gray-400">
                       <span>{formatDate(invoice.date)}</span>
@@ -485,17 +485,17 @@ export default function Account() {
                   to="/settings"
                   className="flex items-center gap-3 p-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition"
                 >
-                  <Settings className="w-4 h-4 text-[#83dcc9]" />
+                  <Settings className="w-4 h-4 text-[#4BB8A9]" />
                   <span className="text-sm">إعدادات الحساب</span>
                 </Link>
                 
                 <button className="w-full flex items-center gap-3 p-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition">
-                  <CreditCard className="w-4 h-4 text-[#83dcc9]" />
+                  <CreditCard className="w-4 h-4 text-[#4BB8A9]" />
                   <span className="text-sm">طرق الدفع</span>
                 </button>
                 
                 <button className="w-full flex items-center gap-3 p-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition">
-                  <Mail className="w-4 h-4 text-[#83dcc9]" />
+                  <Mail className="w-4 h-4 text-[#4BB8A9]" />
                   <span className="text-sm">تفضيلات التنبيهات</span>
                 </button>
               </div>

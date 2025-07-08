@@ -228,7 +228,7 @@ export default function LandingPage() {
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-5">
           <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2383dcc9' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234BB8A9' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }}></div>
         </div>
 
@@ -243,18 +243,18 @@ export default function LandingPage() {
               className="text-center lg:text-right"
             >
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 bg-[#83dcc9]/10 text-[#83dcc9] px-4 py-2 rounded-full text-sm font-semibold mb-6">
+              <div className="inline-flex items-center gap-2 bg-[#4BB8A9]/10 text-[#4BB8A9] px-4 py-2 rounded-full text-sm font-semibold mb-6">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                 </svg>
                 <span>منصة SEO احترافية للمتاجر الإلكترونية</span>
               </div>
 
-              <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 ${
+              <h1 className={`text-4xl md:text-5xl lg:text-5xl font-bold leading-tight mb-6 ${
                 isDark ? 'text-white' : 'text-gray-900'
               }`}>
                 ضاعف مبيعاتك بقوة
-                <span className="block text-[#83dcc9] mt-2">تحسين محركات البحث</span>
+                <span className="block text-[#4BB8A9] mt-2">تحسين محركات البحث</span>
               </h1>
 
               <p className={`text-lg md:text-xl leading-relaxed mb-8 ${
@@ -267,7 +267,7 @@ export default function LandingPage() {
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link to="/checkout?plan=starter" className="group">
-                  <button className="w-full sm:w-auto bg-[#83dcc9] text-gray-900 font-bold py-4 px-8 rounded-lg hover:bg-[#6cc9b9] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2">
+                  <button className="w-full sm:w-auto bg-[#4BB8A9] text-gray-900 font-bold py-4 px-8 rounded-lg hover:bg-[#6cc9b9] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2">
                     <span>ابدأ الآن - 99 ريال/شهر</span>
                     <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -275,10 +275,10 @@ export default function LandingPage() {
                   </button>
                 </Link>
                 <Link to="/pricing" className="group">
-                  <button className={`w-full sm:w-auto border-2 border-[#83dcc9] font-bold py-4 px-8 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 ${
+                  <button className={`w-full sm:w-auto border-2 border-[#4BB8A9] font-bold py-4 px-8 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 ${
                     isDark 
-                      ? 'text-[#83dcc9] hover:bg-[#83dcc9] hover:text-gray-900' 
-                      : 'text-[#83dcc9] hover:bg-[#83dcc9] hover:text-white'
+                      ? 'text-[#4BB8A9] hover:bg-[#4BB8A9] hover:text-gray-900' 
+                      : 'text-[#4BB8A9] hover:bg-[#4BB8A9] hover:text-white'
                   }`}>
                     <span>عرض جميع الباقات</span>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -305,73 +305,155 @@ export default function LandingPage() {
               </div>
             </motion.div>
 
-            {/* Visual Element */}
+             {/* Visual Element - Professional Dashboard Preview */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, delay: 0.2 }}
               className="relative"
             >
-              {/* Dashboard Preview */}
+              {/* Main Dashboard Preview */}
               <div className={`relative rounded-2xl overflow-hidden shadow-2xl border ${
                 isDark ? 'border-gray-800' : 'border-gray-200'
               }`}>
-                <div className={`p-8 ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
-                  {/* Mock Dashboard */}
-                  <div className="space-y-6">
-                    {/* Header */}
+                <div className={`${isDark ? 'bg-gray-900' : 'bg-white'}`}>
+                  {/* Dashboard Header */}
+                  <div className={`px-6 py-4 border-b ${isDark ? 'border-gray-800' : 'border-gray-200'}`}>
                     <div className="flex items-center justify-between">
-                      <div className="h-4 w-32 bg-[#83dcc9]/20 rounded"></div>
-                      <div className="flex gap-2">
-                        <div className="h-8 w-8 bg-[#83dcc9]/20 rounded"></div>
-                        <div className="h-8 w-8 bg-[#83dcc9]/20 rounded"></div>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-[#4BB8A9] rounded-lg flex items-center justify-center">
+                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                          </svg>
+                        </div>
+                        <span className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>لوحة تحكم SEO</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>آخر تحديث: منذ دقيقة</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Dashboard Content */}
+                  <div className="p-6 space-y-6">
+                    {/* SEO Performance Overview */}
+                    <div className="grid grid-cols-3 gap-4">
+                      {/* Score Card */}
+                      <div className={`p-4 rounded-xl ${isDark ? 'bg-gray-800' : 'bg-gray-50'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>نقاط SEO</span>
+                          <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <div className="text-2xl font-bold text-[#4BB8A9]">92/100</div>
+                        <div className="mt-2 flex items-center gap-1">
+                          <div className="flex-1 bg-gray-200 rounded-full h-2">
+                            <div className="bg-[#4BB8A9] h-2 rounded-full transition-all duration-500" style={{width: '92%'}}></div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Products Optimized */}
+                      <div className={`p-4 rounded-xl ${isDark ? 'bg-gray-800' : 'bg-gray-50'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>منتجات محسّنة</span>
+                          <svg className="w-4 h-4 text-[#4BB8A9]" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <div className="text-2xl font-bold">47/50</div>
+                        <div className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>94% مكتمل</div>
+                      </div>
+
+                      {/* Weekly Traffic */}
+                      <div className={`p-4 rounded-xl ${isDark ? 'bg-gray-800' : 'bg-gray-50'}`}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>الزيارات الأسبوعية</span>
+                          <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <div className="text-2xl font-bold">+23%</div>
+                        <div className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>مقارنة بالأسبوع الماضي</div>
                       </div>
                     </div>
 
-                    {/* SEO Score Card */}
-                    <div className={`p-6 rounded-xl ${isDark ? 'bg-gray-800' : 'bg-gray-50'}`}>
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="text-sm font-semibold">نقاط SEO</span>
-                        <span className="text-2xl font-bold text-[#83dcc9]">92/100</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-3">
-                        <div className="bg-[#83dcc9] h-3 rounded-full" style={{width: '92%'}}></div>
-                      </div>
-                    </div>
-
-                    {/* Product Cards */}
-                    <div className="space-y-3">
-                      {[1, 2].map((i) => (
-                        <div key={i} className={`p-4 rounded-lg flex items-center justify-between ${
+                    {/* Recent Products */}
+                    <div>
+                      <h3 className={`text-sm font-semibold mb-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>أحدث المنتجات المحسّنة</h3>
+                      <div className="space-y-2">
+                        {/* Product 1 */}
+                        <div className={`p-3 rounded-lg flex items-center justify-between ${
                           isDark ? 'bg-gray-800' : 'bg-gray-50'
                         }`}>
                           <div className="flex items-center gap-3">
-                            <div className="h-12 w-12 bg-[#83dcc9]/20 rounded"></div>
-                            <div className="space-y-1">
-                              <div className="h-3 w-24 bg-[#83dcc9]/20 rounded"></div>
-                              <div className="h-2 w-16 bg-gray-300/20 rounded"></div>
+                            <div className="w-10 h-10 bg-[#4BB8A9]/20 rounded-lg flex items-center justify-center">
+                              <svg className="w-6 h-6 text-[#4BB8A9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                              </svg>
+                            </div>
+                            <div>
+                              <div className={`font-medium text-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>ساعة ذكية رياضية</div>
+                              <div className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>تم التحسين منذ 5 دقائق</div>
                             </div>
                           </div>
-                          <div className="text-green-500 text-sm font-semibold">محسّن</div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded">+15 نقطة</span>
+                          </div>
                         </div>
-                      ))}
+
+                        {/* Product 2 */}
+                        <div className={`p-3 rounded-lg flex items-center justify-between ${
+                          isDark ? 'bg-gray-800' : 'bg-gray-50'
+                        }`}>
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-[#4BB8A9]/20 rounded-lg flex items-center justify-center">
+                              <svg className="w-6 h-6 text-[#4BB8A9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                            <div>
+                              <div className={`font-medium text-sm ${isDark ? 'text-white' : 'text-gray-900'}`}>هاتف ذكي 256GB</div>
+                              <div className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>تم التحسين منذ 12 دقيقة</div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded">+22 نقطة</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Floating Elements */}
-              <div className="absolute -top-4 -right-4 bg-[#83dcc9] text-white p-3 rounded-lg shadow-lg">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                  <path fillRule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 100 4h2a2 2 0 100 4h-2a1 1 0 100 2 2 2 0 01-2-2v-1a2 2 0 01-2-2V7a2 2 0 012-2h2zm0 2v4h2V7H4zm4 4v4h2v-4H8z" clipRule="evenodd" />
-                </svg>
+              {/* Floating Analytics Card */}
+              <div className="absolute -top-4 -right-4 bg-white rounded-lg shadow-xl p-3 border border-gray-100">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">معدل النمو</div>
+                    <div className="text-sm font-bold text-gray-900">+42%</div>
+                  </div>
+                </div>
               </div>
 
-              <div className="absolute -bottom-4 -left-4 bg-green-500 text-white p-3 rounded-lg shadow-lg">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
-                </svg>
+              {/* Floating Notification */}
+              <div className="absolute -bottom-4 -left-4 bg-[#4BB8A9] text-white rounded-lg shadow-xl p-3">
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
+                  </svg>
+                  <div className="text-sm">
+                    <div className="font-semibold">منتج جديد!</div>
+                    <div className="text-xs opacity-90">جاهز للتحسين</div>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -405,7 +487,7 @@ export default function LandingPage() {
                 isDark ? 'bg-gray-800' : 'bg-white'
               } shadow-lg`}
             >
-              <div className="text-5xl font-bold text-[#83dcc9] mb-4">93%</div>
+              <div className="text-5xl font-bold text-[#4BB8A9] mb-4">93%</div>
               <h3 className={`text-xl font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 من التجارب الشرائية
               </h3>
@@ -426,7 +508,7 @@ export default function LandingPage() {
                 isDark ? 'bg-gray-800' : 'bg-white'
               } shadow-lg`}
             >
-              <div className="text-5xl font-bold text-[#83dcc9] mb-4">75%</div>
+              <div className="text-5xl font-bold text-[#4BB8A9] mb-4">75%</div>
               <h3 className={`text-xl font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 من المستخدمين
               </h3>
@@ -447,7 +529,7 @@ export default function LandingPage() {
                 isDark ? 'bg-gray-800' : 'bg-white'
               } shadow-lg`}
             >
-              <div className="text-5xl font-bold text-[#83dcc9] mb-4">70%</div>
+              <div className="text-5xl font-bold text-[#4BB8A9] mb-4">70%</div>
               <h3 className={`text-xl font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 من النقرات
               </h3>
@@ -466,10 +548,10 @@ export default function LandingPage() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className={`max-w-4xl mx-auto text-center p-8 rounded-2xl ${
-              isDark ? 'bg-gradient-to-r from-[#83dcc9]/20 to-transparent' : 'bg-gradient-to-r from-[#83dcc9]/10 to-transparent'
+              isDark ? 'bg-gradient-to-r from-[#4BB8A9]/20 to-transparent' : 'bg-gradient-to-r from-[#4BB8A9]/10 to-transparent'
             }`}
           >
-            <h3 className="text-2xl font-bold mb-4 text-[#83dcc9]">ماذا يعني هذا لمتجرك؟</h3>
+            <h3 className="text-2xl font-bold mb-4 text-[#4BB8A9]">ماذا يعني هذا لمتجرك؟</h3>
             <p className={`text-lg ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
               إذا لم تظهر منتجاتك في الصفحة الأولى، فأنت تخسر <strong>75% من العملاء المحتملين</strong>.
               مع SEO Raysa، نضمن لك تحسين ظهور منتجاتك وزيادة فرص وصولها للعملاء المناسبين.
@@ -505,8 +587,8 @@ export default function LandingPage() {
                 isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'
               } hover:shadow-lg transition-shadow`}
             >
-              <div className="w-12 h-12 bg-[#83dcc9]/20 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-[#83dcc9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-[#4BB8A9]/20 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-[#4BB8A9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
@@ -527,8 +609,8 @@ export default function LandingPage() {
                 isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'
               } hover:shadow-lg transition-shadow`}
             >
-              <div className="w-12 h-12 bg-[#83dcc9]/20 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-[#83dcc9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-[#4BB8A9]/20 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-[#4BB8A9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
               </div>
@@ -549,8 +631,8 @@ export default function LandingPage() {
                 isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'
               } hover:shadow-lg transition-shadow`}
             >
-              <div className="w-12 h-12 bg-[#83dcc9]/20 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-[#83dcc9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-[#4BB8A9]/20 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-[#4BB8A9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
@@ -571,8 +653,8 @@ export default function LandingPage() {
                 isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'
               } hover:shadow-lg transition-shadow`}
             >
-              <div className="w-12 h-12 bg-[#83dcc9]/20 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-[#83dcc9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-[#4BB8A9]/20 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-[#4BB8A9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                 </svg>
               </div>
@@ -593,8 +675,8 @@ export default function LandingPage() {
                 isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'
               } hover:shadow-lg transition-shadow`}
             >
-              <div className="w-12 h-12 bg-[#83dcc9]/20 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-[#83dcc9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-[#4BB8A9]/20 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-[#4BB8A9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
@@ -615,8 +697,8 @@ export default function LandingPage() {
                 isDark ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'
               } hover:shadow-lg transition-shadow`}
             >
-              <div className="w-12 h-12 bg-[#83dcc9]/20 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-[#83dcc9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 bg-[#4BB8A9]/20 rounded-lg flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-[#4BB8A9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
@@ -658,7 +740,7 @@ export default function LandingPage() {
                 className="relative"
               >
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-[#83dcc9] text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                  <div className="w-16 h-16 bg-[#4BB8A9] text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                     1
                   </div>
                   <h3 className={`text-xl font-semibold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -670,7 +752,7 @@ export default function LandingPage() {
                 </div>
                 
                 {/* Connector Line */}
-                <div className="hidden md:block absolute top-8 left-1/2 w-full h-0.5 bg-gradient-to-r from-[#83dcc9] to-transparent"></div>
+                <div className="hidden md:block absolute top-8 left-1/2 w-full h-0.5 bg-gradient-to-r from-[#4BB8A9] to-transparent"></div>
               </motion.div>
 
               {/* Step 2 */}
@@ -681,7 +763,7 @@ export default function LandingPage() {
                 className="relative"
               >
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-[#83dcc9] text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                  <div className="w-16 h-16 bg-[#4BB8A9] text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                     2
                   </div>
                   <h3 className={`text-xl font-semibold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -693,7 +775,7 @@ export default function LandingPage() {
                 </div>
                 
                 {/* Connector Line */}
-                <div className="hidden md:block absolute top-8 left-1/2 w-full h-0.5 bg-gradient-to-r from-[#83dcc9] to-transparent"></div>
+                <div className="hidden md:block absolute top-8 left-1/2 w-full h-0.5 bg-gradient-to-r from-[#4BB8A9] to-transparent"></div>
               </motion.div>
 
               {/* Step 3 */}
@@ -704,7 +786,7 @@ export default function LandingPage() {
                 className="relative"
               >
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-[#83dcc9] text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                  <div className="w-16 h-16 bg-[#4BB8A9] text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                     3
                   </div>
                   <h3 className={`text-xl font-semibold mb-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -720,6 +802,8 @@ export default function LandingPage() {
         </div>
       </section>
 
+      
+
       {/* Platform Integration */}
       <section className={`py-16 lg:py-24 ${isDark ? 'bg-gray-950' : 'bg-white'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -730,7 +814,7 @@ export default function LandingPage() {
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <div className="inline-flex items-center gap-2 bg-[#83dcc9]/10 text-[#83dcc9] px-4 py-2 rounded-full text-sm font-semibold mb-6">
+              <div className="inline-flex items-center gap-2 bg-[#4BB8A9]/10 text-[#4BB8A9] px-4 py-2 rounded-full text-sm font-semibold mb-6">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
                 </svg>
@@ -818,7 +902,7 @@ export default function LandingPage() {
 
               {/* CTA */}
               <div className="mt-8">
-                <Link to="/checkout?plan=starter" className="inline-flex items-center gap-2 bg-[#83dcc9] text-gray-900 font-bold py-3 px-6 rounded-lg hover:bg-[#6cc9b9] transition-all duration-300 shadow-lg hover:shadow-xl">
+                <Link to="/checkout?plan=starter" className="inline-flex items-center gap-2 bg-[#4BB8A9] text-gray-900 font-bold py-3 px-6 rounded-lg hover:bg-[#6cc9b9] transition-all duration-300 shadow-lg hover:shadow-xl">
                   <span>ابدأ الآن</span>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -827,54 +911,7 @@ export default function LandingPage() {
               </div>
             </motion.div>
 
-            {/* Visual */}
-            <motion.div 
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
-              className="relative"
-            >
-              <div className={`relative rounded-2xl overflow-hidden shadow-2xl border ${
-                isDark ? 'border-gray-800' : 'border-gray-200'
-              }`}>
-                {/* Platform Integration Visual */}
-                <div className={`p-8 ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
-                  <div className="text-center mb-8">
-                    <h3 className={`text-xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                      منصات متوافقة
-                    </h3>
-                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                      نعمل مع أفضل منصات التجارة الإلكترونية
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    {/* Platform Cards */}
-                    {['منصة 1', 'منصة 2', 'منصة 3', 'منصة 4'].map((platform, index) => (
-                      <div key={index} className={`p-4 rounded-lg border ${
-                        isDark ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'
-                      }`}>
-                        <div className="h-8 w-8 bg-[#83dcc9]/20 rounded mb-2"></div>
-                        <div className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                          {platform}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-6 text-center">
-                    <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                      والمزيد قادم قريباً...
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating Badge */}
-              <div className="absolute -top-4 -right-4 bg-green-500 text-white px-4 py-2 rounded-full text-sm font-semibold shadow-lg">
-                تكامل سلس
-              </div>
-            </motion.div>
+           
           </div>
         </div>
       </section>
@@ -957,10 +994,10 @@ export default function LandingPage() {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="relative"
             >
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-[#83dcc9] text-white px-4 py-1 rounded-full text-sm font-semibold">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-[#4BB8A9] text-white px-4 py-1 rounded-full text-sm font-semibold">
                 الأكثر شعبية
               </div>
-              <div className={`p-8 rounded-2xl border-2 border-[#83dcc9] ${
+              <div className={`p-8 rounded-2xl border-2 border-[#4BB8A9] ${
                 isDark ? 'bg-gray-800' : 'bg-white'
               }`}>
                 <h3 className={`text-2xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -1003,7 +1040,7 @@ export default function LandingPage() {
                   </li>
                 </ul>
                 <Link to="/checkout?plan=advanced">
-                  <button className="w-full bg-[#83dcc9] text-gray-900 py-3 rounded-lg font-semibold hover:bg-[#6cc9b9] transition-colors">
+                  <button className="w-full bg-[#4BB8A9] text-gray-900 py-3 rounded-lg font-semibold hover:bg-[#6cc9b9] transition-colors">
                     اشترك الآن
                   </button>
                 </Link>
@@ -1080,7 +1117,7 @@ export default function LandingPage() {
             <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-full ${
               isDark ? 'bg-gray-800' : 'bg-white'
             } shadow-lg`}>
-              <svg className="w-5 h-5 text-[#83dcc9]" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-5 h-5 text-[#4BB8A9]" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
               <span className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -1090,7 +1127,7 @@ export default function LandingPage() {
           </motion.div>
 
           <div className="text-center mt-8">
-            <Link to="/pricing" className="text-[#83dcc9] hover:text-[#6cc9b9] font-semibold">
+            <Link to="/pricing" className="text-[#4BB8A9] hover:text-[#6cc9b9] font-semibold">
               عرض جميع المميزات والمقارنة بين الباقات ←
             </Link>
           </div>
@@ -1177,7 +1214,7 @@ export default function LandingPage() {
           </div>
 
           <div className="text-center mt-8">
-            <Link to="/faq" className="text-[#83dcc9] hover:text-[#6cc9b9] font-semibold">
+            <Link to="/faq" className="text-[#4BB8A9] hover:text-[#6cc9b9] font-semibold">
               عرض جميع الأسئلة الشائعة ←
             </Link>
           </div>
@@ -1201,7 +1238,7 @@ export default function LandingPage() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/checkout?plan=starter" className="group">
-                <button className="w-full sm:w-auto bg-[#83dcc9] text-gray-900 font-bold py-4 px-8 rounded-lg hover:bg-[#6cc9b9] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2">
+                <button className="w-full sm:w-auto bg-[#4BB8A9] text-gray-900 font-bold py-4 px-8 rounded-lg hover:bg-[#6cc9b9] transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2">
                   <span>ابدأ الآن - 99 ريال/شهر</span>
                   <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -1211,8 +1248,8 @@ export default function LandingPage() {
               <Link to="/contact" className="group">
                 <button className={`w-full sm:w-auto border-2 font-bold py-4 px-8 rounded-lg transition-all duration-300 ${
                   isDark 
-                    ? 'border-gray-600 text-gray-300 hover:border-[#83dcc9] hover:text-[#83dcc9]' 
-                    : 'border-gray-300 text-gray-700 hover:border-[#83dcc9] hover:text-[#83dcc9]'
+                    ? 'border-gray-600 text-gray-300 hover:border-[#4BB8A9] hover:text-[#4BB8A9]' 
+                    : 'border-gray-300 text-gray-700 hover:border-[#4BB8A9] hover:text-[#4BB8A9]'
                 }`}>
                   تحدث مع فريق المبيعات
                 </button>
@@ -1253,7 +1290,7 @@ export default function LandingPage() {
             {/* Company Info */}
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 bg-[#83dcc9] rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 bg-[#4BB8A9] rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold">SR</span>
                 </div>
                 <span className={`font-bold text-xl ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -1272,22 +1309,22 @@ export default function LandingPage() {
               </h4>
               <ul className="space-y-2">
                 <li>
-                  <Link to="/features" className={`text-sm hover:text-[#83dcc9] transition-colors ${
+                  <Link to="/features" className={`text-sm hover:text-[#4BB8A9] transition-colors ${
                     isDark ? 'text-gray-400' : 'text-gray-600'
                   }`}>المميزات</Link>
                 </li>
                 <li>
-                  <Link to="/pricing" className={`text-sm hover:text-[#83dcc9] transition-colors ${
+                  <Link to="/pricing" className={`text-sm hover:text-[#4BB8A9] transition-colors ${
                     isDark ? 'text-gray-400' : 'text-gray-600'
                   }`}>الأسعار</Link>
                 </li>
                 <li>
-                  <Link to="/blog" className={`text-sm hover:text-[#83dcc9] transition-colors ${
+                  <Link to="/blog" className={`text-sm hover:text-[#4BB8A9] transition-colors ${
                     isDark ? 'text-gray-400' : 'text-gray-600'
                   }`}>المدونة</Link>
                 </li>
                 <li>
-                  <Link to="/about" className={`text-sm hover:text-[#83dcc9] transition-colors ${
+                  <Link to="/about" className={`text-sm hover:text-[#4BB8A9] transition-colors ${
                     isDark ? 'text-gray-400' : 'text-gray-600'
                   }`}>من نحن</Link>
                 </li>
@@ -1301,22 +1338,22 @@ export default function LandingPage() {
               </h4>
               <ul className="space-y-2">
                 <li>
-                  <Link to="/help" className={`text-sm hover:text-[#83dcc9] transition-colors ${
+                  <Link to="/help" className={`text-sm hover:text-[#4BB8A9] transition-colors ${
                     isDark ? 'text-gray-400' : 'text-gray-600'
                   }`}>مركز المساعدة</Link>
                 </li>
                 <li>
-                  <Link to="/contact" className={`text-sm hover:text-[#83dcc9] transition-colors ${
+                  <Link to="/contact" className={`text-sm hover:text-[#4BB8A9] transition-colors ${
                     isDark ? 'text-gray-400' : 'text-gray-600'
                   }`}>تواصل معنا</Link>
                 </li>
                 <li>
-                  <Link to="/faq" className={`text-sm hover:text-[#83dcc9] transition-colors ${
+                  <Link to="/faq" className={`text-sm hover:text-[#4BB8A9] transition-colors ${
                     isDark ? 'text-gray-400' : 'text-gray-600'
                   }`}>الأسئلة الشائعة</Link>
                 </li>
                 <li>
-                  <a href="mailto:support@seoraysa.com" className={`text-sm hover:text-[#83dcc9] transition-colors ${
+                  <a href="mailto:support@seoraysa.com" className={`text-sm hover:text-[#4BB8A9] transition-colors ${
                     isDark ? 'text-gray-400' : 'text-gray-600'
                   }`}>support@seoraysa.com</a>
                 </li>
@@ -1330,22 +1367,22 @@ export default function LandingPage() {
               </h4>
               <ul className="space-y-2">
                 <li>
-                  <Link to="/privacy" className={`text-sm hover:text-[#83dcc9] transition-colors ${
+                  <Link to="/privacy" className={`text-sm hover:text-[#4BB8A9] transition-colors ${
                     isDark ? 'text-gray-400' : 'text-gray-600'
                   }`}>سياسة الخصوصية</Link>
                 </li>
                 <li>
-                  <Link to="/terms" className={`text-sm hover:text-[#83dcc9] transition-colors ${
+                  <Link to="/terms" className={`text-sm hover:text-[#4BB8A9] transition-colors ${
                     isDark ? 'text-gray-400' : 'text-gray-600'
                   }`}>شروط الاستخدام</Link>
                 </li>
                 <li>
-                  <Link to="/cookies" className={`text-sm hover:text-[#83dcc9] transition-colors ${
+                  <Link to="/cookies" className={`text-sm hover:text-[#4BB8A9] transition-colors ${
                     isDark ? 'text-gray-400' : 'text-gray-600'
                   }`}>سياسة الكوكيز</Link>
                 </li>
                 <li>
-                  <Link to="/refund" className={`text-sm hover:text-[#83dcc9] transition-colors ${
+                  <Link to="/refund" className={`text-sm hover:text-[#4BB8A9] transition-colors ${
                     isDark ? 'text-gray-400' : 'text-gray-600'
                   }`}>سياسة الاسترداد</Link>
                 </li>
@@ -1360,21 +1397,21 @@ export default function LandingPage() {
                 © 2025 SEO Raysa. جميع الحقوق محفوظة.
               </p>
               <div className="flex gap-4">
-                <a href="https://twitter.com/seoraysa" className={`hover:text-[#83dcc9] transition-colors ${
+                <a href="https://twitter.com/seoraysa" className={`hover:text-[#4BB8A9] transition-colors ${
                   isDark ? 'text-gray-400' : 'text-gray-600'
                 }`}>
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"/>
                   </svg>
                 </a>
-                <a href="https://linkedin.com/company/seoraysa" className={`hover:text-[#83dcc9] transition-colors ${
+                <a href="https://linkedin.com/company/seoraysa" className={`hover:text-[#4BB8A9] transition-colors ${
                   isDark ? 'text-gray-400' : 'text-gray-600'
                 }`}>
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                   </svg>
                 </a>
-                <a href="https://instagram.com/seoraysa" className={`hover:text-[#83dcc9] transition-colors ${
+                <a href="https://instagram.com/seoraysa" className={`hover:text-[#4BB8A9] transition-colors ${
                   isDark ? 'text-gray-400' : 'text-gray-600'
                 }`}>
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

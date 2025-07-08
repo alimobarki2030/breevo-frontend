@@ -428,13 +428,13 @@ export default function ManualLogin() {
             {selectedPlan && (
               <div className={`rounded-xl p-4 border transition-colors duration-300 ${
                 isDark 
-                  ? 'bg-gray-800/50 border-[#83dcc9]/30' 
-                  : 'bg-blue-50 border-[#83dcc9]/30'
+                  ? 'bg-gray-800/50 border-[#4BB8A9]/30' 
+                  : 'bg-blue-50 border-[#4BB8A9]/30'
               }`}>
                 <div className="flex items-center gap-3 mb-2">
                   <span className="text-2xl">{PLAN_INFO[selectedPlan].icon}</span>
                   <div>
-                    <h3 className="font-bold text-[#83dcc9]">الخطة {PLAN_INFO[selectedPlan].name}</h3>
+                    <h3 className="font-bold text-[#4BB8A9]">الخطة {PLAN_INFO[selectedPlan].name}</h3>
                     <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
                       {PLAN_INFO[selectedPlan].price}
                     </p>

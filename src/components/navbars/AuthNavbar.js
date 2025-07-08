@@ -42,8 +42,8 @@ const AuthNavbar = () => {
               to={item.path} 
               className={`transition-colors duration-300 ${
                 isActivePath(item.path) 
-                  ? 'text-[#83dcc9] font-semibold' 
-                  : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+                  ? 'text-[#4BB8A9] font-semibold' 
+                  : 'text-gray-300 dark:text-gray-400 hover:text-[#4BB8A9]'
               }`}
             >
               {item.label}
@@ -85,8 +85,8 @@ const AuthNavbar = () => {
                   to={item.path} 
                   className={`transition-colors duration-300 py-2 ${
                     isActivePath(item.path) 
-                      ? 'text-[#83dcc9] font-semibold' 
-                      : 'text-gray-300 dark:text-gray-400 hover:text-[#83dcc9]'
+                      ? 'text-[#4BB8A9] font-semibold' 
+                      : 'text-gray-300 dark:text-gray-400 hover:text-[#4BB8A9]'
                   }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
