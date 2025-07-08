@@ -726,11 +726,7 @@ export default function PricingPage() {
                       : 'text-gray-600 hover:text-gray-900'
                   }`}>المميزات</Link>
                   <Link to="/pricing" className="block text-[#4BB8A9] font-semibold">الأسعار</Link>
-                  <Link to="/how-it-works" className={`block transition ${
-                    isDark 
-                      ? 'text-gray-400 hover:text-white' 
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}>كيف يعمل</Link>
+                  
                 </div>
               </div>
               <div>

@@ -18,7 +18,6 @@ import Checkout from "./pages/Checkout";
 import AdminPromo from './pages/AdminPromo';
 import PromoCodesManagement from './pages/PromoCodesManagement';
 import About from "./pages/About";
-import HowItWorks from "./pages/HowItWorks";
 import Features from "./pages/Features";
 import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
@@ -57,7 +56,6 @@ function App() {
             <Route path="/admin-promo" element={<AdminPromo />} />
             <Route path="/admin/promo-codes" element={<PromoCodesManagement />} />
             <Route path="/about" element={<About />} />
-            <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/features" element={<Features />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/faq" element={<FAQ />} />

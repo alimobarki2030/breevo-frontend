@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useTheme } from '../contexts/ThemeContext';
 import PublicNavbar from '../components/navbars/PublicNavbar';
 
 export default function FeaturesPage() {
+  const { theme, isDark } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  <PublicNavbar />
 
   const mainFeatures = [
     {
@@ -71,8 +71,8 @@ export default function FeaturesPage() {
     },
     {
       icon: "🌐",
-      title: "دعم متعدد المنصات",
-      description: "يعمل مع جميع منصات التجارة الإلكترونية العربية والعالمية"
+      title: "تكامل سلس مع متجرك",
+      description: "ربط مباشر وسهل مع متجرك الإلكتروني لتحسين جميع منتجاتك"
     },
     {
       icon: "📱",
@@ -110,113 +110,38 @@ export default function FeaturesPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-white font-arabic">
+    <div className={`min-h-screen font-arabic transition-all duration-500 ${
+      isDark 
+        ? 'bg-gradient-to-b from-gray-950 via-gray-900 to-gray-950' 
+        : 'bg-gradient-to-b from-white via-gray-50 to-white'
+    }`}>
       {/* Navigation */}
-      <nav className="max-w-screen-xl mx-auto px-4 py-4 flex items-center justify-between relative">
-        <img src="/logo3.png" alt="Logo" className="h-8 md:h-12" />
-        
-        {/* Desktop Menu */}
-        <div className="hidden md:flex items-center space-x-8 space-x-reverse">
-          <Link to="/features" className="text-[#4BB8A9] font-semibold">المميزات</Link>
-          <Link to="/pricing" className="hover:text-[#4BB8A9] transition-colors">الأسعار</Link>
-          <Link to="/how-it-works" className="hover:text-[#4BB8A9] transition-colors">كيف يعمل</Link>
-          <Link to="/about" className="hover:text-[#4BB8A9] transition-colors">من نحن</Link>
-          <Link to="/contact" className="hover:text-[#4BB8A9] transition-colors">اتصل بنا</Link>
-          <Link to="/login" className="bg-[#4BB8A9] text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-[#6cc9b9] transition">
-            دخول
-          </Link>
-        </div>
-        
-        {/* Mobile menu button */}
-        <button 
-          className="md:hidden text-white z-50 relative"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          <svg 
-            className={`w-6 h-6 transition-transform ${isMobileMenuOpen ? 'rotate-90' : ''}`} 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            {isMobileMenuOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
-
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="absolute top-full left-4 right-4 bg-gray-900 border border-gray-700 rounded-xl mt-2 py-4 px-4 shadow-2xl z-40"
-          >
-            <div className="flex flex-col space-y-4">
-              <Link 
-                to="/features" 
-                className="text-[#4BB8A9] font-semibold py-2 border-b border-gray-700"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                المميزات
-              </Link>
-              <Link 
-                to="/pricing" 
-                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                الأسعار
-              </Link>
-              <Link 
-                to="/how-it-works" 
-                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                كيف يعمل
-              </Link>
-              <Link 
-                to="/about" 
-                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                من نحن
-              </Link>
-              <Link 
-                to="/contact" 
-                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                اتصل بنا
-              </Link>
-              <Link 
-                to="/login" 
-                className="bg-[#4BB8A9] text-gray-900 font-bold py-3 px-4 rounded-lg hover:bg-[#6cc9b9] transition text-center mt-4"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                دخول
-              </Link>
-            </div>
-          </motion.div>
-        )}
-      </nav>
+      <PublicNavbar />
 
       {/* Hero Section */}
-      <section className="w-full px-4 py-16 text-center">
+      <section className="w-full px-4 pt-24 pb-16 lg:pt-32 lg:pb-20 text-center">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-3xl md:text-5xl font-extrabold mb-6 leading-tight">
-              مميزات تجعل منتجاتك تتفوق على المنافسين
+            <h1 className={`text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6 leading-normal ${
+              isDark ? 'text-white' : 'text-gray-900'
+            }`}>
+              مميزات تجعل منتجاتك 
+              <span className="block mt-2">تتفوق على المنافسين</span>
             </h1>
-            <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+            <p className={`text-xl mb-8 leading-relaxed ${
+              isDark ? 'text-gray-300' : 'text-gray-600'
+            }`}>
               أدوات متطورة وذكاء اصطناعي متخصص لتحسين ظهور منتجاتك في محركات البحث
             </p>
-            <div className="bg-[#4BB8A9]/10 border border-[#4BB8A9]/30 rounded-2xl p-6">
+            <div className={`rounded-2xl p-6 ${
+              isDark 
+                ? 'bg-[#4BB8A9]/10 border border-[#4BB8A9]/30' 
+                : 'bg-[#4BB8A9]/10 border border-[#4BB8A9]/40'
+            }`}>
               <div className="flex items-center justify-center space-x-4 space-x-reverse text-[#4BB8A9]">
                 <span className="text-2xl">🚀</span>
                 <p className="text-lg font-semibold">
@@ -251,13 +176,21 @@ export default function FeaturesPage() {
                     <h2 className="text-2xl md:text-3xl font-bold text-[#4BB8A9] mb-2">
                       {feature.title}
                     </h2>
-                    <p className="text-lg text-gray-400 mb-4">{feature.subtitle}</p>
-                    <p className="text-xl text-gray-300 leading-relaxed mb-6">
+                    <p className={`text-lg mb-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                      {feature.subtitle}
+                    </p>
+                    <p className={`text-xl leading-relaxed mb-6 ${
+                      isDark ? 'text-gray-300' : 'text-gray-700'
+                    }`}>
                       {feature.description}
                     </p>
                   </div>
 
-                  <div className="bg-[#4BB8A9]/10 border border-[#4BB8A9]/30 rounded-xl p-4">
+                  <div className={`rounded-xl p-4 ${
+                    isDark 
+                      ? 'bg-[#4BB8A9]/10 border border-[#4BB8A9]/30' 
+                      : 'bg-[#4BB8A9]/10 border border-[#4BB8A9]/40'
+                  }`}>
                     <p className="text-[#4BB8A9] font-semibold">✨ {feature.highlight}</p>
                   </div>
                   
@@ -265,7 +198,7 @@ export default function FeaturesPage() {
                     {feature.benefits.map((benefit, idx) => (
                       <div key={idx} className="flex items-center space-x-3 space-x-reverse">
                         <span className="text-[#4BB8A9] text-lg">✓</span>
-                        <span className="text-gray-300">{benefit}</span>
+                        <span className={isDark ? 'text-gray-300' : 'text-gray-700'}>{benefit}</span>
                       </div>
                     ))}
                   </div>
@@ -273,10 +206,16 @@ export default function FeaturesPage() {
 
                 {/* Visual */}
                 <div className="flex-1 flex justify-center">
-                  <div className="w-full max-w-md h-80 bg-gradient-to-tr from-[#4BB8A9]/20 to-transparent rounded-3xl shadow-[0_20px_60px_rgba(131,220,201,0.15)] flex items-center justify-center border border-[#4BB8A9]/20">
+                  <div className={`w-full max-w-md h-80 rounded-3xl flex items-center justify-center ${
+                    isDark 
+                      ? 'bg-gradient-to-tr from-[#4BB8A9]/20 to-transparent shadow-[0_20px_60px_rgba(131,220,201,0.15)] border border-[#4BB8A9]/20' 
+                      : 'bg-gradient-to-tr from-[#4BB8A9]/10 to-transparent shadow-lg border border-[#4BB8A9]/30'
+                  }`}>
                     <div className="text-center">
                       <div className="text-8xl opacity-60 mb-4">{feature.icon}</div>
-                      <div className="text-sm text-gray-400">معاينة الميزة</div>
+                      <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                        معاينة الميزة
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -287,7 +226,7 @@ export default function FeaturesPage() {
       </section>
 
       {/* Additional Features Grid */}
-      <section className="w-full px-4 py-16 bg-gray-900">
+      <section className={`w-full px-4 py-16 ${isDark ? 'bg-gray-900/50' : 'bg-gray-50'}`}>
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -296,8 +235,14 @@ export default function FeaturesPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">مميزات إضافية قوية</h2>
-            <p className="text-xl text-gray-300">أدوات متطورة لتعزيز أداء متجرك</p>
+            <h2 className={`text-3xl md:text-4xl font-bold mb-6 ${
+              isDark ? 'text-white' : 'text-gray-900'
+            }`}>
+              مميزات إضافية قوية
+            </h2>
+            <p className={`text-xl ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+              أدوات متطورة لتعزيز أداء متجرك
+            </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -308,11 +253,15 @@ export default function FeaturesPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-gray-800 p-6 rounded-2xl hover:shadow-xl transition-all hover:-translate-y-1"
+                className={`p-6 rounded-2xl hover:shadow-xl transition-all hover:-translate-y-1 ${
+                  isDark ? 'bg-gray-800' : 'bg-white border border-gray-200'
+                }`}
               >
                 <div className="text-4xl mb-4">{feature.icon}</div>
                 <h3 className="text-xl font-bold mb-3 text-[#4BB8A9]">{feature.title}</h3>
-                <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+                <p className={isDark ? 'text-gray-300' : 'text-gray-600'}>
+                  {feature.description}
+                </p>
               </motion.div>
             ))}
           </div>
@@ -320,7 +269,7 @@ export default function FeaturesPage() {
       </section>
 
       {/* Comparison Section */}
-      <section className="w-full px-4 py-16">
+      <section className={`w-full px-4 py-16 ${isDark ? 'bg-gray-950' : 'bg-white'}`}>
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -329,14 +278,24 @@ export default function FeaturesPage() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">الطريقة التقليدية مقابل منصتنا</h2>
-            <p className="text-xl text-gray-300">اكتشف كيف نوفر عليك الوقت والجهد</p>
+            <h2 className={`text-3xl md:text-4xl font-bold mb-6 ${
+              isDark ? 'text-white' : 'text-gray-900'
+            }`}>
+              الطريقة التقليدية مقابل منصتنا
+            </h2>
+            <p className={`text-xl ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+              اكتشف كيف نوفر عليك الوقت والجهد
+            </p>
           </motion.div>
 
-          <div className="bg-gray-800 rounded-2xl overflow-hidden">
-            <div className="grid grid-cols-3 bg-gray-700 p-4 text-center font-bold">
+          <div className={`rounded-2xl overflow-hidden ${
+            isDark ? 'bg-gray-800' : 'bg-gray-50 border border-gray-200'
+          }`}>
+            <div className={`grid grid-cols-3 p-4 text-center font-bold ${
+              isDark ? 'bg-gray-700' : 'bg-gray-100'
+            }`}>
               <div></div>
-              <div className="text-gray-300">الطريقة التقليدية</div>
+              <div className={isDark ? 'text-gray-300' : 'text-gray-600'}>الطريقة التقليدية</div>
               <div className="text-[#4BB8A9]">منصتنا</div>
             </div>
             
@@ -347,10 +306,18 @@ export default function FeaturesPage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="grid grid-cols-3 p-4 border-b border-gray-700 last:border-b-0"
+                className={`grid grid-cols-3 p-4 border-b last:border-b-0 ${
+                  isDark ? 'border-gray-700' : 'border-gray-200'
+                }`}
               >
-                <div className="font-semibold text-gray-300 text-right pr-4">{item.aspect}</div>
-                <div className="text-gray-400 text-center">{item.manual}</div>
+                <div className={`font-semibold text-right pr-4 ${
+                  isDark ? 'text-gray-300' : 'text-gray-700'
+                }`}>
+                  {item.aspect}
+                </div>
+                <div className={`text-center ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {item.manual}
+                </div>
                 <div className="text-[#4BB8A9] text-center font-medium">{item.platform}</div>
               </motion.div>
             ))}
@@ -359,30 +326,42 @@ export default function FeaturesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="w-full px-4 py-16 text-center">
+      <section className={`w-full px-4 py-16 text-center ${
+        isDark ? 'bg-gray-900/50' : 'bg-gray-50'
+      }`}>
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="bg-gradient-to-r from-[#4BB8A9]/20 to-transparent border border-[#4BB8A9]/30 rounded-2xl p-8"
+            className={`rounded-2xl p-8 ${
+              isDark 
+                ? 'bg-gradient-to-r from-[#4BB8A9]/20 to-transparent border border-[#4BB8A9]/30' 
+                : 'bg-gradient-to-r from-[#4BB8A9]/10 to-transparent border border-[#4BB8A9]/40'
+            }`}
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              جرب جميع المميزات مجاناً
+            <h2 className={`text-3xl md:text-4xl font-bold mb-6 ${
+              isDark ? 'text-white' : 'text-gray-900'
+            }`}>
+              ابدأ رحلة تحسين SEO لمتجرك
             </h2>
-            <p className="text-xl text-gray-300 mb-8">
-              ابدأ بـ 3 منتجات مجانية واختبر قوة منصتنا بنفسك
+            <p className={`text-xl mb-8 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+              احصل على جميع المميزات المتقدمة وحسّن ظهور منتجاتك في محركات البحث
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-              <Link to="/login?plan=free" className="w-full sm:w-auto">
-                <button className="w-full bg-[#4BB8A9] text-gray-900 font-bold py-4 px-8 rounded-xl hover:bg-[#6cc9b9] transition text-lg">
-                  ابدأ التجربة المجانية
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/checkout?plan=starter" className="w-full sm:w-auto">
+                <button className="w-full bg-[#4BB8A9] text-gray-900 font-bold py-3 px-6 rounded-xl hover:bg-[#6cc9b9] transition shadow-lg hover:shadow-xl transform hover:scale-105 whitespace-nowrap">
+                  ابدأ الآن - 99 ريال/شهر
                 </button>
               </Link>
-              <Link to="/how-it-works" className="w-full sm:w-auto">
-                <button className="w-full border border-[#4BB8A9] text-[#4BB8A9] font-bold py-4 px-8 rounded-xl hover:bg-[#4BB8A9] hover:text-gray-900 transition text-lg">
-                  شاهد كيف يعمل
+              <Link to="/pricing" className="w-full sm:w-auto">
+                <button className={`w-full border-2 border-[#4BB8A9] font-bold py-3 px-6 rounded-xl transition whitespace-nowrap ${
+                  isDark 
+                    ? 'text-[#4BB8A9] hover:bg-[#4BB8A9] hover:text-gray-900' 
+                    : 'text-[#4BB8A9] hover:bg-[#4BB8A9] hover:text-white'
+                }`}>
+                  عرض جميع الباقات
                 </button>
               </Link>
             </div>
@@ -391,56 +370,96 @@ export default function FeaturesPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 sm:py-12 px-4 sm:px-6 border-t border-gray-700 bg-gray-900">
+      <footer className={`py-8 sm:py-12 px-4 sm:px-6 border-t ${
+        isDark ? 'bg-gray-950 border-gray-800' : 'bg-white border-gray-200'
+      }`}>
         <div className="max-w-screen-xl mx-auto">
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 text-xs sm:text-sm mb-6 sm:mb-8">
             <div>
               <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">المنصة</h4>
               <div className="space-y-1 sm:space-y-2">
                 <Link to="/features" className="block text-[#4BB8A9] font-semibold">المميزات</Link>
-                <Link to="/pricing" className="block text-gray-400 hover:text-white transition">الأسعار</Link>
-                <Link to="/how-it-works" className="block text-gray-400 hover:text-white transition">كيف يعمل</Link>
-                <Link to="/demo" className="block text-gray-400 hover:text-white transition">تجربة تفاعلية</Link>
+                <Link to="/pricing" className={`block transition ${
+                  isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                }`}>الأسعار</Link>
+                
+                <Link to="/demo" className={`block transition ${
+                  isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                }`}>تجربة تفاعلية</Link>
               </div>
             </div>
             <div>
               <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">الشركة</h4>
               <div className="space-y-1 sm:space-y-2">
-                <Link to="/about" className="block text-gray-400 hover:text-white transition">من نحن</Link>
-                <Link to="/contact" className="block text-gray-400 hover:text-white transition">اتصل بنا</Link>
-                <Link to="/careers" className="block text-gray-400 hover:text-white transition">الوظائف</Link>
-                <Link to="/blog" className="block text-gray-400 hover:text-white transition">المدونة</Link>
+                <Link to="/about" className={`block transition ${
+                  isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                }`}>من نحن</Link>
+                <Link to="/contact" className={`block transition ${
+                  isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                }`}>اتصل بنا</Link>
+                <Link to="/careers" className={`block transition ${
+                  isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                }`}>الوظائف</Link>
+                <Link to="/blog" className={`block transition ${
+                  isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                }`}>المدونة</Link>
               </div>
             </div>
             <div>
               <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">الدعم</h4>
               <div className="space-y-1 sm:space-y-2">
-                <Link to="/faq" className="block text-gray-400 hover:text-white transition">الأسئلة الشائعة</Link>
-                <Link to="/help" className="block text-gray-400 hover:text-white transition">مركز المساعدة</Link>
-                <Link to="/tutorials" className="block text-gray-400 hover:text-white transition">الدروس التعليمية</Link>
-                <Link to="/support" className="block text-gray-400 hover:text-white transition">الدعم الفني</Link>
+                <Link to="/faq" className={`block transition ${
+                  isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                }`}>الأسئلة الشائعة</Link>
+                <Link to="/help" className={`block transition ${
+                  isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                }`}>مركز المساعدة</Link>
+                <Link to="/tutorials" className={`block transition ${
+                  isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                }`}>الدروس التعليمية</Link>
+                <Link to="/support" className={`block transition ${
+                  isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                }`}>الدعم الفني</Link>
               </div>
             </div>
             <div>
               <h4 className="font-bold mb-3 sm:mb-4 text-[#4BB8A9]">قانوني</h4>
               <div className="space-y-1 sm:space-y-2">
-                <Link to="/privacy" className="block text-gray-400 hover:text-white transition">سياسة الخصوصية</Link>
-                <Link to="/terms" className="block text-gray-400 hover:text-white transition">شروط الخدمة</Link>
-                <Link to="/cookies" className="block text-gray-400 hover:text-white transition">سياسة ملفات تعريف الارتباط</Link>
-                <Link to="/refund" className="block text-gray-400 hover:text-white transition">سياسة الاسترداد</Link>
+                <Link to="/privacy" className={`block transition ${
+                  isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                }`}>سياسة الخصوصية</Link>
+                <Link to="/terms" className={`block transition ${
+                  isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                }`}>شروط الخدمة</Link>
+                <Link to="/cookies" className={`block transition ${
+                  isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                }`}>سياسة ملفات تعريف الارتباط</Link>
+                <Link to="/refund" className={`block transition ${
+                  isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                }`}>سياسة الاسترداد</Link>
               </div>
             </div>
           </div>
           
-          <div className="flex flex-col sm:flex-row justify-between items-center pt-6 sm:pt-8 border-t border-gray-700 space-y-4 sm:space-y-0">
+          <div className={`flex flex-col sm:flex-row justify-between items-center pt-6 sm:pt-8 border-t space-y-4 sm:space-y-0 ${
+            isDark ? 'border-gray-700' : 'border-gray-200'
+          }`}>
             <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 sm:space-x-reverse">
               <img src="/logo3.png" alt="Logo" className="h-6 sm:h-8" />
-              <span className="text-gray-400 text-xs text-center sm:text-right">© 2025 مشروع السيو الذكي. جميع الحقوق محفوظة.</span>
+              <span className={`text-xs text-center sm:text-right ${
+                isDark ? 'text-gray-400' : 'text-gray-600'
+              }`}>© 2025 مشروع السيو الذكي. جميع الحقوق محفوظة.</span>
             </div>
             <div className="flex space-x-3 sm:space-x-4 space-x-reverse">
-              <Link to="/social/twitter" className="text-gray-400 hover:text-[#4BB8A9] transition text-xs sm:text-sm">تويتر</Link>
-              <Link to="/social/linkedin" className="text-gray-400 hover:text-[#4BB8A9] transition text-xs sm:text-sm">لينكد إن</Link>
-              <Link to="/social/instagram" className="text-gray-400 hover:text-[#4BB8A9] transition text-xs sm:text-sm">إنستجرام</Link>
+              <Link to="/social/twitter" className={`transition text-xs sm:text-sm ${
+                isDark ? 'text-gray-400 hover:text-[#4BB8A9]' : 'text-gray-600 hover:text-[#4BB8A9]'
+              }`}>تويتر</Link>
+              <Link to="/social/linkedin" className={`transition text-xs sm:text-sm ${
+                isDark ? 'text-gray-400 hover:text-[#4BB8A9]' : 'text-gray-600 hover:text-[#4BB8A9]'
+              }`}>لينكد إن</Link>
+              <Link to="/social/instagram" className={`transition text-xs sm:text-sm ${
+                isDark ? 'text-gray-400 hover:text-[#4BB8A9]' : 'text-gray-600 hover:text-[#4BB8A9]'
+              }`}>إنستجرام</Link>
             </div>
           </div>
         </div>

@@ -199,7 +199,6 @@ export default function FAQPage() {
         <div className="hidden md:flex items-center space-x-8 space-x-reverse">
           <Link to="/features" className="hover:text-[#4BB8A9] transition-colors">المميزات</Link>
           <Link to="/pricing" className="hover:text-[#4BB8A9] transition-colors">الأسعار</Link>
-          <Link to="/how-it-works" className="hover:text-[#4BB8A9] transition-colors">كيف يعمل</Link>
           <Link to="/about" className="hover:text-[#4BB8A9] transition-colors">من نحن</Link>
           <Link to="/contact" className="hover:text-[#4BB8A9] transition-colors">اتصل بنا</Link>
           <Link to="/login" className="bg-[#4BB8A9] text-gray-900 font-bold py-2 px-4 rounded-lg hover:bg-[#6cc9b9] transition">
@@ -249,13 +248,7 @@ export default function FAQPage() {
               >
                 الأسعار
               </Link>
-              <Link 
-                to="/how-it-works" 
-                className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                كيف يعمل
-              </Link>
+            
               <Link 
                 to="/about" 
                 className="hover:text-[#4BB8A9] transition-colors py-2 border-b border-gray-700"
@@ -430,12 +423,6 @@ export default function FAQPage() {
                 <p className="text-gray-400 text-sm">نرد خلال 24 ساعة</p>
               </Link>
               
-              <Link to="/how-it-works" className="bg-gray-800 p-6 rounded-xl hover:shadow-xl transition-all hover:-translate-y-1">
-                <div className="text-4xl mb-3">📚</div>
-                <h3 className="text-lg font-bold text-[#4BB8A9] mb-2">دليل الاستخدام</h3>
-                <p className="text-gray-400 text-sm">تعلم كيف تستخدم المنصة</p>
-              </Link>
-              
               <Link to="/login?plan=free" className="bg-gray-800 p-6 rounded-xl hover:shadow-xl transition-all hover:-translate-y-1">
                 <div className="text-4xl mb-3">🚀</div>
                 <h3 className="text-lg font-bold text-[#4BB8A9] mb-2">جرب مجاناً</h3>
@@ -487,7 +474,6 @@ export default function FAQPage() {
               <div className="space-y-1 sm:space-y-2">
                 <Link to="/features" className="block text-gray-400 hover:text-white transition">المميزات</Link>
                 <Link to="/pricing" className="block text-gray-400 hover:text-white transition">الأسعار</Link>
-                <Link to="/how-it-works" className="block text-gray-400 hover:text-white transition">كيف يعمل</Link>
                 <Link to="/demo" className="block text-gray-400 hover:text-white transition">تجربة تفاعلية</Link>
               </div>
             </div>

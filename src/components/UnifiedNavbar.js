@@ -198,7 +198,6 @@ const UnifiedNavbar = () => {
     return [
       { path: '/features', label: 'المميزات' },
       { path: '/pricing', label: 'الأسعار' },
-      { path: '/how-it-works', label: 'كيف يعمل' },
       { path: '/contact', label: 'اتصل بنا' }
     ];
   };

@@ -19,7 +19,6 @@ const PublicNavbar = () => {
   const publicMenuItems = [
     { path: '/features', label: 'المميزات' },
     { path: '/pricing', label: 'الأسعار' },
-    { path: '/how-it-works', label: 'كيف يعمل' },
     { path: '/about', label: 'من نحن' },
     { path: '/contact', label: 'اتصل بنا' }
   ];
