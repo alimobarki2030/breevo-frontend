@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Helmet } from "react-helmet-async";
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import PublicNavbar from '../components/navbars/PublicNavbar';
@@ -12,128 +11,283 @@ export default function LandingPage() {
   const { theme, isDark } = useTheme();
   const isLoggedIn = user || localStorage.getItem('user') || localStorage.getItem('clientName');
 
-  // Schema Markup Data
-  const organizationSchema = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "SEO Raysa",
-    "url": "https://seoraysa.com",
-    "logo": "https://seoraysa.com/logo.png",
-    "description": "منصة SEO احترافية للمتاجر الإلكترونية - تحسين محركات البحث بالذكاء الاصطناعي",
-    "email": "support@seoraysa.com",
-    "foundingDate": "2024",
-    "areaServed": {
-      "@type": "GeoCircle",
-      "geoMidpoint": {
-        "@type": "GeoCoordinates",
-        "latitude": "24.7136",
-        "longitude": "46.6753"
-      },
-      "geoRadius": "5000000"
-    },
-    "sameAs": [
-      "https://twitter.com/seoraysa",
-      "https://linkedin.com/company/seoraysa",
-      "https://instagram.com/seoraysa"
-    ]
-  };
+  // Set meta tags using useEffect
+  useEffect(() => {
+    // Update document title
+    document.title = "SEO Raysa - منصة تحسين محركات البحث للمتاجر الإلكترونية";
 
-  const websiteSchema = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "url": "https://seoraysa.com",
-    "name": "SEO Raysa",
-    "description": "منصة تحسين محركات البحث للمتاجر الإلكترونية",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://seoraysa.com/search?q={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
-  };
-
-  const productSchema = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "name": "SEO Raysa - منصة تحسين محركات البحث",
-    "description": "منصة متخصصة في تحسين SEO للمتاجر الإلكترونية باستخدام الذكاء الاصطناعي",
-    "brand": {
-      "@type": "Brand",
-      "name": "SEO Raysa"
-    },
-    "offers": [
-      {
-        "@type": "Offer",
-        "name": "الباقة الأساسية",
-        "price": "99",
-        "priceCurrency": "SAR",
-        "availability": "https://schema.org/InStock",
-        "priceValidUntil": "2025-12-31",
-        "url": "https://seoraysa.com/checkout?plan=starter"
-      },
-      {
-        "@type": "Offer",
-        "name": "الباقة المتقدمة",
-        "price": "199",
-        "priceCurrency": "SAR",
-        "availability": "https://schema.org/InStock",
-        "priceValidUntil": "2025-12-31",
-        "url": "https://seoraysa.com/checkout?plan=advanced"
-      },
-      {
-        "@type": "Offer",
-        "name": "الباقة الاحترافية",
-        "price": "399",
-        "priceCurrency": "SAR",
-        "availability": "https://schema.org/InStock",
-        "priceValidUntil": "2025-12-31",
-        "url": "https://seoraysa.com/checkout?plan=professional"
+    // Helper function to set meta tags
+    const setMetaTag = (name, content, property = false) => {
+      let meta = document.querySelector(property ? `meta[property="${name}"]` : `meta[name="${name}"]`);
+      if (!meta) {
+        meta = document.createElement('meta');
+        if (property) {
+          meta.setAttribute('property', name);
+        } else {
+          meta.setAttribute('name', name);
+        }
+        document.head.appendChild(meta);
       }
-    ],
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "reviewCount": "156"
-    }
-  };
+      meta.setAttribute('content', content);
+    };
 
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "هل أحتاج لخبرة تقنية لاستخدام SEO Raysa؟",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "لا، المنصة مصممة لتكون سهلة الاستخدام. كل ما تحتاجه هو ربط متجرك والنظام سيتولى الباقي مع توصيات واضحة وسهلة التطبيق."
+    // Primary Meta Tags
+    setMetaTag('description', 'ضاعف مبيعات متجرك الإلكتروني مع SEO Raysa. منصة متخصصة في تحسين ظهور منتجاتك في Google باستخدام الذكاء الاصطناعي. ابدأ بـ 99 ريال/شهر فقط.');
+    setMetaTag('keywords', 'SEO, تحسين محركات البحث, متاجر إلكترونية, سيو, تحسين المتاجر, SEO للمتاجر, زيادة المبيعات, Google SEO, تحسين الظهور');
+    setMetaTag('robots', 'index, follow');
+    setMetaTag('language', 'Arabic');
+    setMetaTag('author', 'SEO Raysa');
+
+    // Open Graph / Facebook
+    setMetaTag('og:type', 'website', true);
+    setMetaTag('og:url', 'https://seoraysa.com/', true);
+    setMetaTag('og:title', 'SEO Raysa - منصة تحسين محركات البحث للمتاجر الإلكترونية', true);
+    setMetaTag('og:description', 'ضاعف مبيعات متجرك الإلكتروني مع SEO Raysa. منصة متخصصة في تحسين ظهور منتجاتك في Google باستخدام الذكاء الاصطناعي.', true);
+    setMetaTag('og:image', 'https://seoraysa.com/og-image.png', true);
+    setMetaTag('og:site_name', 'SEO Raysa', true);
+    setMetaTag('og:locale', 'ar_SA', true);
+
+    // Twitter
+    setMetaTag('twitter:card', 'summary_large_image');
+    setMetaTag('twitter:url', 'https://seoraysa.com/');
+    setMetaTag('twitter:title', 'SEO Raysa - منصة تحسين محركات البحث للمتاجر الإلكترونية');
+    setMetaTag('twitter:description', 'ضاعف مبيعات متجرك الإلكتروني مع SEO Raysa. منصة متخصصة في تحسين ظهور منتجاتك في Google.');
+    setMetaTag('twitter:image', 'https://seoraysa.com/twitter-image.png');
+    setMetaTag('twitter:site', '@seoraysa');
+
+    // Set canonical link
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', 'https://seoraysa.com');
+
+    // Schema Markup injection
+    const addSchemaScript = (schema) => {
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.text = JSON.stringify(schema);
+      document.head.appendChild(script);
+      return script;
+    };
+
+    // Schema scripts
+    const scripts = [];
+
+    // Cleanup function
+    return () => {
+      scripts.forEach(script => {
+        if (script && script.parentNode) {
+          script.parentNode.removeChild(script);
         }
-      },
-      {
-        "@type": "Question",
-        "name": "كم من الوقت أحتاج لرؤية النتائج؟",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "التحسينات تظهر فوراً على متجرك، لكن نتائج SEO في محركات البحث تحتاج عادة 2-4 أسابيع لتظهر بشكل ملحوظ حسب المنافسة في مجالك."
+      });
+    };
+  }, []);
+
+  // Set meta tags using useEffect
+  useEffect(() => {
+    // Update document title
+    document.title = "SEO Raysa - منصة تحسين محركات البحث للمتاجر الإلكترونية";
+
+    // Helper function to set meta tags
+    const setMetaTag = (name, content, property = false) => {
+      let meta = document.querySelector(property ? `meta[property="${name}"]` : `meta[name="${name}"]`);
+      if (!meta) {
+        meta = document.createElement('meta');
+        if (property) {
+          meta.setAttribute('property', name);
+        } else {
+          meta.setAttribute('name', name);
         }
-      },
-      {
-        "@type": "Question",
-        "name": "هل يمكنني تغيير الباقة في أي وقت؟",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "نعم، يمكنك الترقية أو التخفيض في أي وقت. التغييرات تصبح سارية من بداية دورة الفوترة التالية."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "ماذا يحدث لبياناتي إذا ألغيت الاشتراك؟",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "بياناتك تبقى آمنة ومحفوظة لمدة 30 يوماً بعد الإلغاء. يمكنك استعادة حسابك في أي وقت خلال هذه الفترة."
-        }
+        document.head.appendChild(meta);
       }
-    ]
-  };
+      meta.setAttribute('content', content);
+    };
+
+    // Primary Meta Tags
+    setMetaTag('description', 'ضاعف مبيعات متجرك الإلكتروني مع SEO Raysa. منصة متخصصة في تحسين ظهور منتجاتك في Google باستخدام الذكاء الاصطناعي. ابدأ بـ 99 ريال/شهر فقط.');
+    setMetaTag('keywords', 'SEO, تحسين محركات البحث, متاجر إلكترونية, سيو, تحسين المتاجر, SEO للمتاجر, زيادة المبيعات, Google SEO, تحسين الظهور');
+    setMetaTag('robots', 'index, follow');
+    setMetaTag('language', 'Arabic');
+    setMetaTag('author', 'SEO Raysa');
+
+    // Open Graph / Facebook
+    setMetaTag('og:type', 'website', true);
+    setMetaTag('og:url', 'https://seoraysa.com/', true);
+    setMetaTag('og:title', 'SEO Raysa - منصة تحسين محركات البحث للمتاجر الإلكترونية', true);
+    setMetaTag('og:description', 'ضاعف مبيعات متجرك الإلكتروني مع SEO Raysa. منصة متخصصة في تحسين ظهور منتجاتك في Google باستخدام الذكاء الاصطناعي.', true);
+    setMetaTag('og:image', 'https://seoraysa.com/og-image.png', true);
+    setMetaTag('og:site_name', 'SEO Raysa', true);
+    setMetaTag('og:locale', 'ar_SA', true);
+
+    // Twitter
+    setMetaTag('twitter:card', 'summary_large_image');
+    setMetaTag('twitter:url', 'https://seoraysa.com/');
+    setMetaTag('twitter:title', 'SEO Raysa - منصة تحسين محركات البحث للمتاجر الإلكترونية');
+    setMetaTag('twitter:description', 'ضاعف مبيعات متجرك الإلكتروني مع SEO Raysa. منصة متخصصة في تحسين ظهور منتجاتك في Google.');
+    setMetaTag('twitter:image', 'https://seoraysa.com/twitter-image.png');
+    setMetaTag('twitter:site', '@seoraysa');
+
+    // Set canonical link
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', 'https://seoraysa.com');
+
+    // Schema Markup Data
+    const organizationSchema = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "SEO Raysa",
+      "url": "https://seoraysa.com",
+      "logo": "https://seoraysa.com/logo.png",
+      "description": "منصة SEO احترافية للمتاجر الإلكترونية - تحسين محركات البحث بالذكاء الاصطناعي",
+      "email": "support@seoraysa.com",
+      "foundingDate": "2024",
+      "areaServed": {
+        "@type": "GeoCircle",
+        "geoMidpoint": {
+          "@type": "GeoCoordinates",
+          "latitude": "24.7136",
+          "longitude": "46.6753"
+        },
+        "geoRadius": "5000000"
+      },
+      "sameAs": [
+        "https://twitter.com/seoraysa",
+        "https://linkedin.com/company/seoraysa",
+        "https://instagram.com/seoraysa"
+      ]
+    };
+
+    const websiteSchema = {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "url": "https://seoraysa.com",
+      "name": "SEO Raysa",
+      "description": "منصة تحسين محركات البحث للمتاجر الإلكترونية",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://seoraysa.com/search?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    };
+
+    const productSchema = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "SEO Raysa - منصة تحسين محركات البحث",
+      "description": "منصة متخصصة في تحسين SEO للمتاجر الإلكترونية باستخدام الذكاء الاصطناعي",
+      "brand": {
+        "@type": "Brand",
+        "name": "SEO Raysa"
+      },
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "الباقة الأساسية",
+          "price": "99",
+          "priceCurrency": "SAR",
+          "availability": "https://schema.org/InStock",
+          "priceValidUntil": "2025-12-31",
+          "url": "https://seoraysa.com/checkout?plan=starter"
+        },
+        {
+          "@type": "Offer",
+          "name": "الباقة المتقدمة",
+          "price": "199",
+          "priceCurrency": "SAR",
+          "availability": "https://schema.org/InStock",
+          "priceValidUntil": "2025-12-31",
+          "url": "https://seoraysa.com/checkout?plan=advanced"
+        },
+        {
+          "@type": "Offer",
+          "name": "الباقة الاحترافية",
+          "price": "399",
+          "priceCurrency": "SAR",
+          "availability": "https://schema.org/InStock",
+          "priceValidUntil": "2025-12-31",
+          "url": "https://seoraysa.com/checkout?plan=professional"
+        }
+      ],
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "156"
+      }
+    };
+
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "هل أحتاج لخبرة تقنية لاستخدام SEO Raysa؟",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "لا، المنصة مصممة لتكون سهلة الاستخدام. كل ما تحتاجه هو ربط متجرك والنظام سيتولى الباقي مع توصيات واضحة وسهلة التطبيق."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "كم من الوقت أحتاج لرؤية النتائج؟",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "التحسينات تظهر فوراً على متجرك، لكن نتائج SEO في محركات البحث تحتاج عادة 2-4 أسابيع لتظهر بشكل ملحوظ حسب المنافسة في مجالك."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "هل يمكنني تغيير الباقة في أي وقت؟",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "نعم، يمكنك الترقية أو التخفيض في أي وقت. التغييرات تصبح سارية من بداية دورة الفوترة التالية."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "ماذا يحدث لبياناتي إذا ألغيت الاشتراك؟",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "بياناتك تبقى آمنة ومحفوظة لمدة 30 يوماً بعد الإلغاء. يمكنك استعادة حسابك في أي وقت خلال هذه الفترة."
+          }
+        }
+      ]
+    };
+
+    // Schema Markup injection
+    const addSchemaScript = (schema) => {
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.text = JSON.stringify(schema);
+      document.head.appendChild(script);
+      return script;
+    };
+
+    // Add all schema scripts
+    const scripts = [
+      addSchemaScript(organizationSchema),
+      addSchemaScript(websiteSchema),
+      addSchemaScript(productSchema),
+      addSchemaScript(faqSchema)
+    ];
+
+    // Cleanup function
+    return () => {
+      scripts.forEach(script => {
+        if (script && script.parentNode) {
+          script.parentNode.removeChild(script);
+        }
+      });
+    };
+  }, []);
 
   return (
     <>
