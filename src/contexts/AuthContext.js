@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { authAPI } from '../utils/api';
 
 const AuthContext = createContext({});
 
@@ -14,9 +15,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  // API Base URL
-  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
   // تحميل بيانات المستخدم عند بدء التطبيق
   useEffect(() => {
@@ -35,21 +33,9 @@ export const AuthProvider = ({ children }) => {
           
           // محاولة التحقق من صحة التوكن مع الخادم
           try {
-            const response = await fetch(`${API_BASE_URL}/auth/verify`, {
-              headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-              }
-            });
-
-            if (response.ok) {
-              const verifiedUser = await response.json();
-              setUser(verifiedUser);
-              setIsAuthenticated(true);
-            } else {
-              // إذا كان التوكن غير صالح، نظف البيانات
-              throw new Error('Invalid token');
-            }
+            const verifiedUser = await authAPI.verifyToken();
+            setUser(verifiedUser);
+            setIsAuthenticated(true);
           } catch (apiError) {
             // إذا لم يكن الخادم متاحاً، استخدم البيانات المحلية
             console.log('API not available, using local data');
@@ -76,33 +62,18 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(credentials)
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // حفظ التوكن والبيانات
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
-        // حفظ اسم العميل للتوافق مع النظام القديم
-        if (data.user.name) {
-          localStorage.setItem('clientName', data.user.name);
-        }
-
-        setUser(data.user);
-        setIsAuthenticated(true);
-        
-        return { success: true, user: data.user };
-      } else {
-        throw new Error(data.message || 'فشل في تسجيل الدخول');
+      const data = await authAPI.login(credentials.email, credentials.password);
+      
+      // البيانات محفوظة تلقائياً في authAPI.login
+      setUser(data.user);
+      setIsAuthenticated(true);
+      
+      // حفظ اسم العميل للتوافق مع النظام القديم
+      if (data.user.name) {
+        localStorage.setItem('clientName', data.user.name);
       }
+      
+      return { success: true, user: data.user };
     } catch (error) {
       console.error('Login error:', error);
       return { 
@@ -114,33 +85,18 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(userData)
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // حفظ التوكن والبيانات
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
-        // حفظ اسم العميل للتوافق مع النظام القديم
-        if (data.user.name) {
-          localStorage.setItem('clientName', data.user.name);
-        }
-
-        setUser(data.user);
-        setIsAuthenticated(true);
-        
-        return { success: true, user: data.user };
-      } else {
-        throw new Error(data.message || 'فشل في إنشاء الحساب');
+      const data = await authAPI.register(userData);
+      
+      // البيانات محفوظة تلقائياً في authAPI.register
+      setUser(data.user);
+      setIsAuthenticated(true);
+      
+      // حفظ اسم العميل للتوافق مع النظام القديم
+      if (data.user.name) {
+        localStorage.setItem('clientName', data.user.name);
       }
+      
+      return { success: true, user: data.user };
     } catch (error) {
       console.error('Register error:', error);
       return { 
@@ -157,13 +113,7 @@ export const AuthProvider = ({ children }) => {
       // محاولة إشعار الخادم بتسجيل الخروج
       if (token) {
         try {
-          await fetch(`${API_BASE_URL}/auth/logout`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          });
+          await authAPI.logout();
         } catch (apiError) {
           // لا بأس إذا فشل إشعار الخادم
           console.log('Could not notify server of logout');
@@ -203,6 +153,8 @@ export const AuthProvider = ({ children }) => {
         throw new Error('لا يوجد توكن صالح');
       }
 
+      const API_BASE_URL = process.env.REACT_APP_API_URL || "https://breevo-backend.onrender.com";
+      
       const response = await fetch(`${API_BASE_URL}/auth/profile`, {
         method: 'PUT',
         headers: {
