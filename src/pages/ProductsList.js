@@ -27,10 +27,11 @@ import {
   ExternalLink,
   Store,
   Globe,
-  Clock
+  Clock,
+  Coins,
+  Lock
 } from "lucide-react";
 
-// ✅ استيراد النافبار الموحد و useTheme
 import UserNavbar from '../components/navbars/UserNavbar';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -89,29 +90,21 @@ const calculateSEOStatus = (score) => {
   return "ضعيف";
 };
 
-// دالة لعرض صورة المنتج أو placeholder
-// دالة لعرض صورة المنتج أو placeholder
 const getProductImage = (product) => {
-  // إذا كان من سلة وله صور
   if (product.source === "سلة" && product.images && product.images.length > 0) {
-    // أخذ أول صورة من مصفوفة الصور
     const firstImage = product.images[0];
-    // إذا كانت الصورة عبارة عن string مباشر
     if (typeof firstImage === 'string') {
       return firstImage;
     }
-    // إذا كانت الصورة عبارة عن object مع URL
     if (firstImage && firstImage.url) {
       return firstImage.url;
     }
   }
   
-  // إذا كان محلي وله صورة مرفوعة
   if (product.source === "محلي" && product.image) {
     return product.image;
   }
   
-  // صورة افتراضية بسيطة - استخدام encodeURIComponent بدلاً من btoa
   const svgContent = `
     <svg width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect width="400" height="300" fill="#F3F4F6"/>
@@ -126,7 +119,6 @@ const getProductImage = (product) => {
 };
 
 export default function ProductsList() {
-  // ✅ استخدام useTheme
   const { theme, isDark } = useTheme();
 
   // State management
@@ -155,81 +147,118 @@ export default function ProductsList() {
     name: ""
   });
 
-  // User subscription info - فصل العدادات
-  const [userPlan, setUserPlan] = useState("free");
-  
-  // عداد المنتجات منفصل
-  const [usageStats, setUsageStats] = useState({
-    productsUsed: 0,
-    productsLimit: 3,
-    canAddMore: true
-  });
-
-  // عداد التوليد الذكي منفصل
-  const [aiUsageStats, setAiUsageStats] = useState({
-    used: 0,
-    limit: 3,
-    resetDate: null
-  });
+  // نظام النقاط
+  const [userPoints, setUserPoints] = useState(null);
+  const [pointsLoading, setPointsLoading] = useState(true);
+  const [subscription, setSubscription] = useState(null);
 
   const navigate = useNavigate();
 
-  // تحميل إحصائيات التوليد الذكي
-  const loadAiUsage = () => {
-    const usage = JSON.parse(localStorage.getItem("seo_trial_usage") || "{}");
-    const now = new Date();
-    const currentMonth = `${now.getFullYear()}-${now.getMonth()}`;
-    
-    if (!usage.month || usage.month !== currentMonth) {
-      const newUsage = {
-        used: 0,
-        limit: 3,
-        month: currentMonth,
-        resetDate: new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString()
-      };
-      localStorage.setItem("seo_trial_usage", JSON.stringify(newUsage));
-      setAiUsageStats(newUsage);
-    } else {
-      setAiUsageStats(newUsage);
-    }
-  };
-
-  // Load user plan and usage
+  // تحميل رصيد النقاط والاشتراك
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    const subscription = JSON.parse(localStorage.getItem("subscription") || "{}");
-    
-    const plan = subscription.plan || user.plan || "free";
-    const isOwner = user.email === "alimobarki.ad@gmail.com" || 
-                   user.email === "owner@breevo.com" || 
-                   user.role === "owner" || 
-                   user.id === "1";
-    
-    setUserPlan(isOwner ? "owner" : plan);
-    
-    // Set limits based on plan - للمنتجات فقط
-    const limits = {
-      free: 3,
-      pro: 30,
-      enterprise: -1 // unlimited
-    };
-    
-    const currentLimit = limits[plan] || limits.free;
-    setUsageStats(prev => ({
-      ...prev,
-      productsLimit: currentLimit
-    }));
-
-    // تحميل إحصائيات التوليد الذكي للمجانيين فقط
-    if (!isOwner && plan === "free") {
-      loadAiUsage();
-    }
-
-    // فحص اتصال سلة
+    loadUserPointsAndSubscription();
     checkSallahConnection();
   }, []);
 
-  // فحص اتصال سلة عبر جلب المتاجر المربوطة
+  const loadUserPointsAndSubscription = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setPointsLoading(false);
+      navigate('/login');
+      return;
+    }
+
+    // حل بسيط - تحقق من البريد الإلكتروني مباشرة
+    const userEmail = localStorage.getItem("userEmail");
+    console.log("Current user email:", userEmail);
+    
+    // قائمة بالمستخدمين المسموح لهم بالدخول بدون اشتراك
+    const adminEmails = [
+      "muath17a@gmail.com",  // ضع بريدك الإلكتروني هنا
+      // يمكنك إضافة المزيد من البريد الإلكتروني للمسؤولين
+    ];
+    
+    const isOwnerOrAdmin = adminEmails.includes(userEmail);
+
+    // تحميل رصيد النقاط
+    try {
+      const pointsResponse = await fetch(`${API_BASE_URL}/api/points/balance`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (pointsResponse.ok) {
+        const pointsData = await pointsResponse.json();
+        setUserPoints(pointsData);
+      } else if (isOwnerOrAdmin) {
+        // إعطاء نقاط افتراضية للمالك إذا فشل تحميل النقاط
+        setUserPoints({ 
+          balance: 999999, 
+          monthly_points: 999999, 
+          monthly_points_used: 0 
+        });
+      }
+    } catch (error) {
+      console.log("Points loading error:", error);
+      if (isOwnerOrAdmin) {
+        setUserPoints({ 
+          balance: 999999, 
+          monthly_points: 999999, 
+          monthly_points_used: 0 
+        });
+      }
+    }
+
+    // التعامل مع الاشتراك
+    if (isOwnerOrAdmin) {
+      // إذا كان المستخدم مالك أو أدمن، أعطه اشتراك افتراضي
+      console.log("User is owner/admin - granting full access");
+      setSubscription({ 
+        plan_name: 'Owner Access', 
+        expires_at: null,
+        features: 'unlimited',
+        status: 'active'
+      });
+      setPointsLoading(false);
+      return; // مهم - توقف هنا ولا تحاول تحميل الاشتراك
+    }
+
+    // للمستخدمين العاديين فقط - تحقق من الاشتراك
+    try {
+      const subscriptionResponse = await fetch(`${API_BASE_URL}/api/subscription/current`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (subscriptionResponse.ok) {
+        const subData = await subscriptionResponse.json();
+        setSubscription(subData);
+      } else {
+        // إذا لم يكن هناك اشتراك، توجيه لصفحة الأسعار
+        console.log("No subscription found - redirecting to pricing");
+        toast.error('يجب الاشتراك في إحدى الباقات للمتابعة');
+        navigate('/pricing');
+        return;
+      }
+    } catch (error) {
+      console.error('Error loading subscription:', error);
+      toast.error('خطأ في تحميل بيانات الاشتراك');
+      navigate('/pricing');
+    }
+
+  } catch (error) {
+    console.error('Error in loadUserPointsAndSubscription:', error);
+    toast.error('خطأ في تحميل البيانات');
+  } finally {
+    setPointsLoading(false);
+  }
+};
+
   const checkSallahConnection = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
@@ -248,7 +277,6 @@ export default function ProductsList() {
         setSallahStores(stores);
         setSallahConnected(stores.length > 0);
         
-        // تحديد آخر وقت تزامن من أي متجر
         if (stores.length > 0) {
           const lastSyncs = stores.map(store => store.last_sync).filter(Boolean);
           if (lastSyncs.length > 0) {
@@ -263,7 +291,6 @@ export default function ProductsList() {
     }
   }, []);
 
-  // جلب المنتجات من سلة (جميع المتاجر)
   const fetchSallahProducts = useCallback(async () => {
     console.log('🔄 Fetching products from Sallah stores...');
     setSyncingFromSallah(true);
@@ -281,12 +308,10 @@ export default function ProductsList() {
 
       let allSallahProducts = [];
 
-      // جلب المنتجات من كل متجر
       for (const store of sallahStores) {
         try {
           console.log(`🏪 Syncing store: ${store.name}`);
           
-          // بدء مزامنة المتجر
           const syncResponse = await fetch(`${API_BASE_URL}/api/salla/stores/${store.id}/sync`, {
             method: 'POST',
             headers: {
@@ -300,10 +325,8 @@ export default function ProductsList() {
             continue;
           }
 
-          // انتظار قليل لإنهاء المزامنة
           await new Promise(resolve => setTimeout(resolve, 2000));
 
-          // جلب المنتجات من المتجر
           const productsResponse = await fetch(`${API_BASE_URL}/api/salla/stores/${store.id}/products`, {
             method: 'GET',
             headers: {
@@ -321,13 +344,12 @@ export default function ProductsList() {
           console.log(`✅ Store ${store.name} products:`, result);
           
           if (result.products && result.products.length > 0) {
-            // تحويل منتجات سلة للصيغة المطلوبة
             const formattedProducts = result.products.map(product => ({
               id: `sallah_${product.id}`,
               sallahId: product.salla_product_id,
               name: product.name,
               description: product.description || "",
-              seoScore: null, // سيتم حسابها لاحقاً
+              seoScore: null,
               status: "جديد",
               lastUpdated: product.last_synced || new Date().toISOString(),
               createdAt: product.created_at || new Date().toISOString(),
@@ -358,13 +380,11 @@ export default function ProductsList() {
 
       console.log(`✅ Total Sallah products fetched: ${allSallahProducts.length}`);
 
-      // دمج مع المنتجات المحلية
       const localProducts = JSON.parse(localStorage.getItem("saved_products") || "[]");
       const allProducts = [...localProducts, ...allSallahProducts];
       
       setProducts(allProducts);
       
-      // حفظ منتجات سلة منفصلة
       localStorage.setItem("sallah_products", JSON.stringify(allSallahProducts));
       localStorage.setItem("sallah_last_sync", new Date().toISOString());
       setLastSyncTime(new Date());
@@ -382,35 +402,24 @@ export default function ProductsList() {
     }
   }, [sallahStores]);
 
-  // Load products from localStorage and Sallah
   useEffect(() => {
-    loadProducts();
-  }, [sallahConnected]);
+    if (!pointsLoading && subscription) {
+      loadProducts();
+    }
+  }, [sallahConnected, pointsLoading, subscription]);
 
   const loadProducts = useCallback(async () => {
     setLoading(true);
     try {
       console.log('🔄 Loading products...');
       
-      // تحميل المنتجات المحلية
       const localProducts = JSON.parse(localStorage.getItem("saved_products") || "[]");
-      
-      // تحميل منتجات سلة المحفوظة
       const sallahProducts = JSON.parse(localStorage.getItem("sallah_products") || "[]");
-      
-      // دمج المنتجات
       const allProducts = [...localProducts, ...sallahProducts];
       
       console.log(`✅ Loaded ${localProducts.length} local + ${sallahProducts.length} Sallah products`);
       setProducts(allProducts);
       
-      setUsageStats(prev => ({ 
-        ...prev, 
-        productsUsed: localProducts.length, // فقط المنتجات المحلية تحسب في الاستخدام
-        canAddMore: prev.productsLimit === -1 || localProducts.length < prev.productsLimit
-      }));
-      
-      // إذا لم توجد منتجات سلة وكان متصل، جرب التزامن
       if (sallahProducts.length === 0 && sallahConnected && sallahStores.length > 0) {
         console.log('🔄 No Sallah products found, attempting sync...');
         await fetchSallahProducts();
@@ -425,7 +434,6 @@ export default function ProductsList() {
     }
   }, [sallahConnected, sallahStores, fetchSallahProducts]);
 
-  // دالة التزامن اليدوي مع سلة
   const handleSyncWithSallah = useCallback(async () => {
     if (!sallahConnected || sallahStores.length === 0) {
       toast.error("لم يتم ربط حساب سلة بعد");
@@ -435,7 +443,6 @@ export default function ProductsList() {
     await fetchSallahProducts();
   }, [sallahConnected, sallahStores, fetchSallahProducts]);
 
-  // Filtered products with new source filter
   const filteredProducts = useMemo(() => {
     let filtered = products.filter((product) => {
       const matchesStatus = statusFilter === "الكل" || product.status === statusFilter;
@@ -496,7 +503,6 @@ export default function ProductsList() {
     };
   }, [filteredProducts]);
 
-  // Event handlers
   const handleAnalyze = useCallback((product) => {
     navigate(`/product-seo/${product.id}`, { state: { product } });
   }, [navigate]);
@@ -523,11 +529,6 @@ export default function ProductsList() {
 
   const handleSubmit = useCallback(async () => {
     if (!validateNewProduct()) return;
-    
-    if (!usageStats.canAddMore) {
-      toast.error(`وصلت للحد الأقصى من المنتجات (${usageStats.productsLimit}). قم بترقية خطتك للمزيد.`);
-      return;
-    }
 
     try {
       const productData = {
@@ -554,19 +555,11 @@ export default function ProductsList() {
         images: null
       };
 
-      // إضافة للمنتجات المحلية فقط
       const localProducts = JSON.parse(localStorage.getItem("saved_products") || "[]");
       const updatedLocalProducts = [...localProducts, productData];
       localStorage.setItem("saved_products", JSON.stringify(updatedLocalProducts));
 
-      // تحديث قائمة المنتجات الكاملة
       setProducts(prev => [...prev, productData]);
-      
-      setUsageStats(prev => ({ 
-        ...prev, 
-        productsUsed: prev.productsUsed + 1,
-        canAddMore: prev.productsLimit === -1 || prev.productsUsed + 1 < prev.productsLimit
-      }));
 
       toast.success("تم إضافة المنتج بنجاح! 🎉");
       setShowModal(false);
@@ -585,7 +578,7 @@ export default function ProductsList() {
       console.error("Error adding product:", error);
       toast.error("حدث خطأ أثناء إضافة المنتج");
     }
-  }, [newProduct, usageStats, validateNewProduct, navigate]);
+  }, [newProduct, validateNewProduct, navigate]);
 
   const handleDeleteProduct = useCallback(async (productId) => {
     try {
@@ -596,20 +589,12 @@ export default function ProductsList() {
         return;
       }
 
-      // حذف من المنتجات المحلية
       const localProducts = JSON.parse(localStorage.getItem("saved_products") || "[]");
       const updatedLocalProducts = localProducts.filter(p => p.id !== productId);
       localStorage.setItem("saved_products", JSON.stringify(updatedLocalProducts));
 
-      // تحديث القائمة
       const updatedProducts = products.filter(p => p.id !== productId);
       setProducts(updatedProducts);
-      
-      setUsageStats(prev => ({ 
-        ...prev, 
-        productsUsed: Math.max(0, prev.productsUsed - 1),
-        canAddMore: prev.productsLimit === -1 || prev.productsUsed - 1 < prev.productsLimit
-      }));
       
       toast.success("تم حذف المنتج بنجاح");
       setShowDeleteConfirm(false);
@@ -651,15 +636,10 @@ export default function ProductsList() {
   }, [selectedProducts, bulkAction, handleDeleteProduct, products]);
 
   const openModal = useCallback(() => {
-    if (!usageStats.canAddMore) {
-      toast.error(`وصلت للحد الأقصى من المنتجات (${usageStats.productsLimit}). قم بترقية خطتك للمزيد.`);
-      return;
-    }
-    
     setNewProduct({ name: "" });
     setErrors({});
     setShowModal(true);
-  }, [usageStats]);
+  }, []);
 
   const formatDate = useCallback((dateString) => {
     return new Date(dateString).toLocaleDateString('ar-SA', {
@@ -670,7 +650,7 @@ export default function ProductsList() {
   }, []);
 
   // Loading state
-  if (loading) {
+  if (loading || pointsLoading) {
     return (
       <div className={`min-h-screen flex items-center justify-center transition-colors duration-500 ${
         isDark ? 'bg-gray-900' : 'bg-gray-50'
@@ -678,7 +658,32 @@ export default function ProductsList() {
         <UserNavbar />
         <div className="text-center pt-20">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className={isDark ? 'text-gray-300' : 'text-gray-600'}>جاري تحميل المنتجات...</p>
+          <p className={isDark ? 'text-gray-300' : 'text-gray-600'}>جاري تحميل البيانات...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // إذا لم يكن هناك اشتراك
+  if (!subscription) {
+    return (
+      <div className={`min-h-screen flex items-center justify-center transition-colors duration-500 ${
+        isDark ? 'bg-gray-900' : 'bg-gray-50'
+      }`}>
+        <UserNavbar />
+        <div className="text-center pt-20 max-w-md">
+          <Lock className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-4">مطلوب اشتراك نشط</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            يجب الاشتراك في إحدى الباقات للوصول إلى هذه الصفحة
+          </p>
+          <Link
+            to="/pricing"
+            className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Crown className="w-5 h-5" />
+            عرض الباقات
+          </Link>
         </div>
       </div>
     );
@@ -688,14 +693,11 @@ export default function ProductsList() {
     <div className={`min-h-screen transition-colors duration-500 ${
       isDark ? 'bg-gray-900' : 'bg-gray-50'
     }`}>
-      {/* ✅ استخدام النافبار الموحد */}
       <UserNavbar />
       
-      {/* ✅ المحتوى الرئيسي */}
       <div className="pt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
           
-          {/* Error Display */}
           {errors.load && (
             <div className="bg-red-100 dark:bg-red-900/20 border border-red-400 dark:border-red-600/30 text-red-700 dark:text-red-300 px-4 py-3 rounded-lg mb-4 transition-colors duration-300">
               ❌ {errors.load}
@@ -735,7 +737,7 @@ export default function ProductsList() {
             </div>
           </div>
 
-          {/* Header Stats - محدث للثيم مع إحصائيات سلة */}
+          {/* Header Stats */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div className={`rounded-xl p-6 shadow-sm border hover:shadow-md transition-all duration-300 ${
               isDark 
@@ -782,7 +784,7 @@ export default function ProductsList() {
               </div>
             </div>
             
-            {/* عداد المنتجات المحلية */}
+            {/* رصيد النقاط */}
             <div className={`rounded-xl p-6 shadow-sm border hover:shadow-md transition-all duration-300 ${
               isDark 
                 ? 'bg-gray-800 border-gray-700' 
@@ -791,70 +793,65 @@ export default function ProductsList() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    المنتجات المحلية
+                    رصيد النقاط
+                  </p>
+                  <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
+                    {userPoints ? userPoints.balance.toLocaleString() : '0'}
+                  </p>
+                  {userPoints && userPoints.monthly_points > 0 && (
+                    <p className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                      شهري: {userPoints.monthly_points_used}/{userPoints.monthly_points}
+                    </p>
+                  )}
+                </div>
+                <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-full">
+                  <Coins className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+                </div>
+              </div>
+            </div>
+            
+            {/* الباقة الحالية */}
+            <div className={`rounded-xl p-6 shadow-sm border hover:shadow-md transition-all duration-300 ${
+              isDark 
+                ? 'bg-gray-800 border-gray-700' 
+                : 'bg-white border-gray-100'
+            }`}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    الباقة الحالية
+                  </p>
+                  <p className="text-lg font-bold text-purple-600 dark:text-purple-400">
+                    {subscription ? subscription.plan_name : 'غير محدد'}
+                  </p>
+                  {subscription && subscription.expires_at && (
+                    <p className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+                      ينتهي: {formatDate(subscription.expires_at)}
+                    </p>
+                  )}
+                </div>
+                <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-full">
+                  <Crown className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                </div>
+              </div>
+            </div>
+            
+            <div className={`rounded-xl p-6 shadow-sm border hover:shadow-md transition-all duration-300 ${
+              isDark 
+                ? 'bg-gray-800 border-gray-700' 
+                : 'bg-white border-gray-100'
+            }`}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    المنتجات المحسنة
                   </p>
                   <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                    {stats.local}
-                    {usageStats.productsLimit !== -1 && (
-                      <span className={`text-lg ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                        /{usageStats.productsLimit}
-                      </span>
-                    )}
+                    {stats.statusCounts['ممتاز'] + stats.statusCounts['جيد']}
                   </p>
                 </div>
                 <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                  <ShoppingBag className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                </div>
-              </div>
-            </div>
-            
-            {/* عداد التوليد الذكي */}
-            <div className={`rounded-xl p-6 shadow-sm border hover:shadow-md transition-all duration-300 ${
-              isDark 
-                ? 'bg-gray-800 border-gray-700' 
-                : 'bg-white border-gray-100'
-            }`}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    استخدام التوليد الذكي
-                  </p>
-                  <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-                    {userPlan === "free" ? (
-                      <>
-                        {aiUsageStats.used}
-                        <span className={`text-lg ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
-                          /{aiUsageStats.limit}
-                        </span>
-                      </>
-                    ) : (
-                      "∞"
-                    )}
-                  </p>
-                </div>
-                <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-full">
-                  <Sparkles className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                </div>
-              </div>
-            </div>
-            
-            <div className={`rounded-xl p-6 shadow-sm border hover:shadow-md transition-all duration-300 ${
-              isDark 
-                ? 'bg-gray-800 border-gray-700' 
-                : 'bg-white border-gray-100'
-            }`}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    خطتك الحالية
-                  </p>
-                  <p className="text-lg font-bold text-yellow-600 dark:text-yellow-400 flex items-center gap-1">
-                    {userPlan === "enterprise" && <Crown className="w-4 h-4" />}
-                    {userPlan === "free" ? "مجانية" : userPlan === "pro" ? "احترافية" : "أعمال"}
-                  </p>
-                </div>
-                <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-full">
-                  <Crown className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+                  <TrendingUp className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                 </div>
               </div>
             </div>
@@ -906,7 +903,7 @@ export default function ProductsList() {
             </div>
           )}
 
-          {/* Toolbar - محدث للثيم مع فلتر المصدر */}
+          {/* Toolbar */}
           <div className={`rounded-xl p-6 shadow-sm border transition-colors duration-300 ${
             isDark 
               ? 'bg-gray-800 border-gray-700' 
@@ -947,7 +944,6 @@ export default function ProductsList() {
                   ))}
                 </select>
 
-                {/* فلتر المصدر */}
                 <select
                   value={sourceFilter}
                   onChange={(e) => setSourceFilter(e.target.value)}
@@ -1026,12 +1022,7 @@ export default function ProductsList() {
                 
                 <button
                   onClick={openModal}
-                  className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 shadow-sm ${
-                    usageStats.canAddMore
-                      ? "bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white"
-                      : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-                  }`}
-                  disabled={!usageStats.canAddMore}
+                  className="px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 shadow-sm bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white"
                 >
                   <Plus className="w-5 h-5" />
                   إضافة منتج محلي
@@ -1039,53 +1030,26 @@ export default function ProductsList() {
               </div>
             </div>
 
-            {/* Usage Warning - محدث للثيم */}
-            {(
-              (usageStats.productsLimit !== -1 && stats.local >= usageStats.productsLimit * 0.8) ||
-              (userPlan === "free" && aiUsageStats.used >= aiUsageStats.limit * 0.8)
-            ) && (
-              <div className="mt-4 space-y-2">
-                {/* تحذير المنتجات */}
-                {usageStats.productsLimit !== -1 && stats.local >= usageStats.productsLimit * 0.8 && (
-                  <div className={`border rounded-lg p-3 transition-colors duration-300 ${
-                    isDark 
-                      ? 'bg-yellow-900/20 border-yellow-600/30 text-yellow-300' 
-                      : 'bg-yellow-50 border-yellow-200 text-yellow-800'
-                  }`}>
-                    <div className="flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4" />
-                      <span className="text-sm">
-                        اقتربت من الحد الأقصى للمنتجات المحلية ({stats.local}/{usageStats.productsLimit}). 
-                        <Link to="/account" className="underline hover:no-underline mr-1">
-                          قم بترقية خطتك
-                        </Link>
-                      </span>
-                    </div>
-                  </div>
-                )}
-                
-                {/* تحذير التوليد الذكي */}
-                {userPlan === "free" && aiUsageStats.used >= aiUsageStats.limit * 0.8 && (
-                  <div className={`border rounded-lg p-3 transition-colors duration-300 ${
-                    isDark 
-                      ? 'bg-purple-900/20 border-purple-600/30 text-purple-300' 
-                      : 'bg-purple-50 border-purple-200 text-purple-800'
-                  }`}>
-                    <div className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4" />
-                      <span className="text-sm">
-                        اقتربت من الحد الأقصى للتوليد الذكي ({aiUsageStats.used}/{aiUsageStats.limit}) هذا الشهر. 
-                        <Link to="/account" className="underline hover:no-underline mr-1">
-                          قم بترقية خطتك
-                        </Link>
-                      </span>
-                    </div>
-                  </div>
-                )}
+            {/* Points Balance Warning */}
+            {userPoints && userPoints.balance < 100 && (
+              <div className={`mt-4 border rounded-lg p-3 transition-colors duration-300 ${
+                isDark 
+                  ? 'bg-yellow-900/20 border-yellow-600/30 text-yellow-300' 
+                  : 'bg-yellow-50 border-yellow-200 text-yellow-800'
+              }`}>
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4" />
+                  <span className="text-sm">
+                    رصيد النقاط منخفض ({userPoints.balance} نقطة). 
+                    <Link to="/points/purchase" className="underline hover:no-underline mr-1">
+                      اشترِ نقاط إضافية
+                    </Link>
+                  </span>
+                </div>
               </div>
             )}
 
-            {/* Bulk Actions - محدث للثيم */}
+            {/* Bulk Actions */}
             {selectedProducts.length > 0 && (
               <div className={`mt-4 flex items-center gap-3 p-3 rounded-lg transition-colors duration-300 ${
                 isDark 
@@ -1128,7 +1092,7 @@ export default function ProductsList() {
             )}
           </div>
 
-          {/* Products Grid - محدث للثيم */}
+          {/* Products Grid */}
           {displayedProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {displayedProducts.map((product) => (
@@ -1336,7 +1300,6 @@ export default function ProductsList() {
                   <button
                     onClick={openModal}
                     className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white px-8 py-4 rounded-xl font-medium transition-all flex items-center gap-3 mx-auto shadow-lg hover:shadow-xl"
-                    disabled={!usageStats.canAddMore}
                   >
                     <Plus className="w-5 h-5" />
                     إضافة منتج محلي
@@ -1356,7 +1319,7 @@ export default function ProductsList() {
             </div>
           )}
 
-          {/* Pagination - محدث للثيم */}
+          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex justify-center items-center gap-2 mt-8">
               <button
@@ -1426,7 +1389,7 @@ export default function ProductsList() {
         </div>
       </div>
 
-      {/* Add Product Modal - محدث للثيم */}
+      {/* Add Product Modal */}
       <Transition appear show={showModal} as={React.Fragment}>
         <Dialog as="div" className="relative z-10" onClose={setShowModal}>
           <Transition.Child
@@ -1486,7 +1449,7 @@ export default function ProductsList() {
                       )}
                     </div>
 
-                    {/* شرح الفرق بين المحلي وسلة */}
+                    {/* الفرق بين المحلي وسلة */}
                     <div className={`rounded-xl p-5 border transition-colors duration-300 ${
                       isDark 
                         ? 'bg-blue-900/20 border-blue-600/30' 
@@ -1503,45 +1466,36 @@ export default function ProductsList() {
                       }`}>
                         <div className="flex items-start gap-2">
                           <Globe className="w-4 h-4 mt-0.5 text-blue-500" />
-                          <span><strong>المحلية:</strong> تضيفها يدوياً، كامل التحكم، تحسب في حد الاستخدام</span>
+                          <span><strong>المحلية:</strong> تضيفها يدوياً، كامل التحكم في المحتوى</span>
                         </div>
                         <div className="flex items-start gap-2">
                           <Store className="w-4 h-4 mt-0.5 text-green-500" />
-                          <span><strong>سلة:</strong> تأتي من متجرك تلقائياً، بيانات حقيقية، لا تحسب في الحد</span>
+                          <span><strong>سلة:</strong> تأتي من متجرك تلقائياً، بيانات حقيقية ومحدثة</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* معلومات الاستخدام - محدث للثيم */}
-                    <div className={`rounded-xl p-4 space-y-3 transition-colors duration-300 ${
-                      isDark ? 'bg-gray-700' : 'bg-gray-50'
-                    }`}>
-                      <div className={`flex items-center gap-2 text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
-                        <ShoppingBag className="w-4 h-4 text-blue-500" />
-                        <span>المنتجات المحلية: {stats.local} / {usageStats.productsLimit === -1 ? '∞' : usageStats.productsLimit}</span>
-                      </div>
-                      {sallahConnected && (
-                        <div className={`flex items-center gap-2 text-sm ${isDark ? 'text-green-300' : 'text-green-700'}`}>
-                          <Store className="w-4 h-4 text-green-500" />
-                          <span>منتجات سلة: {stats.sallah} (لا محدودة)</span>
+                    {/* معلومات النقاط */}
+                    {userPoints && (
+                      <div className={`rounded-xl p-4 space-y-3 transition-colors duration-300 ${
+                        isDark ? 'bg-gray-700' : 'bg-gray-50'
+                      }`}>
+                        <div className={`flex items-center justify-between text-sm ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                          <span className="flex items-center gap-2">
+                            <Coins className="w-4 h-4 text-yellow-500" />
+                            رصيد النقاط:
+                          </span>
+                          <span className="font-bold">{userPoints.balance.toLocaleString()} نقطة</span>
                         </div>
-                      )}
-                      {userPlan === "free" && (
-                        <div className={`flex items-center gap-2 text-sm ${isDark ? 'text-purple-300' : 'text-purple-700'}`}>
-                          <Sparkles className="w-4 h-4 text-purple-500" />
-                          <span>التوليد الذكي: {aiUsageStats.used} / {aiUsageStats.limit} هذا الشهر</span>
-                        </div>
-                      )}
-                      {userPlan === "free" && (
                         <div className={`text-xs px-3 py-2 rounded-lg transition-colors duration-300 ${
                           isDark 
                             ? 'text-blue-300 bg-blue-900/30' 
                             : 'text-blue-600 bg-blue-100'
                         }`}>
-                          💡 ترقية للمزيد من المنتجات المحلية والتوليد الذكي
+                          💡 ستحتاج نقاط لاستخدام خدمات التوليد الذكي وتحسين السيو
                         </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex justify-end gap-3 mt-8">
@@ -1559,7 +1513,7 @@ export default function ProductsList() {
                     <button
                       type="button"
                       onClick={handleSubmit}
-                      disabled={!usageStats.canAddMore || !newProduct.name.trim()}
+                      disabled={!newProduct.name.trim()}
                       className="px-8 py-3 text-sm font-medium text-white bg-gradient-to-r from-green-500 to-blue-500 border border-transparent rounded-xl hover:from-green-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
                     >
                       🚀 انتقل للتحسين
@@ -1572,7 +1526,7 @@ export default function ProductsList() {
         </Dialog>
       </Transition>
 
-      {/* Delete Confirmation Modal - محدث للثيم */}
+      {/* Delete Confirmation Modal */}
       <Transition appear show={showDeleteConfirm} as={React.Fragment}>
         <Dialog as="div" className="relative z-10" onClose={setShowDeleteConfirm}>
           <Transition.Child
