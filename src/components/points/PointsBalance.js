@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Coins } from 'lucide-react';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+import { API_BASE_URL } from '../../config/api';
 
 export default function PointsBalance() {
   const [balance, setBalance] = useState(0);

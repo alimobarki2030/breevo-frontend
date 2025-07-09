@@ -1,6 +1,9 @@
 // config/api.js - API Configuration محدث للعمل مع Render
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://breevo-backend.onrender.com';
 
+// Export للاستخدام في components أخرى
+export { API_BASE_URL };
+
 // API endpoints - شامل ومتكامل مع سلة
 export const API_ENDPOINTS = {
   // المصادقة والحسابات
@@ -92,10 +95,14 @@ export const apiCall = async (endpoint, options = {}) => {
   const token = localStorage.getItem('token');
   if (token) {
     defaultOptions.headers.Authorization = `Bearer ${token}`;
+    console.log(`🔐 Token found for ${endpoint}`);
+  } else {
+    console.log(`⚠️ No token for ${endpoint}`);
   }
 
   try {
     console.log(`🔗 API Call: ${options.method || 'GET'} ${endpoint}`);
+    console.log(`📋 Headers:`, defaultOptions.headers);
     
     const response = await fetch(endpoint, {
       ...defaultOptions,
@@ -109,6 +116,7 @@ export const apiCall = async (endpoint, options = {}) => {
       
       // معالجة خطأ انتهاء صلاحية الرمز
       if (response.status === 401) {
+        console.error('🚫 Unauthorized - clearing credentials');
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         localStorage.removeItem('clientName');
@@ -179,6 +187,7 @@ export const authAPI = {
     if (response.access_token) {
       localStorage.setItem('token', response.access_token);
       localStorage.setItem('user', JSON.stringify(response.user));
+      console.log('✅ Token saved:', response.access_token);
     }
     
     return response;
@@ -194,6 +203,7 @@ export const authAPI = {
     if (response.access_token) {
       localStorage.setItem('token', response.access_token);
       localStorage.setItem('user', JSON.stringify(response.user));
+      console.log('✅ Token saved:', response.access_token);
     }
     
     return response;
