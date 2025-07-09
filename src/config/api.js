@@ -1,4 +1,4 @@
-// utils/api.js - API Configuration محدث للعمل مع Render
+// config/api.js - API Configuration محدث للعمل مع Render
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://breevo-backend.onrender.com';
 
 // API endpoints - شامل ومتكامل مع سلة
@@ -10,6 +10,7 @@ export const API_ENDPOINTS = {
     register: `${API_BASE_URL}/auth/register`,
     logout: `${API_BASE_URL}/auth/logout`,
     me: `${API_BASE_URL}/auth/me`,
+    verify: `${API_BASE_URL}/auth/verify`, // أضفنا هذا السطر
   },
   
   // إدارة المنتجات
@@ -50,6 +51,23 @@ export const API_ENDPOINTS = {
     runEmailTasks: `${API_BASE_URL}/api/salla/run-email-tasks`,
   },
   
+  // النقاط
+  points: {
+    balance: `${API_BASE_URL}/api/points/balance`,
+    packages: `${API_BASE_URL}/api/points/packages`,
+    purchase: `${API_BASE_URL}/api/points/packages/purchase`,
+    transactions: `${API_BASE_URL}/api/points/transactions`,
+    services: `${API_BASE_URL}/api/points/services`,
+    useService: `${API_BASE_URL}/api/points/services/use`,
+  },
+  
+  // الاشتراكات
+  subscription: {
+    current: `${API_BASE_URL}/api/subscription/current`,
+    plans: `${API_BASE_URL}/api/subscription/plans`,
+    subscribe: `${API_BASE_URL}/api/subscription/subscribe`,
+  },
+  
   // تحسين محركات البحث
   seo: {
     base: `${API_BASE_URL}/dataforseo`,
@@ -70,8 +88,8 @@ export const apiCall = async (endpoint, options = {}) => {
     },
   };
 
-  // Add auth token if available
-  const token = localStorage.getItem('token') || localStorage.getItem('access_token');
+  // Add auth token if available - هام جداً
+  const token = localStorage.getItem('token');
   if (token) {
     defaultOptions.headers.Authorization = `Bearer ${token}`;
   }
@@ -92,12 +110,13 @@ export const apiCall = async (endpoint, options = {}) => {
       // معالجة خطأ انتهاء صلاحية الرمز
       if (response.status === 401) {
         localStorage.removeItem('token');
-        localStorage.removeItem('access_token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('clientName');
         // يمكن إضافة redirect للتسجيل هنا
-        window.location.href = '/auth/login';
+        window.location.href = '/login';
       }
       
-      throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
+      throw new Error(errorData.detail || errorData.message || `HTTP ${response.status}: ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -119,7 +138,7 @@ export const sallaAPI = {
   
   // جلب متاجر المستخدم
   async getUserStores() {
-    return await apiCall(API_ENDPOINTS.salla.userStores);
+    return await apiCall(API_ENDPOINTS.salla.stores);
   },
   
   // التحقق من متجر مؤقت
@@ -151,28 +170,110 @@ export const sallaAPI = {
 // دوال مساعدة للمصادقة
 export const authAPI = {
   async login(email, password) {
-    return await apiCall(API_ENDPOINTS.auth.login, {
+    const response = await apiCall(API_ENDPOINTS.auth.login, {
       method: 'POST',
       body: JSON.stringify({ email, password })
     });
+    
+    // حفظ التوكن
+    if (response.access_token) {
+      localStorage.setItem('token', response.access_token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+    }
+    
+    return response;
   },
   
   async register(userData) {
-    return await apiCall(API_ENDPOINTS.auth.register, {
+    const response = await apiCall(API_ENDPOINTS.auth.register, {
       method: 'POST',
       body: JSON.stringify(userData)
     });
+    
+    // حفظ التوكن
+    if (response.access_token) {
+      localStorage.setItem('token', response.access_token);
+      localStorage.setItem('user', JSON.stringify(response.user));
+    }
+    
+    return response;
   },
   
   async getCurrentUser() {
     return await apiCall(API_ENDPOINTS.auth.me);
   },
   
+  async verifyToken() {
+    return await apiCall(API_ENDPOINTS.auth.verify);
+  },
+  
   async logout() {
     const result = await apiCall(API_ENDPOINTS.auth.logout, { method: 'POST' });
     localStorage.removeItem('token');
-    localStorage.removeItem('access_token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('clientName');
     return result;
+  }
+};
+
+// دوال مساعدة للنقاط
+export const pointsAPI = {
+  async getBalance() {
+    return await apiCall(API_ENDPOINTS.points.balance);
+  },
+  
+  async getPackages() {
+    return await apiCall(API_ENDPOINTS.points.packages);
+  },
+  
+  async purchasePackage(packageId, paymentData) {
+    return await apiCall(API_ENDPOINTS.points.purchase, {
+      method: 'POST',
+      body: JSON.stringify({
+        package_id: packageId,
+        ...paymentData
+      })
+    });
+  },
+  
+  async getTransactions(params = {}) {
+    const queryString = new URLSearchParams(params).toString();
+    return await apiCall(`${API_ENDPOINTS.points.transactions}?${queryString}`);
+  },
+  
+  async getServices() {
+    return await apiCall(API_ENDPOINTS.points.services);
+  },
+  
+  async useService(serviceType, options = {}) {
+    return await apiCall(API_ENDPOINTS.points.useService, {
+      method: 'POST',
+      body: JSON.stringify({
+        service_type: serviceType,
+        ...options
+      })
+    });
+  }
+};
+
+// دوال مساعدة للاشتراكات
+export const subscriptionAPI = {
+  async getCurrentSubscription() {
+    return await apiCall(API_ENDPOINTS.subscription.current);
+  },
+  
+  async getPlans() {
+    return await apiCall(API_ENDPOINTS.subscription.plans);
+  },
+  
+  async subscribe(planId, paymentData) {
+    return await apiCall(API_ENDPOINTS.subscription.subscribe, {
+      method: 'POST',
+      body: JSON.stringify({
+        plan_id: planId,
+        ...paymentData
+      })
+    });
   }
 };
 
