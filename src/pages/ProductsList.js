@@ -161,28 +161,15 @@ export default function ProductsList() {
   }, []);
 
   const loadUserPointsAndSubscription = async () => {
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setPointsLoading(false);
-      navigate('/login');
-      return;
-    }
-
-    // حل بسيط - تحقق من البريد الإلكتروني مباشرة
-    const userEmail = localStorage.getItem("userEmail");
-    console.log("Current user email:", userEmail);
-    
-    // قائمة بالمستخدمين المسموح لهم بالدخول بدون اشتراك
-    const adminEmails = [
-      "muath17a@gmail.com",  // ضع بريدك الإلكتروني هنا
-      // يمكنك إضافة المزيد من البريد الإلكتروني للمسؤولين
-    ];
-    
-    const isOwnerOrAdmin = adminEmails.includes(userEmail);
-
-    // تحميل رصيد النقاط
     try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setPointsLoading(false);
+        navigate('/login');
+        return;
+      }
+
+      // تحميل رصيد النقاط
       const pointsResponse = await fetch(`${API_BASE_URL}/api/points/balance`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -193,41 +180,9 @@ export default function ProductsList() {
       if (pointsResponse.ok) {
         const pointsData = await pointsResponse.json();
         setUserPoints(pointsData);
-      } else if (isOwnerOrAdmin) {
-        // إعطاء نقاط افتراضية للمالك إذا فشل تحميل النقاط
-        setUserPoints({ 
-          balance: 999999, 
-          monthly_points: 999999, 
-          monthly_points_used: 0 
-        });
       }
-    } catch (error) {
-      console.log("Points loading error:", error);
-      if (isOwnerOrAdmin) {
-        setUserPoints({ 
-          balance: 999999, 
-          monthly_points: 999999, 
-          monthly_points_used: 0 
-        });
-      }
-    }
 
-    // التعامل مع الاشتراك
-    if (isOwnerOrAdmin) {
-      // إذا كان المستخدم مالك أو أدمن، أعطه اشتراك افتراضي
-      console.log("User is owner/admin - granting full access");
-      setSubscription({ 
-        plan_name: 'Owner Access', 
-        expires_at: null,
-        features: 'unlimited',
-        status: 'active'
-      });
-      setPointsLoading(false);
-      return; // مهم - توقف هنا ولا تحاول تحميل الاشتراك
-    }
-
-    // للمستخدمين العاديين فقط - تحقق من الاشتراك
-    try {
+      // تحميل معلومات الاشتراك
       const subscriptionResponse = await fetch(`${API_BASE_URL}/api/subscription/current`, {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -240,24 +195,17 @@ export default function ProductsList() {
         setSubscription(subData);
       } else {
         // إذا لم يكن هناك اشتراك، توجيه لصفحة الأسعار
-        console.log("No subscription found - redirecting to pricing");
         toast.error('يجب الاشتراك في إحدى الباقات للمتابعة');
         navigate('/pricing');
-        return;
       }
-    } catch (error) {
-      console.error('Error loading subscription:', error);
-      toast.error('خطأ في تحميل بيانات الاشتراك');
-      navigate('/pricing');
-    }
 
-  } catch (error) {
-    console.error('Error in loadUserPointsAndSubscription:', error);
-    toast.error('خطأ في تحميل البيانات');
-  } finally {
-    setPointsLoading(false);
-  }
-};
+    } catch (error) {
+      console.error('Error loading user data:', error);
+      toast.error('خطأ في تحميل بيانات المستخدم');
+    } finally {
+      setPointsLoading(false);
+    }
+  };
 
   const checkSallahConnection = useCallback(async () => {
     try {
