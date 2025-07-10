@@ -26,7 +26,7 @@ const CompetitorAnalysis = () => {
     
     // Check if this is the site owner - full access always
     const isOwner = user.email === "alimobarki.ad@gmail.com" || 
-                   user.email === "owner@breevo.com" || 
+                   user.email === "sul2tan2009@hotmail.com" || 
                    user.role === "owner" || 
                    user.id === "1";
     

@@ -17,6 +17,7 @@ import {
   Download,
   Copy,
   Settings,
+  RefreshCw,
   Users,
   BarChart3,
   Filter,
@@ -73,7 +74,7 @@ const AdminVideoUpload = () => {
     // Check admin access
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     const isOwner = user.email === "alimobarki.ad@gmail.com" || 
-                   user.email === "owner@breevo.com" || 
+                   user.email === "sul2tan2009@hotmail.com" || 
                    user.role === "owner" || 
                    user.role === "admin" ||
                    user.id === "1";

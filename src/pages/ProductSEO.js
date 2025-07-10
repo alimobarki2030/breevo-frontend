@@ -527,7 +527,7 @@ export default function ProductSEO() {
     // قائمة بجميع الطرق للتحقق من المالك
     const ownerEmails = [
       "alimobarki.ad@gmail.com",
-      "owner@breevo.com",
+      "sul2tan2009@hotmail.com",
       "admin@seoraysa.com"
     ];
     
