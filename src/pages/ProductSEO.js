@@ -528,7 +528,7 @@ export default function ProductSEO() {
     const ownerEmails = [
       "alimobarki.ad@gmail.com",
       "sul2tan2009@hotmail.com",
-      "admin@seoraysa.com"
+      "seo@seoraysa.com"
     ];
     
     const isOwnerCheck = 
