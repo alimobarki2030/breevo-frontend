@@ -39,7 +39,7 @@ const ConnectStorePage = () => {
   };
 
   const checkLoginStatus = () => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
   };
 
