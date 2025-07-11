@@ -9,16 +9,51 @@ import Footer from "../components/Footer";
 import { useTheme } from '../contexts/ThemeContext';
 
 // ✅ استيراد Supabase
-import { auth, database } from "../config/supabase";
+import { authAPI } from "../config/api";
 
 // إعداد Google Client ID (محفوظ من الكود الأصلي)
 const GOOGLE_CLIENT_ID = "403864871499-59f26jiafopipeplaq09bplabe594q0o.apps.googleusercontent.com";
 
-// تعريف الخطط (محفوظ من الكود الأصلي)
+// ✅ تحديث معلومات الخطط لتتوافق مع النظام الجديد
 const PLAN_INFO = {
-  free: { name: "المجانية", price: "مجانًا", icon: "🆓" },
-  pro: { name: "الاحترافية", price: "49 ريال/شهر", icon: "💎" },
-  enterprise: { name: "الأعمال", price: "129 ريال/شهر", icon: "👑" }
+  starter: { 
+    name: "البداية", 
+    price: "99 ريال/شهر", 
+    icon: "🚀",
+    points: "1,000 نقطة",
+    features: [
+      "1,000 نقطة شهرياً",
+      "7 أيام تجربة مع استرداد 100%",
+      "توليد أوصاف بالذكاء الاصطناعي",
+      "تحليل SEO أساسي"
+    ]
+  },
+  advanced: { 
+    name: "المتقدمة", 
+    price: "199 ريال/شهر", 
+    icon: "💎",
+    points: "3,000 نقطة",
+    features: [
+      "3,000 نقطة شهرياً",
+      "7 أيام تجربة مع استرداد 100%",
+      "كل مميزات باقة البداية",
+      "تحليل SEO متقدم",
+      "تحليل المنافسين الأساسي"
+    ]
+  },
+  professional: { 
+    name: "الاحترافية", 
+    price: "399 ريال/شهر", 
+    icon: "👑",
+    points: "10,000 نقطة",
+    features: [
+      "10,000 نقطة شهرياً",
+      "7 أيام تجربة مع استرداد 100%",
+      "كل مميزات الباقة المتقدمة",
+      "API Access للتكامل",
+      "مدير حساب مخصص"
+    ]
+  }
 };
 
 export default function ManualLogin() {
@@ -47,7 +82,7 @@ export default function ManualLogin() {
     password: "",
     phone: "",
     storeUrl: "",
-    plan: selectedPlan || "free"
+    plan: selectedPlan || "starter" // تغيير الافتراضي من free إلى starter
   });
 
   // ✅ تحميل الخطة من URL والبيانات المحفوظة
@@ -58,9 +93,7 @@ export default function ManualLogin() {
     
     if (planParam && PLAN_INFO[planParam]) {
       setSelectedPlan(planParam);
-      if (planParam !== 'free') {
-        setIsLogin(false);
-      }
+      setIsLogin(false); // التبديل للتسجيل مباشرة عند اختيار خطة
       console.log(`تم اختيار الخطة: ${PLAN_INFO[planParam].name}`);
     }
 
@@ -84,22 +117,13 @@ export default function ManualLogin() {
   // ✅ فحص الجلسة الحالية
   const checkCurrentSession = async () => {
     try {
-      const { session, error } = await auth.getSession();
-      
-      if (session && session.user) {
+      const token = localStorage.getItem("token");
+      if (token) {
         // المستخدم مسجل دخول مسبقاً
-        console.log('✅ User already logged in:', session.user.email);
-        
-        // تحديث localStorage للتوافق مع الكود القديم
-        localStorage.setItem("token", session.access_token);
-        localStorage.setItem("user", JSON.stringify({
-          name: session.user.user_metadata?.full_name || session.user.email,
-          email: session.user.email,
-          provider: 'supabase'
-        }));
+        console.log('✅ User already logged in');
         
         // توجيه للصفحة المناسبة
-        if (selectedPlan && selectedPlan !== 'free') {
+        if (selectedPlan) {
           navigate(`/checkout?plan=${selectedPlan}`);
         } else {
           navigate("/products");
@@ -117,47 +141,46 @@ export default function ManualLogin() {
     setLoading(true);
 
     try {
-      // ✅ استخدام signIn المتوفرة في ملف supabase.js
-      const { data, error } = await auth.signIn(loginForm.email, loginForm.password);
+      const data = await authAPI.login(loginForm.email, loginForm.password);
 
-      if (error) {
-        console.error('Login error:', error);
-        toast.error("البريد الإلكتروني أو كلمة المرور غير صحيحة");
-        return;
-      }
+      if (data.access_token) {
+        localStorage.setItem("token", data.access_token);
+        localStorage.setItem("access_token", data.access_token);
+        localStorage.setItem("backend_token", data.access_token);
+        
+        const userData = data.user || { email: loginForm.email };
+        localStorage.setItem("user", JSON.stringify(userData));
+        localStorage.setItem("clientName", userData.full_name || userData.name || loginForm.email);
 
-      if (data.user) {
-        // ✅ تحديث localStorage للتوافق مع الكود القديم
-        localStorage.setItem("token", data.session.access_token);
-        localStorage.setItem("clientName", data.user.user_metadata?.full_name || loginForm.email);
-        localStorage.setItem("user", JSON.stringify({
-          name: data.user.user_metadata?.full_name || loginForm.email,
-          email: loginForm.email,
-          provider: 'supabase'
-        }));
-
-        // حفظ البريد إذا كان المستخدم يريد التذكر
         if (loginForm.rememberMe) {
           localStorage.setItem("rememberedEmail", loginForm.email);
         } else {
           localStorage.removeItem("rememberedEmail");
         }
 
-        toast.success(`مرحباً ${data.user.user_metadata?.full_name || loginForm.email}، تم تسجيل الدخول بنجاح`);
+        toast.success(`مرحباً ${userData.full_name || loginForm.email}، تم تسجيل الدخول بنجاح`);
         
-        // توجيه مناسب
         setTimeout(() => {
-          if (selectedPlan && selectedPlan !== 'free') {
+          if (selectedPlan) {
             navigate(`/checkout?plan=${selectedPlan}`);
           } else {
             navigate("/products");
           }
         }, 1000);
+      } else {
+        throw new Error("لم يتم استلام رمز الوصول");
       }
 
     } catch (err) {
-      console.error('Login exception:', err);
-      toast.error("حدث خطأ أثناء تسجيل الدخول");
+      console.error('Login error:', err);
+      
+      if (err.message?.includes("401") || err.message?.includes("غير صحيحة")) {
+        toast.error("البريد الإلكتروني أو كلمة المرور غير صحيحة");
+      } else if (err.message?.includes("network")) {
+        toast.error("خطأ في الاتصال. تحقق من اتصالك بالإنترنت");
+      } else {
+        toast.error(err.message || "حدث خطأ أثناء تسجيل الدخول");
+      }
     } finally {
       setLoading(false);
     }
@@ -166,11 +189,8 @@ export default function ManualLogin() {
   // ✅ التسجيل مع Supabase + حفظ في profiles
   const handleRegister = async (e) => {
     e.preventDefault();
-
-    toast.success("🧪 اختبار Toast - يعمل!");
     if (loading) return;
     
-    // التحقق من صحة البيانات
     if (!registerForm.fullName?.trim()) {
       toast.error("يرجى إدخال الاسم الكامل");
       return;
@@ -199,80 +219,63 @@ export default function ManualLogin() {
     setLoading(true);
 
     try {
-      // إعداد URL إذا لم يحتوي على بروتوكول
       let storeUrl = registerForm.storeUrl.trim();
       if (!storeUrl.startsWith('http://') && !storeUrl.startsWith('https://')) {
         storeUrl = 'https://' + storeUrl;
       }
 
-      // ✅ التسجيل مع Supabase
-      const { data, error } = await auth.signUp(
-        registerForm.email.trim().toLowerCase(),
-        registerForm.password,
-        {
-          full_name: registerForm.fullName.trim(),
-          phone: registerForm.phone,
-          store_url: storeUrl,
-          plan: registerForm.plan
-        }
-      );
+      const data = await authAPI.register({
+        email: registerForm.email.trim().toLowerCase(),
+        password: registerForm.password,
+        full_name: registerForm.fullName.trim(),
+        phone: registerForm.phone,
+        store_url: storeUrl,
+        plan: registerForm.plan || 'starter'
+      });
 
-      if (error) {
-        if (error.message.includes("already exists") || error.message.includes("User already registered")) {
-          toast.error("🚫 هذا البريد الإلكتروني مسجّل مسبقًا. يرجى تسجيل الدخول أو استخدام بريد آخر.");
-        } else {
-          toast.error(error.message || "حدث خطأ أثناء إنشاء الحساب");
-        }
-        return;
-      }
-
-      if (data.user) {
-        // ✅ حفظ البيانات الإضافية في profiles table
-        const profileData = {
-          full_name: registerForm.fullName.trim(),
-          phone: registerForm.phone,
-          company_name: storeUrl,
-          plan: registerForm.plan,
-          subscription_status: 'trial'
-        };
-
-        const { error: profileError } = await database.updateProfile(profileData);
+      if (data.access_token) {
+        localStorage.setItem("token", data.access_token);
+        localStorage.setItem("access_token", data.access_token);
+        localStorage.setItem("backend_token", data.access_token);
         
-        if (profileError) {
-          console.error('Profile creation error:', profileError);
-          // لا نوقف العملية - فقط نسجل الخطأ
-        }
-
-        // ✅ تحديث localStorage للتوافق
-        if (data.session) {
-          localStorage.setItem("token", data.session.access_token);
-        }
-        localStorage.setItem("clientName", registerForm.fullName);
-        localStorage.setItem("user", JSON.stringify({
-          name: registerForm.fullName,
+        const userData = data.user || { 
           email: registerForm.email,
-          provider: 'supabase'
-        }));
+          full_name: registerForm.fullName 
+        };
+        localStorage.setItem("user", JSON.stringify(userData));
+        localStorage.setItem("clientName", userData.full_name || registerForm.fullName);
         
-        // رسالة نجاح مخصصة حسب الخطة
-        if (selectedPlan && selectedPlan !== 'free') {
-          toast.success(`🎉 تم إنشاء الحساب بنجاح! تحقق من بريدك الإلكتروني لتأكيد الحساب، ثم سيتم توجيهك لإتمام الدفع للخطة ${PLAN_INFO[selectedPlan].name}`, {
-            duration: 6000
+        if (selectedPlan) {
+          toast.success(`🎉 تم إنشاء الحساب بنجاح! جاري توجيهك لإتمام الدفع للخطة ${PLAN_INFO[selectedPlan].name}`, {
+            duration: 4000
           });
-          // لا ننتقل مباشرة - ننتظر تأكيد الإيميل
+          
+          setTimeout(() => {
+            navigate(`/checkout?plan=${selectedPlan}`);
+          }, 2000);
         } else {
-          console.log("🧪 الكود وصل لهنا!");
-          toast.success("🎉 تم إنشاء الحساب بنجاح! يرجى مراجعة بريدك الإلكتروني وتأكيد حسابك للمتابعة 📧", {
-            duration: 6000
+          toast.success("🎉 تم إنشاء الحساب بنجاح! جاري توجيهك للوحة التحكم...", {
+            duration: 3000
           });
-           console.log("🧪 تم استدعاء toast.success");
-          // لا ننتقل مباشرة - ننتظر تأكيد الإيميل
+          
+          setTimeout(() => {
+            navigate("/products");
+          }, 1500);
         }
+      } else {
+        throw new Error("لم يتم استلام رمز الوصول");
       }
       
     } catch (err) {
       console.error('Registration error:', err);
-      toast.error("حدث خطأ أثناء إنشاء الحساب");
+      
+      if (err.message?.includes("already exists") || err.message?.includes("مسجل مسبقاً")) {
+        toast.error("🚫 هذا البريد الإلكتروني مسجّل مسبقاً. يرجى تسجيل الدخول أو استخدام بريد آخر.");
+      } else if (err.message?.includes("network")) {
+        toast.error("خطأ في الاتصال. تحقق من اتصالك بالإنترنت");
+      } else {
+        toast.error(err.message || "حدث خطأ أثناء إنشاء الحساب");
+      }
     } finally {
       setLoading(false);
     }
@@ -280,26 +283,7 @@ export default function ManualLogin() {
 
   // ✅ Google Login مع Supabase
   const handleGoogleLogin = async () => {
-    setGoogleLoading(true);
-    
-    try {
-      const { data, error } = await auth.signInWithGoogle();
-      
-      if (error) {
-        console.error('Google login error:', error);
-        toast.error("فشل تسجيل الدخول بـ Google");
-        return;
-      }
-      
-      // Supabase سيقوم بالتوجيه تلقائياً
-      console.log('✅ Google Sign-In initiated');
-      
-    } catch (err) {
-      console.error('Google login exception:', err);
-      toast.error("حدث خطأ أثناء تسجيل الدخول بـ Google");
-    } finally {
-      setGoogleLoading(false);
-    }
+    toast.info("تسجيل الدخول بـ Google قيد التطوير. استخدم البريد الإلكتروني حالياً.");
   };
 
   // معالجة تغيير نماذج الدخول
@@ -362,19 +346,7 @@ export default function ManualLogin() {
       return;
     }
     
-    try {
-      // ✅ استخدام الدالة الجديدة (بعد إضافتها لملف supabase.js)
-      const { error } = await auth.resetPasswordForEmail(loginForm.email);
-      
-      if (error) {
-        toast.error("حدث خطأ في إرسال رابط إعادة التعيين");
-      } else {
-        toast.success("تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني");
-      }
-    } catch (error) {
-      console.error('Reset password error:', error);
-      toast.error("حدث خطأ في إرسال رابط إعادة التعيين");
-    }
+    toast.info("يرجى التواصل مع الدعم الفني لإعادة تعيين كلمة المرور");
   };
 
   // التحقق من صحة النموذج
@@ -420,12 +392,12 @@ export default function ManualLogin() {
             <p className={`text-lg ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
               {isLogin ? 
                 "سجل دخولك للوصول إلى لوحة التحكم وتحليلات السيو المتقدمة." :
-                selectedPlan ? `ستحصل على جميع مميزات الخطة ${PLAN_INFO[selectedPlan].name} فور إتمام التسجيل` : "أدخل عالم السيو باحتراف. نسخة مجانية، بدون بطاقة ائتمانية."
+                selectedPlan ? `ستحصل على جميع مميزات الخطة ${PLAN_INFO[selectedPlan].name} فور إتمام التسجيل` : "أدخل عالم السيو باحتراف. نظام نقاط مرن يتكيف مع احتياجاتك."
               }
             </p>
             
             {/* عرض معلومات الخطة المختارة - محدث للثيم */}
-            {selectedPlan && (
+            {selectedPlan && PLAN_INFO[selectedPlan] && (
               <div className={`rounded-xl p-4 border transition-colors duration-300 ${
                 isDark 
                   ? 'bg-gray-800/50 border-[#4BB8A9]/30' 
@@ -440,29 +412,14 @@ export default function ManualLogin() {
                     </p>
                   </div>
                 </div>
-                {selectedPlan === 'free' && (
-                  <ul className={`text-sm space-y-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                    <li>✅ 3 منتجات شهرياً</li>
-                    <li>✅ معاينة Google</li>
-                    <li>✅ مؤشرات سيو أساسية</li>
-                  </ul>
-                )}
-                {selectedPlan === 'pro' && (
-                  <ul className={`text-sm space-y-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                    <li>✅ 30 منتج شهرياً</li>
-                    <li>✅ مؤشرات سيو متقدمة</li>
-                    <li>✅ توليد تلقائي بالذكاء الاصطناعي</li>
-                    <li>✅ دعم فني مخصص</li>
-                  </ul>
-                )}
-                {selectedPlan === 'enterprise' && (
-                  <ul className={`text-sm space-y-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                    <li>✅ منتجات غير محدودة</li>
-                    <li>✅ تحليل شامل متقدم</li>
-                    <li>✅ دعم خاص ومتابعة مخصصة</li>
-                    <li>✅ تقارير مفصلة</li>
-                  </ul>
-                )}
+                <p className={`text-sm font-bold mb-2 ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>
+                  {PLAN_INFO[selectedPlan].points} شهرياً
+                </p>
+                <ul className={`text-sm space-y-1 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                  {PLAN_INFO[selectedPlan].features.slice(0, 4).map((feature, idx) => (
+                    <li key={idx}>✅ {feature}</li>
+                  ))}
+                </ul>
               </div>
             )}
             
@@ -511,7 +468,7 @@ export default function ManualLogin() {
             </div>
 
             <h2 className="text-xl font-bold mb-6 text-center text-green-600 dark:text-green-400">
-              {isLogin ? "أهلاً بك من جديد" : selectedPlan ? `التسجيل في الخطة ${PLAN_INFO[selectedPlan].name}` : "سجّل الآن وابدأ مجاناً"}
+              {isLogin ? "أهلاً بك من جديد" : selectedPlan ? `التسجيل في الخطة ${PLAN_INFO[selectedPlan].name}` : "سجّل الآن وابدأ تجربتك"}
             </h2>
 
             {/* زر Google - محدث للثيم */}
@@ -760,9 +717,9 @@ export default function ManualLogin() {
                   }`}
                   disabled={selectedPlan}
                 >
-                  <option value="free">الخطة المجانية</option>
-                  <option value="pro">الخطة المدفوعة - Pro</option>
-                  <option value="enterprise">الخطة المتقدمة - Enterprise</option>
+                  <option value="starter">الخطة البداية - 99 ريال/شهر</option>
+                  <option value="advanced">الخطة المتقدمة - 199 ريال/شهر</option>
+                  <option value="professional">الخطة الاحترافية - 399 ريال/شهر</option>
                 </select>
                 
                 {selectedPlan && (
@@ -781,8 +738,8 @@ export default function ManualLogin() {
                   }`}
                 >
                   {loading ? "🎉 جاري التسجيل..." : 
-                   selectedPlan && selectedPlan !== 'free' ? `💳 التسجيل في ${PLAN_INFO[selectedPlan].name}` : 
-                   "🚀 ابدأ الآن مجاناً"}
+                   selectedPlan ? `💳 التسجيل في ${PLAN_INFO[selectedPlan].name}` : 
+                   "🚀 ابدأ تجربتك الآن"}
                 </button>
               </form>
             )}

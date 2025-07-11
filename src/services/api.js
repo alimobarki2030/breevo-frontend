@@ -1,5 +1,5 @@
 // API Configuration
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+const API_BASE_URL = 'https://breevo-backend.onrender.com';
 
 // API endpoints
 export const API_ENDPOINTS = {
@@ -17,7 +17,7 @@ export const API_ENDPOINTS = {
 };
 
 // Helper function for API calls
-export const apiCall = aRefreshCw (endpoint, options = {}) => {
+export const apiCall = async (endpoint, options = {}) => {
   const defaultOptions = {
     headers: {
       'Content-Type': 'application/json',

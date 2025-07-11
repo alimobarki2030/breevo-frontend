@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authAPI } from '../config/api'; // المسار الصحيح
+import { authAPI } from '../config/api';
 
 const AuthContext = createContext({});
 
@@ -24,27 +24,28 @@ export const AuthProvider = ({ children }) => {
   const checkAuthState = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const storedUser = localStorage.getItem('user');
+      const token = localStorage.getItem('token') || 
+                   localStorage.getItem('access_token') || 
+                   localStorage.getItem('backend_token');
       
-      if (token && storedUser) {
+      if (token) {
         try {
-          const userData = JSON.parse(storedUser);
+          // التحقق من صحة التوكن مع Backend
+          const verifiedUser = await authAPI.verifyToken();
           
-          // محاولة التحقق من صحة التوكن مع الخادم
-          try {
-            const verifiedUser = await authAPI.verifyToken();
+          if (verifiedUser) {
             setUser(verifiedUser);
             setIsAuthenticated(true);
-          } catch (apiError) {
-            // إذا لم يكن الخادم متاحاً، استخدم البيانات المحلية
-            console.log('API not available, using local data');
-            setUser(userData);
-            setIsAuthenticated(true);
+            
+            // حفظ البيانات للتوافق
+            localStorage.setItem('user', JSON.stringify(verifiedUser));
+            if (verifiedUser.full_name || verifiedUser.name) {
+              localStorage.setItem('clientName', verifiedUser.full_name || verifiedUser.name);
+            }
           }
         } catch (error) {
-          // إذا كانت البيانات تالفة، نظف كل شيء
-          console.error('Corrupted user data:', error);
+          console.error('Token verification failed:', error);
+          // إذا فشل التحقق، نظف البيانات
           await logout();
         }
       } else {
@@ -62,18 +63,29 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (credentials) => {
     try {
+      // استخدام Backend API
       const data = await authAPI.login(credentials.email, credentials.password);
       
-      // البيانات محفوظة تلقائياً في authAPI.login
-      setUser(data.user);
-      setIsAuthenticated(true);
-      
-      // حفظ اسم العميل للتوافق مع النظام القديم
-      if (data.user.name) {
-        localStorage.setItem('clientName', data.user.name);
+      if (data.access_token) {
+        // حفظ التوكن في جميع الأماكن المحتملة
+        localStorage.setItem('token', data.access_token);
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('backend_token', data.access_token);
+        
+        // حفظ بيانات المستخدم
+        const userData = data.user || { email: credentials.email };
+        setUser(userData);
+        setIsAuthenticated(true);
+        
+        localStorage.setItem('user', JSON.stringify(userData));
+        if (userData.full_name || userData.name) {
+          localStorage.setItem('clientName', userData.full_name || userData.name);
+        }
+        
+        return { success: true, user: userData };
       }
       
-      return { success: true, user: data.user };
+      throw new Error('No access token received');
     } catch (error) {
       console.error('Login error:', error);
       return { 
@@ -85,18 +97,36 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const data = await authAPI.register(userData);
+      // استخدام Backend API للتسجيل
+      const data = await authAPI.register({
+        email: userData.email,
+        password: userData.password,
+        full_name: userData.fullName || userData.full_name,
+        phone: userData.phone,
+        store_url: userData.storeUrl || userData.store_url,
+        plan: userData.plan || 'free'
+      });
       
-      // البيانات محفوظة تلقائياً في authAPI.register
-      setUser(data.user);
-      setIsAuthenticated(true);
-      
-      // حفظ اسم العميل للتوافق مع النظام القديم
-      if (data.user.name) {
-        localStorage.setItem('clientName', data.user.name);
+      if (data.access_token) {
+        // حفظ التوكن
+        localStorage.setItem('token', data.access_token);
+        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('backend_token', data.access_token);
+        
+        // حفظ بيانات المستخدم
+        const user = data.user || { email: userData.email };
+        setUser(user);
+        setIsAuthenticated(true);
+        
+        localStorage.setItem('user', JSON.stringify(user));
+        if (user.full_name || user.name) {
+          localStorage.setItem('clientName', user.full_name || user.name);
+        }
+        
+        return { success: true, user };
       }
       
-      return { success: true, user: data.user };
+      throw new Error('No access token received');
     } catch (error) {
       console.error('Register error:', error);
       return { 
@@ -108,46 +138,42 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token') || 
+                   localStorage.getItem('access_token') || 
+                   localStorage.getItem('backend_token');
       
-      // محاولة إشعار الخادم بتسجيل الخروج
+      // محاولة إشعار Backend بتسجيل الخروج
       if (token) {
         try {
           await authAPI.logout();
-        } catch (apiError) {
-          // لا بأس إذا فشل إشعار الخادم
+        } catch (error) {
           console.log('Could not notify server of logout');
         }
       }
-
-      // تنظيف البيانات المحلية
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      localStorage.removeItem('clientName');
-      localStorage.removeItem('selected_site');
-      
-      setUser(null);
-      setIsAuthenticated(false);
-      
-      return { success: true };
     } catch (error) {
       console.error('Logout error:', error);
-      // حتى لو حدث خطأ، نظف البيانات المحلية
+    } finally {
+      // تنظيف البيانات المحلية في جميع الأحوال
       localStorage.removeItem('token');
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('backend_token');
       localStorage.removeItem('user');
       localStorage.removeItem('clientName');
       localStorage.removeItem('selected_site');
       
+      // تنظيف بيانات Supabase القديمة
+      localStorage.removeItem('sb-afkxzvmbrymdpvyfzyzn-auth-token');
+      
       setUser(null);
       setIsAuthenticated(false);
-      
-      return { success: false, error: error.message };
     }
   };
 
   const updateUser = async (updatedData) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('token') || 
+                   localStorage.getItem('access_token') || 
+                   localStorage.getItem('backend_token');
       
       if (!token) {
         throw new Error('لا يوجد توكن صالح');
@@ -171,9 +197,8 @@ export const AuthProvider = ({ children }) => {
         const updatedUser = { ...user, ...data.user };
         localStorage.setItem('user', JSON.stringify(updatedUser));
         
-        // تحديث اسم العميل للتوافق مع النظام القديم
-        if (updatedUser.name) {
-          localStorage.setItem('clientName', updatedUser.name);
+        if (updatedUser.full_name || updatedUser.name) {
+          localStorage.setItem('clientName', updatedUser.full_name || updatedUser.name);
         }
         
         setUser(updatedUser);

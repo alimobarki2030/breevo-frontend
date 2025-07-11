@@ -184,7 +184,7 @@ const generateWithCustomPrompt = async (variables) => {
   }
 };
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
+const API_BASE_URL = process.env.REACT_APP_API_URL || "https://breevo-backend.onrender.com";
 
 // Utility functions
 const truncateText = (text, maxLength) => {

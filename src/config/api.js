@@ -1,5 +1,5 @@
 // config/api.js - API Configuration محدث للعمل مع Render
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://breevo-backend.onrender.com';
+const API_BASE_URL = 'https://breevo-backend.onrender.com';
 
 // Export للاستخدام في components أخرى
 export { API_BASE_URL };
